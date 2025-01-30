@@ -6,87 +6,98 @@ import {
   CardContent,
   CircularProgress,
   TextField,
+  Typography,
 } from "@mui/material";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-interface Pokemon {
+import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+interface ResponseData {
   name: string;
-  url: string;
+  sprites: {
+    front_default: string | null;
+  };
+  height: number;
+  weight: number;
+  types: { type: { name: string } }[];
 }
 
-interface PokemonApiResponse {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: Pokemon[];
-}
 export default function Home() {
-  const queryClient = useQueryClient();
+  const { register, handleSubmit } = useForm<{ name: string }>();
+  const [searchValue, setSearchValue] = useState("");
 
-  // Queries
-  const { data } = useQuery({ queryKey: ["test"], queryFn: get });
-
-  async function get(): Promise<PokemonApiResponse> {
-    const response = await fetch("https://pokeapi.co/api/v2/pokemon");
+  const fetchData = async (): Promise<ResponseData> => {
+    if (!searchValue) throw new Error("Nenhum  valor de busca especificado");
+    const response = await fetch(
+      `https://pokeapi.co/api/v2/pokemon/${searchValue.toLowerCase()}`
+    );
     if (!response.ok) {
-      throw new Error("Network response was not ok");
+      throw new Error("Pokémon não encontrado");
     }
-    const json = await response.json();
-    return JSON.parse(JSON.stringify(json));
-  }
+    return response.json();
+  };
 
-  // Mutations
-  const mutation = useMutation({
-    mutationFn: post,
-    onSuccess: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ["test"] });
-    },
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["example", searchValue],
+    queryFn: fetchData,
   });
 
-  async function post() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({ id: Math.random(), title: "New Todo" });
-      }, 1000);
-    });
-  }
+  const onSubmit = (data: { name: string }) => {
+    if (!data.name.trim()) return;
+    setSearchValue(data.name);
+    refetch();
+  };
 
   return (
     <div>
-      <h1>SuperAdmin</h1>
-      <Box display={"flex"} flexDirection={"column"} alignItems={"center"}>
-        <TextField label="Material Text Field" />
-        <Box m={2}>
+      <h1>Super Admin</h1>
+      <Box display="flex" flexDirection="column" alignItems="center">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <TextField
+            label="Nome do Pokémon"
+            {...register("name", { required: true })}
+            sx={{ mb: 2, mr: 2 }}
+          />
           <Button
+            type="submit"
             variant="contained"
             color="primary"
-            onClick={() => mutation.mutate()}
-            sx={{ marginRight: 2 }}
+            size="large"
           >
-            Mutate
+            Procurar
           </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() =>
-              queryClient.invalidateQueries({ queryKey: ["test"] })
-            }
-          >
-            Invalidate Query
-          </Button>
-        </Box>
-        {data?.results ? (
-          <Box>
-            {data.results.map((item: Pokemon) => (
-              <Box key={item.name} p={1} m={1}>
-                <Card>
-                  <CardContent>{item.name}</CardContent>
-                </Card>
-              </Box>
-            ))}
-          </Box>
-        ) : (
-          <CircularProgress />
+        </form>
+        {isLoading && <CircularProgress sx={{ mt: 2 }} />}
+        {isError && (
+          <Typography color="error" mt={2}>
+            Resultado não encontrado!
+          </Typography>
+        )}
+        {data && data.sprites.front_default && (
+          <Card sx={{ mt: 2, p: 2 }}>
+            <CardContent>
+              <Typography variant="h5">{data.name?.toUpperCase()}</Typography>
+              {data.sprites.front_default ? (
+                <Image
+                  src={data.sprites.front_default}
+                  alt={data.name}
+                  width={100}
+                  height={100}
+                  unoptimized
+                />
+              ) : (
+                <Typography color="textSecondary">
+                  Imagem não disponível
+                </Typography>
+              )}
+              <Typography>Altura: {data.height / 10}m</Typography>
+              <Typography>Peso: {data.weight / 10}kg</Typography>
+              <Typography>
+                Tipos: {data.types?.map((t) => t.type.name).join(", ")}
+              </Typography>
+            </CardContent>
+          </Card>
         )}
       </Box>
     </div>
