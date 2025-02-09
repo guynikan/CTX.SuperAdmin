@@ -1,0 +1,11 @@
+{
+  "greeting": "Hello",
+  "farewell": "Goodbye",
+  "header": {
+    "title": "Super Admin em Inglês",
+    "subtitle": "subheading"
+  },
+  "footer": {
+    "copyright": "© 2025 All rights reserved"
+  }
+}
