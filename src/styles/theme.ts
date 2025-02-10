@@ -1,12 +1,11 @@
+
+
 export const theme = {
   colors: {
-    background: "#f8f8f8",
+    background: "#232323",
     primary: "#000",
     secondary: "#555",
     inputBackground: "#fff",
     inputBorder: "#ccc",
-  },
-  fonts: {
-    regular: "Arial, sans-serif",
-  },
+  }
 };

@@ -1,5 +1,18 @@
 "use client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "styled-components";
+
+import { theme } from "../styles/theme";
+import { GlobalStyle } from "../styles/global";
+
+import { DM_Sans } from "next/font/google";
+
+const appFont = DM_Sans({
+  weight: ["400", "600"],
+  subsets: ["latin"],
+  display: "swap",
+});
+
 
 export default function RootLayout({
   children,
@@ -11,8 +24,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <QueryClientProvider client={queryClient}>
-        <body>{children}</body>
+        <ThemeProvider theme={theme}>
+          <GlobalStyle />
+          <body className={appFont.className}>{children}</body>
+          </ThemeProvider>
       </QueryClientProvider>
+
     </html>
   );
 }
