@@ -9,7 +9,7 @@ export default function RootLayout({
   const queryClient = new QueryClient();
 
   return (
-    <html lang="en">
+    <html >
       <QueryClientProvider client={queryClient}>
         <body>{children}</body>
       </QueryClientProvider>

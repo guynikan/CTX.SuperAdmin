@@ -8,11 +8,8 @@ export default function useTranslation(namespace = 'common') {
   const [locale, setLocale] = useState('pt'); 
 
   useEffect(() => {
- 
-    if (typeof window !== 'undefined') {
       const pathLocale = window.location.pathname.split('/')[1];
-      setLocale(pathLocale || 'en');
-    }
+      setLocale(pathLocale || 'pt');
   }, []);
 
   useEffect(() => {
@@ -29,11 +26,14 @@ export default function useTranslation(namespace = 'common') {
     loadTranslations();
   }, [locale, namespace]);
 
-  const t = (key: string)  => {
-    const value = key.split('.').reduce((acc: any, part: string) => {
-      return acc && acc[part] !== undefined ? acc[part] : null;
-    }, translations);
-    return value ?? key;
+  const t = (key: string) => {
+    const keys = key.split('.');
+    let value: any = translations;
+    for (const k of keys) {
+      value = value ? value[k] : null;
+    }
+    return value || key;
   }
+
   return { t, locale, translations };
 }
