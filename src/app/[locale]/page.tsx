@@ -12,8 +12,9 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import useTranslation from '@/hooks/useTranslation';
 
+import { useContext } from "react";
+import { DictionaryContext } from "@/i18n/DictionaryProvider";
 
 interface ResponseData {
   name: string;
@@ -29,8 +30,8 @@ export default function Home() {
   const { register, handleSubmit } = useForm<{ name: string }>();
   const [searchValue, setSearchValue] = useState("");
  
-  const { t } = useTranslation('commom');
-  
+  const dictionary = useContext(DictionaryContext)?.dictionary;
+
   const fetchData = async (): Promise<ResponseData> => {
     if (!searchValue) throw new Error("Nenhum  valor de busca especificado");
     const response = await fetch(
@@ -55,7 +56,7 @@ export default function Home() {
 
   return (
     <div>
-     <h1>{t('header.title')}</h1>
+     <h1>{dictionary?.greeting}</h1>
       <Box display="flex" flexDirection="column" alignItems="center">
         <form onSubmit={handleSubmit(onSubmit)}>
           <TextField

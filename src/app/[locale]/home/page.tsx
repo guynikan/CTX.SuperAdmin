@@ -1,16 +1,16 @@
 "use client";
 
-import useTranslation from '@/hooks/useTranslation';
+import { useContext } from "react";
+import { DictionaryContext } from "@/i18n/DictionaryProvider";
 
 export default function LocalePageExample() {
-  const { t } = useTranslation('commom');
+  const { dictionary, locale } = useContext(DictionaryContext)!;
 
   return (
     <div>
-      <h1>{t('greeting')}</h1>
-      <h1>{t('header.title')}</h1>
-      <h2>{t('header.subtitle')}</h2>
-      <p>{t('footer.copyright')}</p>
+      <h1>{dictionary?.greeting}</h1>
+      <h1>{dictionary?.footer?.contact}</h1>
+      <p>Idioma atual: {locale}</p>
 
     </div>
   );

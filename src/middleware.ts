@@ -1,28 +1,25 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { getPreferredLocale } from "@/i18n/getPreferredLocale";
+import { i18n } from "@/i18n/config";
 
-export function middleware(req: NextRequest) {
-  const pathname = req.nextUrl.pathname;
-  const localeFromPath = pathname.split('/')[1];
+export function middleware(request: NextRequest) {
+  const locale = getPreferredLocale(request.headers);
+  const url = request.nextUrl.clone();
 
-  const locales = ['pt', 'en'];
+  // Pega o locale da URL
+  const pathnameLocale = url.pathname.split("/")[1] as string;
 
-  let locale = 'pt'; // Usar assim enquanto não pegamos o locale pela API
-  
-  if (locales.includes(localeFromPath)) {
-    locale = localeFromPath;
-  } 
-
-  if (!locales.includes(localeFromPath)) {
-    const url = req.nextUrl.clone();
-    url.pathname = `/${locale}${pathname}`;
-    return NextResponse.redirect(url);
+  // Se o locale na URL já for válido, não faz nada
+  if (i18n.locales.includes(pathnameLocale as any)) {
+    return NextResponse.next();
   }
 
-  return NextResponse.next();
+  // Redireciona para a URL com o locale correto
+  url.pathname = `/${locale}${url.pathname}`;
+  return NextResponse.redirect(url);
 }
 
-// Ref: https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)'],
+  matcher: "/((?!_next/static|_next/image|favicon.ico).*)",
 };
