@@ -42,7 +42,7 @@ const Providers = ({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <DictionaryProvider lang={lang}>
+      <DictionaryProvider namespace="common" lang={lang}>
         {children}
       </DictionaryProvider>
     </QueryClientProvider>

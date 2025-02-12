@@ -1,6 +1,7 @@
 "use client";
+
 import { createContext, useContext, useEffect, useState } from "react";
-import { getDictionary, Dictionary } from "./dictionary";
+import { getDictionary, Dictionary, dictionaries } from "./dictionary";
 import { i18n, Locale } from "./config";
 import { usePathname } from "next/navigation";
 
@@ -17,15 +18,31 @@ export function useDictionary() {
   return context;
 }
 
-export function DictionaryProvider({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname(); 
-  const locale = (pathname.split("/")[1] as Locale) || i18n.defaultLocale; 
+export function DictionaryProvider({
+  children,
+  namespace = "common", 
+}: {
+  children: React.ReactNode;
+  namespace?: keyof typeof dictionaries[Locale];
+}) {
+  const pathname = usePathname();
+  const locale = (pathname.split("/")[1] as Locale) || i18n.defaultLocale;
 
   const [dictionary, setDictionary] = useState<Dictionary | null>(null);
 
   useEffect(() => {
-    getDictionary(locale, "common").then(setDictionary);
-  }, [locale]);
+    async function loadDictionary() {
+      try {
+        const dict = await getDictionary(locale, namespace);
+        setDictionary(dict);
+      } catch (error) {
+        console.error(`Erro ao carregar o dicionário (${namespace}): ${error}`);
+        setDictionary({});
+      }
+    }
+
+    loadDictionary();
+  }, [locale, namespace]);
 
   if (!dictionary) return <p>Carregando traduções...</p>;
 
