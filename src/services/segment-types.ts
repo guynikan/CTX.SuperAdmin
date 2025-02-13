@@ -9,8 +9,7 @@ export interface SegmentType {
 
 export const getSegmentTypes = async (): Promise<SegmentType[] | undefined> => {
   return await httpService<SegmentType[]>({
-    //path: "/api/SegmentType",
-    path: "/46ae-2258-43f7-88e2", // Resposta temporaria com Dummyjson
+    path: "/api/SegmentType",
     options: { method: "GET" },
   });
 };
