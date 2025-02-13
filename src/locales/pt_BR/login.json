@@ -1,9 +1,0 @@
-{
-  "form": {
-    "title": "Entrar",
-    "cpf": "CPF",
-    "password": "Password",
-    "login_button": "Entrar",
-    "forgot_password": "Esqueci minha senha"
-  }
-}

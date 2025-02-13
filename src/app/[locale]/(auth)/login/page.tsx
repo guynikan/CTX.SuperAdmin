@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useState } from "react";
+import { useState } from "react";
 import {
   TextField,
   Button,
@@ -14,19 +14,19 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Grid from "@mui/material/Grid2"; 
 
-import { DictionaryContext } from "@/i18n/DictionaryProvider";
+import { useDictionary } from "@/i18n/DictionaryProvider";
 
 export default function LoginPage() {
 
-  const { dictionary } = useContext(DictionaryContext)!;
+  const { dictionary } = useDictionary();
 
-  const [cpf, setCpf] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert("cpf: " + cpf + " password:" + password);
+    alert("username: " + username + " password:" + password);
   };
 
   return (
@@ -46,31 +46,31 @@ export default function LoginPage() {
         <Container maxWidth="xs">
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <Typography variant="h5" fontWeight={600}>
-              {dictionary?.form?.title}
+              {dictionary?.signIn}
             </Typography>
 
             <Box component="form" onSubmit={handleSubmit} noValidate>
 
               <TextField
-                label="CPF"
+                label={dictionary?.username}
                 fullWidth
                 variant="outlined"
                 margin="normal"
-                value={cpf}
-                onChange={(e) => setCpf(e.target.value)}
-                placeholder="000.000.000-00"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder={dictionary?.username}
               />
-
       
               <TextField
-                label="Senha"
+                label={dictionary?.password}
                 type={showPassword ? "text" : "password"}
                 fullWidth
+                autoComplete="on"
                 variant="outlined"
                 margin="normal"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="******"
+                placeholder="*******"
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -81,7 +81,6 @@ export default function LoginPage() {
                   ),
                 }}
               />
-
 
               <Button
                 type="submit"
@@ -95,13 +94,13 @@ export default function LoginPage() {
                   "&:hover": { opacity: 0.9 },
                 }}
               >
-                {dictionary?.form?.login_button} →
+                {dictionary?.signIn} →
               </Button>
 
               {/* Esqueci a Senha */}
               <Typography variant="body2" sx={{ mt: 3, color:'#434343', textAlign: "center" }}>
-                <Link href="/forgot-password" underline="hover" fontWeight={600}>
-                  {dictionary?.form?.forgot_password}
+                <Link href="/esqueci-minha-senha" underline="hover" fontWeight={600}>
+                  {dictionary?.forgot_password}
                 </Link>
               </Typography>
 
