@@ -15,19 +15,40 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Grid from "@mui/material/Grid2"; 
 
 import { useDictionary } from "@/i18n/DictionaryProvider";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
 
 export default function LoginPage() {
 
   const { dictionary } = useDictionary();
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert("username: " + username + " password:" + password);
-  };
+  const schema = yup.object({
+    username: yup
+      .string()
+      .required(dictionary?.required),
+    password: yup
+      .string()
+      .required(dictionary?.required)
+  }).required();
+
+  type FormValues = yup.InferType<typeof schema>;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>({
+    resolver: yupResolver(schema),
+    mode: "onTouched",
+  });
+
+    const onSubmit = (data: FormValues) => {
+      console.log({data})
+    };
 
   return (
 
@@ -49,27 +70,29 @@ export default function LoginPage() {
               {dictionary?.signIn}
             </Typography>
 
-            <Box component="form" onSubmit={handleSubmit} noValidate>
+            <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
 
               <TextField
+                {...register("username")}
+                error={!!errors.username}
+                helperText={errors.username?.message}
                 label={dictionary?.username}
                 fullWidth
                 variant="outlined"
                 margin="normal"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
                 placeholder={dictionary?.username}
               />
       
               <TextField
+                {...register("password")}
+                error={!!errors.password}
+                helperText={errors.password?.message}
                 label={dictionary?.password}
                 type={showPassword ? "text" : "password"}
                 fullWidth
                 autoComplete="on"
                 variant="outlined"
-                margin="normal"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                margin="normal"           
                 placeholder="*******"
                 InputProps={{
                   endAdornment: (
@@ -108,9 +131,6 @@ export default function LoginPage() {
           </Box>
         </Container>
       </Grid>
-     
     </Grid>
-
-   
   );
 }
