@@ -37,8 +37,8 @@ export default function Home() {
       <Container
         sx={{
           display: "flex",
-          justifyContent:'space-around',
-          flexDirection: "row",
+          flexWrap: 'wrap',
+          justifyContent:'center',
           gap: 2,
           alignItems: "center",
         }}
