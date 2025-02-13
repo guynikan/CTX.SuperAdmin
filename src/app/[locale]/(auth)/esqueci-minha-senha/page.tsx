@@ -8,6 +8,6 @@ export default function ForgotPasswordPage(){
   const { dictionary } = useDictionary();
 
   return(
-    <h1>{dictionary?.form.forgot_password}</h1>
+    <h1>{dictionary?.forgot_password}</h1>
   )
 }
