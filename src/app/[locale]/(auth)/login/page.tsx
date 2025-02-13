@@ -97,7 +97,7 @@ export default function LoginPage() {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      <IconButton data-testid="show-password-button"  onClick={() => setShowPassword(!showPassword)} edge="end">
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -106,6 +106,7 @@ export default function LoginPage() {
               />
 
               <Button
+                data-testid="signin-button"
                 type="submit"
                 fullWidth
                 variant="contained"

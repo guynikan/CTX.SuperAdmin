@@ -1,3 +1,4 @@
+import { i18n } from "./config";
 import type { Locale } from "./config";
 
 export const dictionaries = {
