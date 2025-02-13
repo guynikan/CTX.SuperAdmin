@@ -1,19 +1,31 @@
 "use client";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { DictionaryProvider } from "@/i18n/DictionaryProvider";
-import { getPreferredLocale } from "@/i18n/getPreferredLocale";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const queryClient = new QueryClient();
+import { getPreferredLocale } from "@/i18n/getPreferredLocale";
+import { GlobalStyle } from "../styles/global";
+import { DM_Sans } from "next/font/google";
+import Providers from "./providers";
+
+const appFont = DM_Sans({
+  weight: ["400", "600"],
+  subsets: ["latin"],
+  display: "swap",
+});
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   const locale = getPreferredLocale();
 
   return (
-    <html lang={locale}>
-      <QueryClientProvider client={queryClient}>
-        <DictionaryProvider locale={locale}>
-          <body>{children}</body>
-        </DictionaryProvider>
-      </QueryClientProvider>
+    <html>
+     <body className={appFont.className}>
+        <Providers lang={locale}>
+          <GlobalStyle />
+          {children}
+        </Providers>
+      </body>
     </html>
   );
 }
