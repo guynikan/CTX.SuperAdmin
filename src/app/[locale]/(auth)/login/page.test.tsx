@@ -2,7 +2,6 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import LoginPage from "./page";
 import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 
-
 jest.mock("next/navigation", () => ({
   usePathname: jest.fn(() => "/pt_BR/login"),
 }));
@@ -21,15 +20,13 @@ const renderWithProvider = async () => {
       <LoginPage />
     </DictionaryProvider>
   );
-
-  // 🔥 Aguarda o carregamento das traduções antes de prosseguir
   await waitFor(() => {
     expect(screen.queryByText("Carregando traduções...")).not.toBeInTheDocument();
   });
 };
 
 describe("LoginPage", () => {
-  it("renderiza a página corretamente", async () => {
+  it("render page correctly", async () => {
     await renderWithProvider();
     
     expect(screen.getByText(mockDictionary.signIn)).toBeInTheDocument();
@@ -38,7 +35,7 @@ describe("LoginPage", () => {
     expect(screen.getByText(mockDictionary.forgot_password)).toBeInTheDocument();
   });
 
-  it("mostra mensagens de erro ao tentar submeter sem preencher os campos", async () => {
+  it("shows error messages when trying to submit without filling the fields", async () => {
     await renderWithProvider();
     fireEvent.click(screen.getByTestId('signin-button'));
     await waitFor(() => {
@@ -46,7 +43,7 @@ describe("LoginPage", () => {
     });
   });
 
-  it("não deve permitir o envio do formulário se houver erros de validação", async () => {
+  it("should not allow form submission if there are validation errors", async () => {
     await renderWithProvider();
     
     const submitButton = screen.getByTestId("signin-button");
@@ -57,7 +54,7 @@ describe("LoginPage", () => {
     });
   });
 
-  it("preenche os campos corretamente", async () => {
+  it("fill in the fields correctly", async () => {
     await renderWithProvider();
 
     const username = screen.getByLabelText(mockDictionary.username);
@@ -70,7 +67,7 @@ describe("LoginPage", () => {
     expect(passwordInput).toHaveValue("senha123");
   });
 
-  it("exibe e oculta a senha ao clicar no ícone", async () => {
+  it("shows and hides password when clicking on icon", async () => {
     await renderWithProvider();
 
     const passwordInput = screen.getByLabelText(mockDictionary.password);
@@ -84,7 +81,7 @@ describe("LoginPage", () => {
     expect(passwordInput).toHaveAttribute("type", "password");
   });
 
-  it("submete o formulário corretamente com valores válidos", async () => {
+  it("submit the form correctly with valid values", async () => {
     await renderWithProvider();
 
     const username = screen.getByLabelText(mockDictionary.username);
