@@ -1,11 +1,5 @@
 import { httpService } from "@/services/http";
-
-export interface SegmentType {
-  id: string;
-  name: string;
-  description: string;
-  priority: string;
-}
+import { SegmentType } from "@/types/segment-type";
 
 export const getSegmentTypes = async (): Promise<SegmentType[] | undefined> => {
   return await httpService<SegmentType[]>({
