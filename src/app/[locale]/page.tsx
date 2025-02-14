@@ -1,110 +1,69 @@
 "use client";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
-import Image from "next/image";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Box, Button, Container, Typography } from "@mui/material";
+import Link from "next/link";
 
-import { useContext } from "react";
-import { DictionaryContext } from "@/i18n/DictionaryProvider";
+const links = [
+  { name: "Login ✅ ", href: "/login" },
+  { name: "Segment Types ✅ ", href: "/segment-types" },
+  { name: "Segment Values ⌛", href: "/" },
+  { name: "Configuration Types ⌛", href: "/" },
+  { name: "Configuration Values ⌛", href: "/" },
 
-interface ResponseData {
-  name: string;
-  sprites: {
-    front_default: string | null;
-  };
-  height: number;
-  weight: number;
-  types: { type: { name: string } }[];
-}
+];
 
 export default function Home() {
-  const { register, handleSubmit } = useForm<{ name: string }>();
-  const [searchValue, setSearchValue] = useState("");
- 
-  const dictionary = useContext(DictionaryContext)?.dictionary;
-
-  const fetchData = async (): Promise<ResponseData> => {
-    if (!searchValue) throw new Error("Nenhum  valor de busca especificado");
-    const response = await fetch(
-      `https://pokeapi.co/api/v2/pokemon/${searchValue.toLowerCase()}`
-    );
-    if (!response.ok) {
-      throw new Error("Pokémon não encontrado");
-    }
-    return response.json();
-  };
-
-  const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["example", searchValue],
-    queryFn: fetchData,
-  });
-
-  const onSubmit = (data: { name: string }) => {
-    if (!data.name.trim()) return;
-    setSearchValue(data.name);
-    refetch();
-  };
-
   return (
-    <div>
-     <h1>{dictionary?.greeting}</h1>
-      <Box display="flex" flexDirection="column" alignItems="center">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <TextField
-            label="Nome do Pokémon"
-            {...register("name", { required: true })}
-            sx={{ mb: 2, mr: 2 }}
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            size="large"
-          >
-            Procurar
-          </Button>
-        </form>
-        {isLoading && <CircularProgress sx={{ mt: 2 }} />}
-        {isError && (
-          <Typography color="error" mt={2}>
-            Resultado não encontrado!
-          </Typography>
-        )}
-        {data && data.sprites.front_default && (
-          <Card sx={{ mt: 2, p: 2 }}>
-            <CardContent>
-              <Typography variant="h5">{data.name?.toUpperCase()}</Typography>
-              {data.sprites.front_default ? (
-                <Image
-                  src={data.sprites.front_default}
-                  alt={data.name}
-                  width={100}
-                  height={100}
-                  unoptimized
-                />
-              ) : (
-                <Typography color="textSecondary">
-                  Imagem não disponível
-                </Typography>
-              )}
-              <Typography>Altura: {data.height / 10}m</Typography>
-              <Typography>Peso: {data.weight / 10}kg</Typography>
-              <Typography>
-                Tipos: {data.types?.map((t) => t.type.name).join(", ")}
-              </Typography>
-            </CardContent>
-          </Card>
-        )}
-      </Box>
-    </div>
+    <Box
+      sx={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(to bottom, #000, #333)",
+        color: "white",
+        textAlign: "center",
+      }}
+    >
+      <Typography
+        variant="h2"
+        fontWeight="bold"
+        letterSpacing={2}
+        sx={{ mb: 4 }}
+      >
+        Super Admin NextGen
+      </Typography>
+
+      <Container
+        sx={{
+          display: "flex",
+          flexWrap: 'wrap',
+          justifyContent:'center',
+          gap: 2,
+          alignItems: "center",
+        }}
+      >
+        {links.map((link) => (
+          <Link key={link.name} href={link.href} passHref>
+            <Button
+              variant="outlined"
+              sx={{
+                fontSize: "14px",
+                borderRadius: "8px",
+                color: "white",
+                borderColor: "white",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  backgroundColor: "white",
+                  color: "black",
+                },
+              }}
+            >
+              {link.name}
+            </Button>
+          </Link>
+        ))}
+      </Container>
+    </Box>
   );
 }
