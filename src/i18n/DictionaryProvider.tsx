@@ -28,7 +28,7 @@ export function DictionaryProvider({
   const pathname = usePathname();
   const locale = (pathname.split("/")[1] as Locale) || i18n.defaultLocale;
 
-  const [dictionary, setDictionary] = useState<Dictionary | null>(null);
+  const [dictionary, setDictionary] = useState<Dictionary>();
 
   useEffect(() => {
     async function loadDictionary() {

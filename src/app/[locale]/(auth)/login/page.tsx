@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useState } from "react";
+import { useState } from "react";
 import {
   TextField,
   Button,
@@ -14,20 +14,41 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Grid from "@mui/material/Grid2"; 
 
-import { DictionaryContext } from "@/i18n/DictionaryProvider";
+import { useDictionary } from "@/i18n/DictionaryProvider";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
 
 export default function LoginPage() {
 
-  const { dictionary } = useContext(DictionaryContext)!;
+  const { dictionary } = useDictionary();
 
-  const [cpf, setCpf] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert("cpf: " + cpf + " password:" + password);
-  };
+  const schema = yup.object({
+    username: yup
+      .string()
+      .required(dictionary?.required),
+    password: yup
+      .string()
+      .required(dictionary?.required)
+  }).required();
+
+  type FormValues = yup.InferType<typeof schema>;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>({
+    resolver: yupResolver(schema),
+    mode: "onTouched",
+  });
+
+    const onSubmit = (data: FormValues) => {
+      console.log({data})
+    };
 
   return (
 
@@ -46,35 +67,37 @@ export default function LoginPage() {
         <Container maxWidth="xs">
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <Typography variant="h5" fontWeight={600}>
-              {dictionary?.form?.title}
+              {dictionary?.signIn}
             </Typography>
 
-            <Box component="form" onSubmit={handleSubmit} noValidate>
+            <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
 
               <TextField
-                label="CPF"
+                {...register("username")}
+                error={!!errors.username}
+                helperText={errors.username?.message}
+                label={dictionary?.username}
                 fullWidth
                 variant="outlined"
                 margin="normal"
-                value={cpf}
-                onChange={(e) => setCpf(e.target.value)}
-                placeholder="000.000.000-00"
+                placeholder={dictionary?.username}
               />
-
       
               <TextField
-                label="Senha"
+                {...register("password")}
+                error={!!errors.password}
+                helperText={errors.password?.message}
+                label={dictionary?.password}
                 type={showPassword ? "text" : "password"}
                 fullWidth
+                autoComplete="on"
                 variant="outlined"
-                margin="normal"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="******"
+                margin="normal"           
+                placeholder="*******"
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      <IconButton data-testid="show-password-button"  onClick={() => setShowPassword(!showPassword)} edge="end">
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -82,8 +105,8 @@ export default function LoginPage() {
                 }}
               />
 
-
               <Button
+                data-testid="signin-button"
                 type="submit"
                 fullWidth
                 variant="contained"
@@ -95,13 +118,13 @@ export default function LoginPage() {
                   "&:hover": { opacity: 0.9 },
                 }}
               >
-                {dictionary?.form?.login_button} →
+                {dictionary?.signIn} →
               </Button>
 
               {/* Esqueci a Senha */}
               <Typography variant="body2" sx={{ mt: 3, color:'#434343', textAlign: "center" }}>
-                <Link href="/forgot-password" underline="hover" fontWeight={600}>
-                  {dictionary?.form?.forgot_password}
+                <Link href="/esqueci-minha-senha" underline="hover" fontWeight={600}>
+                  {dictionary?.forgot_password}
                 </Link>
               </Typography>
 
@@ -109,9 +132,6 @@ export default function LoginPage() {
           </Box>
         </Container>
       </Grid>
-     
     </Grid>
-
-   
   );
 }
