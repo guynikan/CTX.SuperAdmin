@@ -9,7 +9,7 @@ const links = [
   { name: "Login ✅", href: ROUTES.AUTH.LOGIN },
   { name: "Segment Types ✅", href: ROUTES.SEGMENTS.TYPES },
   { name: "Segment Values ⌛", href: ROUTES.SEGMENTS.VALUES },
-  { name: "Configuration Types ⌛", href: ROUTES.CONFIGURATION.TYPES },
+  { name: "Configuration Types ⌛", href: ROUTES.CONFIGURATION.RULES },
   { name: "Configuration Values ⌛", href: ROUTES.CONFIGURATION.VALUES },
 ];
 

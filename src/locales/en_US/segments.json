@@ -1,6 +1,6 @@
 {
-  "title": "All entities",
-  "registerButton": "Register entity",
+  "title": "All Segment types",
+  "registerButton": "Register Segment Type",
   "loading": "🔄 Loading segment types...",
   "errorTitle": "⚠️ Error loading segment types.",
   "errorMessage": "Please try again later.",
