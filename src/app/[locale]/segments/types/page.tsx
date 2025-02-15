@@ -49,8 +49,8 @@ export default function SegmentTypesPage() {
   const { locale, dictionary } = useDictionary();
 
   const columns: GridColDef[] = [
-    { field: "name", headerName: dictionary?.table.name, width: 200 },
-    { field: "description", headerName: dictionary?.table.description, width: 250 },
+    { field: "name", headerName: dictionary?.table.name, width: 320 },
+    { field: "description", headerName: dictionary?.table.description, width: 350 },
     { field: "priority", headerName: dictionary?.table.priority, width: 150 },
     {
       field: "actions",
@@ -82,7 +82,7 @@ export default function SegmentTypesPage() {
     );
 
   return (
-    <Box sx={{ width: "100%", maxWidth: "1200px", margin: "auto", padding: 2 }}>
+    <Box sx={{ width: "100%", maxWidth: "1000px", margin: "auto", padding: 2 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
         <Typography variant="h6" fontWeight="bold">
 
@@ -98,8 +98,7 @@ export default function SegmentTypesPage() {
           localeText={localeMap[locale].components.MuiDataGrid.defaultProps.localeText}
           rows={segmentTypes || []}
           columns={columns}
-          pageSizeOptions={[5, 10, 20, 100]}
-          checkboxSelection
+          pageSizeOptions={[5, 10, 20]}
         />
       </Box>
     </Box>
