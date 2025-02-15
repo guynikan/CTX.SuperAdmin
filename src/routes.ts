@@ -7,7 +7,7 @@ export const ROUTES = {
   },
   CONFIGURATION: {
     ROOT: "/configuration",
-    TYPES: "/configuration/types",
+    RULES: "/configuration/rules",
     VALUES: "/configuration/values",
   },
   SEGMENTS: {

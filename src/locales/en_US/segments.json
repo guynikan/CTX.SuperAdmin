@@ -1,0 +1,14 @@
+{
+  "title": "All entities",
+  "registerButton": "Register entity",
+  "loading": "🔄 Loading segment types...",
+  "errorTitle": "⚠️ Error loading segment types.",
+  "errorMessage": "Please try again later.",
+  "table": {
+    "name": "Name",
+    "description": "Description",
+    "priority": "Priority",
+    "actions": "Actions"
+  }
+}
+

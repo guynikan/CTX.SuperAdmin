@@ -1,14 +1,16 @@
 "use client";
+
 import { Box, Button, Container, Typography } from "@mui/material";
 import Link from "next/link";
 
-const links = [
-  { name: "Login ✅ ", href: "/login" },
-  { name: "Segment Types ✅ ", href: "/segment-types" },
-  { name: "Segment Values ⌛", href: "/" },
-  { name: "Configuration Types ⌛", href: "/" },
-  { name: "Configuration Values ⌛", href: "/" },
+import { ROUTES } from "@/routes";
 
+const links = [
+  { name: "Login ✅", href: ROUTES.AUTH.LOGIN },
+  { name: "Segment Types ✅", href: ROUTES.SEGMENTS.TYPES },
+  { name: "Segment Values ⌛", href: ROUTES.SEGMENTS.VALUES },
+  { name: "Configuration Types ⌛", href: ROUTES.CONFIGURATION.TYPES },
+  { name: "Configuration Values ⌛", href: ROUTES.CONFIGURATION.VALUES },
 ];
 
 export default function Home() {
