@@ -3,7 +3,7 @@ export const ROUTES = {
   AUTH: {
     ROOT: "/auth",
     LOGIN: "/auth/login",
-    FORGOT_PASSWORD: "/auth/forgot",
+    FORGOT_PASSWORD: "/auth/forgot-password",
   },
   CONFIGURATION: {
     ROOT: "/configuration",

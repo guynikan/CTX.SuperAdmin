@@ -5,11 +5,11 @@ import {
   updateSegmentValue,
   deleteSegmentValue,
   getSegmentValuesByType
-} from "./segment-values";
-import { httpService } from "./http";
+} from "./values";
+import { httpService } from "@/services/http";
 import { CreateSegmentValue, SegmentValue } from "@/types/segments";
 
-jest.mock("../services/http", () => ({
+jest.mock("@/services/http", () => ({
   httpService: jest.fn(),
 }));
 

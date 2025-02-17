@@ -5,7 +5,7 @@ import {
   createSegmentType,
   updateSegmentType,
   deleteSegmentType,
-} from "@/services/segment-types";
+} from "@/services/segments/types";
 
 import { CreateSegmentType, SegmentType } from "@/types/segments";
 

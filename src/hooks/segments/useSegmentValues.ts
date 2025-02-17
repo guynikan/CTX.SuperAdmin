@@ -6,7 +6,7 @@ import {
   createSegmentValue,
   updateSegmentValue,
   deleteSegmentValue,
-} from "@/services/segment-values";
+} from "@/services/segments/values";
 import { CreateSegmentValue, SegmentValue } from "@/types/segments";
 
 export function useSegmentValues() {

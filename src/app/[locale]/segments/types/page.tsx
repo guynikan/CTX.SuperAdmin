@@ -1,7 +1,7 @@
 "use client";
 
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useSegmentTypes, useDeleteSegmentType, useUpdateSegmentType } from "@/hooks/useSegmentTypes";
+import { useSegmentTypes, useDeleteSegmentType, useUpdateSegmentType } from "@/hooks/segments/useSegmentTypes";
 import { Box, Button, Typography, IconButton } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
 import { useDictionary } from "@/i18n/DictionaryProvider";
