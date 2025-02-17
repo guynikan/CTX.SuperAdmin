@@ -1,11 +1,17 @@
 {
-  "greeting": "Olá",
-  "farewell": "Adeus",
   "header": {
     "title": "Super Admin em Português",
     "subtitle": "Subtítulo"
   },
-  "footer": {
-    "copyright": "© 2025 Todos os direitos reservados"
+  "buttons": {
+    "delete": "Delete",
+    "edit": "Edit"
+  },
+  "pagination": {
+    "show": "Show",
+    "first": "First",
+    "previous": "Previous",
+    "next": "Next",
+    "last": "Last"
   }
 }

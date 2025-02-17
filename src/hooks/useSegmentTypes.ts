@@ -22,7 +22,7 @@ export function useSegmentTypeById(id: string) {
   return useQuery({
     queryKey: ["segment-type", id],
     queryFn: () => getSegmentTypeById(id),
-    enabled: !!id, // Só busca se `id` for válido
+    enabled: !!id, 
   });
 }
 

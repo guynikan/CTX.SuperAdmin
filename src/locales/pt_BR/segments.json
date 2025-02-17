@@ -1,0 +1,13 @@
+{
+  "title": "Todos os Tipos de Segmentos",
+  "registerButton": "Cadastrar Tipo de Segmento",
+  "loading": "🔄 Carregando Tipos de Segmento...",
+  "errorTitle": "⚠️ Erro ao carregar os Tipos de Segmento.",
+  "errorMessage": "Tente novamente mais tarde.",
+  "table": {
+    "name": "Nome",
+    "description": "Descrição",
+    "priority": "Prioridade",
+    "actions": "Ações"
+  }
+}

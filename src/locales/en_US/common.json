@@ -1,11 +1,17 @@
 {
-  "greeting": "Hello",
-  "farewell": "Goodbye",
   "header": {
     "title": "Super Admin em Inglês",
     "subtitle": "subheading"
   },
-  "footer": {
-    "copyright": "© 2025 All rights reserved"
+  "buttons": {
+    "delete": "Excluir",
+    "edit": "Editar"
+  },
+  "pagination": {
+    "show": "Exibir",
+    "first": "Primeira",
+    "previous": "Anterior",
+    "next": "Próxima",
+    "last": "Última"
   }
 }
