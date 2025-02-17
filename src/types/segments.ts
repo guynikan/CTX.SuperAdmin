@@ -21,6 +21,6 @@ export type SegmentValue = {
   segmentType: string;
 };
 
-export type CreateSegmentValue = Pick<SegmentValue, "segmentTypeId" | "value" | "displayName" |  description>;
+export type CreateSegmentValue = Pick<SegmentValue, "segmentTypeId" | "value" | "displayName" | "description">;
 
 export type CreateSegmentType = Pick<SegmentType, "name" | "description" | "priority">;
