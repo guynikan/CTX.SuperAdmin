@@ -5,8 +5,10 @@ import {
   createSegmentType,
   updateSegmentType,
   deleteSegmentType,
-  SegmentType,
 } from "@/services/segment-types";
+
+import { SegmentType } from "@/types/segments";
+
 
 export function useSegmentTypes() {
   return useQuery({

@@ -6,10 +6,10 @@ export type SegmentType = {
   description: string;
   priority: number;
   isActive: boolean;
-  segmentValues?: SegmentValueType[];
+  segmentValues?: SegmentValue[];
 };
 
-export type SegmentValueType = {
+export type SegmentValue = {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -20,5 +20,7 @@ export type SegmentValueType = {
   isActive: boolean;
   segmentType: string;
 };
+
+export type CreateSegmentValue = Pick<SegmentValue, "segmentTypeId" | "value" | "displayName" |  description>;
 
 export type CreateSegmentType = Pick<SegmentType, "name" | "description" | "priority">;
