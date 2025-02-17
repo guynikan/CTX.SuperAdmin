@@ -17,6 +17,8 @@ const DeleteButton = ({ id }: { id: string }) => {
   return (
     <IconButton
       color="error"
+      aria-label="delete"
+      data-testid="delete-button"
       size="small"
       onClick={() => {alert('delete for:' + id)}}
       disabled={deleteSegmentType.isPending}
@@ -35,6 +37,9 @@ const EditButton = ({ id }: { id: string }) => {
     <IconButton
       color="primary"
       size="small"
+      aria-label="edit"
+      data-testid="edit-button"
+
       onClick={() => { alert( "edit for:" + id )}}
       disabled={editSegmentType.isPending}
     >
@@ -98,7 +103,7 @@ export default function SegmentTypesPage() {
           localeText={localeMap[locale].components.MuiDataGrid.defaultProps.localeText}
           rows={segmentTypes || []}
           columns={columns}
-          pageSizeOptions={[5, 10, 20]}
+          pageSizeOptions={[5, 10, 100]}
         />
       </Box>
     </Box>
