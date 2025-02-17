@@ -1,5 +1,5 @@
 import { httpService } from "@/services/http";
-import { SegmentType } from "@/types/segment-type";
+import { CreateSegmentType, SegmentType } from "@/types/segments";
 
 export const getSegmentTypes = async (): Promise<SegmentType[] | undefined> => {
   return await httpService<SegmentType[]>({
@@ -15,7 +15,7 @@ export const getSegmentTypeById = async (id: string): Promise<SegmentType | unde
   });
 };
 
-export const createSegmentType = async (segmentType: Omit<SegmentType, "id">): Promise<SegmentType | undefined> => {
+export const createSegmentType = async (segmentType: CreateSegmentType): Promise<SegmentType | undefined> => {
   return await httpService<SegmentType>({
     path: "/api/SegmentType",
     options: {

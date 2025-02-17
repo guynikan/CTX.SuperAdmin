@@ -11,14 +11,13 @@ export type SegmentType = {
 
 export type SegmentValue = {
   id: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
   segmentTypeId: string;
   value: string;
   displayName: string;
   description: string;
   isActive: boolean;
-  segmentType: string;
 };
 
 export type CreateSegmentValue = Pick<SegmentValue, "segmentTypeId" | "value" | "displayName" | "description">;

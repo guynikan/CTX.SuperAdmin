@@ -7,7 +7,7 @@ import {
   updateSegmentValue,
   deleteSegmentValue,
 } from "@/services/segment-values";
-import { SegmentValue } from "@/types/segments";
+import { CreateSegmentValue, SegmentValue } from "@/types/segments";
 
 export function useSegmentValues() {
   return useQuery({
@@ -38,7 +38,7 @@ export function useSegmentValuesByType(segmentTypeId: string) {
 export function useCreateSegmentValue() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: createSegmentValue,
+    mutationFn: (data: CreateSegmentValue) => createSegmentValue(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["segment-values"] });
     },

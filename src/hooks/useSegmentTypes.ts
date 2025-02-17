@@ -7,7 +7,7 @@ import {
   deleteSegmentType,
 } from "@/services/segment-types";
 
-import { SegmentType } from "@/types/segments";
+import { CreateSegmentType, SegmentType } from "@/types/segments";
 
 
 export function useSegmentTypes() {
@@ -31,7 +31,7 @@ export function useSegmentTypeById(id: string) {
 export function useCreateSegmentType() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: createSegmentType,
+    mutationFn: (data: CreateSegmentType) => createSegmentType(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["segment-types"] });
     },
