@@ -7,6 +7,10 @@ import { Delete, Edit } from "@mui/icons-material";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 import { ptBR, enUS } from "@mui/x-data-grid/locales";
 
+import CreateModal from "./components/CreateModal"; 
+
+import { useState } from "react";
+
 const localeMap = {
   pt_BR: ptBR,
   en_US: enUS,
@@ -39,7 +43,6 @@ const EditButton = ({ id }: { id: string }) => {
       size="small"
       aria-label="edit"
       data-testid="edit-button"
-
       onClick={() => { alert( "edit for:" + id )}}
       disabled={editSegmentType.isPending}
     >
@@ -52,6 +55,9 @@ export default function SegmentTypesPage() {
   const { data: segmentTypes, isLoading, error } = useSegmentTypes();
 
   const { locale, dictionary } = useDictionary();
+
+  const [open, setOpen] = useState(false);
+
 
   const columns: GridColDef[] = [
     { field: "name", headerName: dictionary?.table.name, width: 320 },
@@ -93,7 +99,7 @@ export default function SegmentTypesPage() {
 
         {dictionary?.title} 
         </Typography>
-        <Button variant="contained" color="primary" size="small">
+        <Button onClick={() => setOpen(true)} variant="contained" color="primary" size="small">
         {dictionary?.registerButton} 
         </Button>
       </Box>
@@ -106,6 +112,9 @@ export default function SegmentTypesPage() {
           pageSizeOptions={[5, 10, 100]}
         />
       </Box>
+
+      <CreateModal open={open} onClose={() => setOpen(false)} />
+
     </Box>
   );
 }

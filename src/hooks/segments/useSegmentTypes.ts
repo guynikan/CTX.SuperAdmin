@@ -1,4 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+
 import {
   getSegmentTypes,
   getSegmentTypeById,
@@ -28,16 +30,22 @@ export function useSegmentTypeById(id: string) {
   });
 }
 
+
 export function useCreateSegmentType() {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (data: CreateSegmentType) => createSegmentType(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["segment-types"] });
+      toast.success("Segmento criado com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao criar segmento. Tente novamente.");
+      console.error("Erro ao criar segmento:", error);
     },
   });
 }
-
 
 export function useUpdateSegmentType() {
   const queryClient = useQueryClient();
