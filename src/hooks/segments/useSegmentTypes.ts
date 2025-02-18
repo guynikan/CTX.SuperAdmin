@@ -49,14 +49,20 @@ export function useCreateSegmentType() {
 
 export function useUpdateSegmentType() {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<SegmentType> }) => updateSegmentType(id, data),
-    onSuccess: (_, { id }) => { 
-      queryClient.invalidateQueries({ queryKey: ["segment-type", id] }); 
+    mutationFn: (data: { id: string; values: Partial<SegmentType> }) => updateSegmentType(data.id, data.values),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["segment-types"] });
+      toast.success("Segmento atualizado com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao atualizar segmento. Tente novamente.");
+      console.error("Erro ao atualizar segmento:", error);
     },
   });
 }
+
 
 export function useDeleteSegmentType() {
   const queryClient = useQueryClient();

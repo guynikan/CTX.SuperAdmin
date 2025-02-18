@@ -1,15 +1,18 @@
 "use client";
 
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useSegmentTypes, useDeleteSegmentType, useUpdateSegmentType } from "@/hooks/segments/useSegmentTypes";
+import { useSegmentTypes, useDeleteSegmentType } from "@/hooks/segments/useSegmentTypes";
 import { Box, Button, Typography, IconButton } from "@mui/material";
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete } from "@mui/icons-material";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 import { ptBR, enUS } from "@mui/x-data-grid/locales";
 
-import CreateModal from "./components/CreateModal"; 
-
 import { useState } from "react";
+
+import CreateModal from "./components/CreateModal"; 
+import EditModal from "./components/EditModal";
+import { SegmentType } from "@/types/segments";
+import EditButton from "./components/EditButton";
 
 const localeMap = {
   pt_BR: ptBR,
@@ -32,31 +35,21 @@ const DeleteButton = ({ id }: { id: string }) => {
   );
 };
 
-
-
-const EditButton = ({ id }: { id: string }) => {
-  const editSegmentType = useUpdateSegmentType();
-
-  return (
-    <IconButton
-      color="primary"
-      size="small"
-      aria-label="edit"
-      data-testid="edit-button"
-      onClick={() => { alert( "edit for:" + id )}}
-      disabled={editSegmentType.isPending}
-    >
-      <Edit />
-    </IconButton>
-  );
-};
-
 export default function SegmentTypesPage() {
   const { data: segmentTypes, isLoading, error } = useSegmentTypes();
 
   const { locale, dictionary } = useDictionary();
 
   const [open, setOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedSegment, setSelectedSegment] = useState<SegmentType | null>(null);
+
+
+
+  const handleEditClick = (segment: SegmentType) => {
+    setSelectedSegment(segment);
+    setEditModalOpen(true);
+  };
 
 
   const columns: GridColDef[] = [
@@ -70,7 +63,7 @@ export default function SegmentTypesPage() {
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
           <DeleteButton id={params.row.id} />
-          <EditButton id={params.row.id} />
+          <EditButton id={params.row.id} onEdit={() => handleEditClick(params.row)} />
         </Box>
       ),
     },
@@ -112,6 +105,8 @@ export default function SegmentTypesPage() {
           pageSizeOptions={[5, 10, 100]}
         />
       </Box>
+
+      <EditModal open={editModalOpen} onClose={() => setEditModalOpen(false)} segment={selectedSegment} />
 
       <CreateModal open={open} onClose={() => setOpen(false)} />
 
