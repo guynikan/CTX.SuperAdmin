@@ -46,18 +46,18 @@ export default function DeleteModal({ open, onClose, segment }: Props) {
         }}
       >
         <Box>
-          <Typography sx={{ fontSize: '16px', textAlign:'center'}} mb={2}> Deseja remover o Tipo de Segmento: <strong>{segment?.name}</strong> ?</Typography>
+          <Typography data-testid="remove-title" sx={{ fontSize: '16px', textAlign:'center'}} mb={2}> Deseja remover o Tipo de Segmento: <strong>{segment?.name}</strong> ?</Typography>
         </Box>
         <Box sx={{
           display: 'flex',
           justifyContent: 'center'
         }}>
           <Button 
-          sx={{ marginRight:2 }}
+            sx={{ marginRight:2 }}
             variant="contained" 
             color="error" 
             size="small"
-            onClick={() => confirmDelete(segment?.id)}
+            onClick={() => confirmDelete(segment.id)}
             disabled={loading}>
               {loading ? "Removendo..." : "Remover"}
 
