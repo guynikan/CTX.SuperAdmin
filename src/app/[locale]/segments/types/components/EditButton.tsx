@@ -3,8 +3,8 @@ import { Edit } from "@mui/icons-material";
 import { SegmentType } from "@/types/segments";
 
 type EditButtonProps = {
-  segment: SegmentType; // Passamos o objeto inteiro para poder preencher o modal
-  onEdit: (segment: SegmentType) => void; // Função para abrir o modal
+  segment: SegmentType; 
+  onEdit: (segment: SegmentType) => void; 
 };
 
 const EditButton = ({ segment, onEdit }: EditButtonProps) => {
@@ -14,7 +14,7 @@ const EditButton = ({ segment, onEdit }: EditButtonProps) => {
       size="small"
       aria-label="edit"
       data-testid="edit-button"
-      onClick={() => onEdit(segment)} // Abre o modal com os dados do segmento
+      onClick={() => onEdit(segment)}
     >
       <Edit />
     </IconButton>

@@ -9,7 +9,6 @@ jest.mock("@/hooks/segments/useSegmentTypes", () => ({
 
 }));
 
-
 const mockSegment: SegmentType = {
   id:"8912410298139123",
   name: "Segment Type test",

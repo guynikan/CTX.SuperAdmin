@@ -52,16 +52,17 @@ export default function DeleteModal({ open, onClose, segment }: Props) {
           display: 'flex',
           justifyContent: 'center'
         }}>
-          <Button 
+          {segment &&   
+            <Button 
             sx={{ marginRight:2 }}
             variant="contained" 
             color="error" 
             size="small"
             onClick={() => confirmDelete(segment.id)}
             disabled={loading}>
-              {loading ? "Removendo..." : "Remover"}
-
-          </Button>  
+            {loading ? "Removendo..." : "Remover"}
+          </Button>  }
+         
           <Button 
             onClick={() => onClose()} 
             variant="outlined" 

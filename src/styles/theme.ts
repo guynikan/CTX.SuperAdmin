@@ -1,5 +1,3 @@
-
-
 export const theme = {
   colors: {
     background: "#232323",

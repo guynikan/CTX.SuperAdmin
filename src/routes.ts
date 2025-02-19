@@ -1,5 +1,8 @@
 export const ROUTES = {
   HOME: "/home",
+  MODULE:{
+    ROOT: '/module'
+  },
   AUTH: {
     ROOT: "/auth",
     LOGIN: "/auth/login",
