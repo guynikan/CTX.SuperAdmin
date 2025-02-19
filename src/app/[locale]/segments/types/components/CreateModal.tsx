@@ -1,5 +1,7 @@
+
+
 import { useCreateSegmentType } from "@/hooks/segments/useSegmentTypes";
-import { Modal, Box, TextField, Button, Typography, MenuItem } from "@mui/material";
+import { Modal, Box, TextField, Button, Typography } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -18,9 +20,9 @@ type Props =  {
 }
 
 export default function CreateModal({ open, onClose }: Props) {
+
   const { control, handleSubmit, reset } = useForm<CreateSegmentType>({
-    resolver: yupResolver(schema),
-    defaultValues: { name: "", description: "", priority: 0},
+    resolver: yupResolver(schema), mode: "onTouched",
   });
 
   const createSegmentType = useCreateSegmentType();
@@ -53,9 +55,10 @@ export default function CreateModal({ open, onClose }: Props) {
           transform: "translate(-50%, -50%)",
           width: 600,
           bgcolor: "background.paper",
-          boxShadow: 24,
+          borderTop:'5px solid #333',
+          boxShadow: 20,
           p: 5,
-          borderRadius: 2,
+          borderRadius: 1,
         }}
       >
         <Typography variant="h6" mb={2}>Criar Segment Type</Typography>

@@ -1,9 +1,8 @@
 "use client";
 
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useSegmentTypes, useDeleteSegmentType } from "@/hooks/segments/useSegmentTypes";
+import { useSegmentTypes } from "@/hooks/segments/useSegmentTypes";
 import { Box, Button, Typography, IconButton } from "@mui/material";
-import { Delete } from "@mui/icons-material";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 import { ptBR, enUS } from "@mui/x-data-grid/locales";
 
@@ -12,27 +11,15 @@ import { useState } from "react";
 import CreateModal from "./components/CreateModal"; 
 import EditModal from "./components/EditModal";
 import { SegmentType } from "@/types/segments";
+
 import EditButton from "./components/EditButton";
+import DeleteButton from "./components/DeleteButton";
+
+import DeleteModal from "./components/DeleteModal";
 
 const localeMap = {
   pt_BR: ptBR,
   en_US: enUS,
-};
-
-const DeleteButton = ({ id }: { id: string }) => {
-  const deleteSegmentType = useDeleteSegmentType();
-  return (
-    <IconButton
-      color="error"
-      aria-label="delete"
-      data-testid="delete-button"
-      size="small"
-      onClick={() => {alert('delete for:' + id)}}
-      disabled={deleteSegmentType.isPending}
-    >
-      <Delete />
-    </IconButton>
-  );
 };
 
 export default function SegmentTypesPage() {
@@ -42,15 +29,19 @@ export default function SegmentTypesPage() {
 
   const [open, setOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
   const [selectedSegment, setSelectedSegment] = useState<SegmentType | null>(null);
-
-
 
   const handleEditClick = (segment: SegmentType) => {
     setSelectedSegment(segment);
     setEditModalOpen(true);
   };
 
+  const handleDeleteClick = (segment: SegmentType) => {
+    setSelectedSegment(segment);
+    setDeleteModalOpen(true);
+  };
 
   const columns: GridColDef[] = [
     { field: "name", headerName: dictionary?.table.name, width: 320 },
@@ -62,7 +53,8 @@ export default function SegmentTypesPage() {
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
-          <DeleteButton id={params.row.id} />
+
+          <DeleteButton id={params.row.id} onDelete={() => handleDeleteClick(params.row)} />
           <EditButton id={params.row.id} onEdit={() => handleEditClick(params.row)} />
         </Box>
       ),
@@ -91,22 +83,33 @@ export default function SegmentTypesPage() {
         <Typography variant="h6" fontWeight="bold">
 
         {dictionary?.title} 
+
         </Typography>
         <Button onClick={() => setOpen(true)} variant="contained" color="primary" size="small">
         {dictionary?.registerButton} 
         </Button>
       </Box>
-
       <Box sx={{ height: "500px", width: "100%", overflowX: "auto" }}>
-        <DataGrid
-          localeText={localeMap[locale].components.MuiDataGrid.defaultProps.localeText}
-          rows={segmentTypes || []}
-          columns={columns}
-          pageSizeOptions={[5, 10, 100]}
-        />
+        {
+          segmentTypes?.length ? 
+            <DataGrid
+            localeText={localeMap[locale].components.MuiDataGrid.defaultProps.localeText}
+            rows={segmentTypes}
+            columns={columns}
+            pageSizeOptions={[5, 10, 100]}
+          />
+        : 
+          <Box>
+            <Typography sx={{ fontSize: '16px', textAlign:'center'}} mb={2} mt={6} > Não existem Tipos de Segmento cadastrados</Typography>
+          
+          </Box>
+        }
+  
       </Box>
 
-      <EditModal open={editModalOpen} onClose={() => setEditModalOpen(false)} segment={selectedSegment} />
+      <EditModal open={editModalOpen } onClose={() => setEditModalOpen(false)} segment={selectedSegment} />
+
+      <DeleteModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false) } segment={selectedSegment} />
 
       <CreateModal open={open} onClose={() => setOpen(false)} />
 

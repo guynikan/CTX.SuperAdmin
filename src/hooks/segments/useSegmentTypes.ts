@@ -67,9 +67,14 @@ export function useUpdateSegmentType() {
 export function useDeleteSegmentType() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteSegmentType,
+    mutationFn: (id: string) => deleteSegmentType(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["segment-types"] }); 
+      toast.success("Segmento removido com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao remover segmento. Tente novamente.");
+      console.error("Erro ao remover segmento:", error);
     },
   });
 }

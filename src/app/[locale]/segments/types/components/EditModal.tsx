@@ -15,19 +15,18 @@ const schema = yup.object().shape({
 type Props = {
   open: boolean;
   onClose: () => void;
-  segment: SegmentType | null; // O item a ser editado
+  segment: SegmentType | null; 
 };
 
 export default function EditModal({ open, onClose, segment }: Props) {
   const { control, handleSubmit, reset } = useForm<SegmentType>({
     resolver: yupResolver(schema),
-    defaultValues: { name: "", description: "", priority: 0 }, // Inicializa vazio
+    defaultValues: { name: "", description: "", priority: 0 }, 
   });
 
   const updateSegmentType = useUpdateSegmentType();
   const [loading, setLoading] = useState(false);
 
-  // Quando um `segment` for passado, preenche o formulário com os dados
   useEffect(() => {
     if (segment) {
       reset({
@@ -63,15 +62,16 @@ export default function EditModal({ open, onClose, segment }: Props) {
     <Modal open={open} onClose={onClose}>
       <Box
         sx={{
+          borderTop:'5px solid #333',
           position: "absolute",
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: 600,
           bgcolor: "background.paper",
-          boxShadow: 24,
+          boxShadow: 20,
           p: 5,
-          borderRadius: 2,
+          borderRadius: 1,
         }}
       >
         <Typography variant="h6" mb={2}>Editar Segment Type</Typography>

@@ -6,13 +6,17 @@ import { SegmentType } from "@/types/segments";
 
 jest.mock("@/hooks/segments/useSegmentTypes", () => ({
   useSegmentTypes: jest.fn(),
-  useDeleteSegmentType: jest.fn(() => ({
+  useCreateSegmentType:jest.fn(() => ({
     mutate: jest.fn(),
     isPending: false, 
   })),
   useUpdateSegmentType: jest.fn(() => ({
     mutate: jest.fn(),
     isPending: false,
+  })),
+  useDeleteSegmentType: jest.fn(() => ({
+    mutate: jest.fn(),
+    isPending: false, 
   })),
 }));
 jest.mock("next/navigation", () => ({
