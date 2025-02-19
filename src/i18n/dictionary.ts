@@ -6,7 +6,6 @@ export const dictionaries = {
     common: () => import("@/locales/pt_BR/common.json").then((mod) => mod.default),
     auth: () => import("@/locales/pt_BR/auth.json").then((mod) => mod.default),
     segments: () => import("@/locales/pt_BR/segments.json").then((mod) => mod.default),
-
   },
   en_US: {
     common: () => import("@/locales/en_US/common.json").then((mod) => mod.default),

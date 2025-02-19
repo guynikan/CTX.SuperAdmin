@@ -1,6 +1,6 @@
 export const i18n = {
   defaultLocale: "pt_BR",
-  modules: ['common', 'auth', 'segments'],
+  modules: ['common', 'auth', 'segments', 'configuration', 'modules'],
   locales: ["pt_BR", "en_US"],
 } as const;
 

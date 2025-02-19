@@ -23,7 +23,7 @@ import { ROUTES } from "@/routes";
 
 export default function LoginPage() {
 
-  const { dictionary } = useDictionary();
+  const { dictionary } = useDictionary()!;
 
   const [showPassword, setShowPassword] = useState(false);
 
