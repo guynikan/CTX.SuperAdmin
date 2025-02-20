@@ -3,7 +3,7 @@ export type SegmentType = {
   createdAt?: string;
   updatedAt?: string;
   name: string;
-  description: string;
+  description?: string;
   priority: number;
   isActive: boolean;
   segmentValues?: SegmentValue[];

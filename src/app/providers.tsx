@@ -5,6 +5,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Locale } from "@/i18n/config";
 import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+
+
+
 export interface ProvidersProps {
   children: ReactNode;
   lang: Locale;
@@ -42,6 +48,7 @@ const Providers = ({
 
   return (
     <QueryClientProvider client={queryClient}>
+      <ToastContainer position="top-right" autoClose={3000} />
       <DictionaryProvider namespace="common" lang={lang}>
         {children}
       </DictionaryProvider>

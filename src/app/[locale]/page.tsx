@@ -8,30 +8,30 @@ import { ROUTES } from "@/routes";
 const links = [
   { name: "Login ✅", href: ROUTES.AUTH.LOGIN },
   { name: "Segment Types ✅", href: ROUTES.SEGMENTS.TYPES },
-  { name: "Segment Values ⌛", href: ROUTES.SEGMENTS.VALUES },
+  { name: "Segment Values ✅", href: ROUTES.SEGMENTS.VALUES },
   { name: "Configuration Types ⌛", href: ROUTES.CONFIGURATION.RULES },
-  { name: "Configuration Values ⌛", href: ROUTES.CONFIGURATION.VALUES },
+  { name: "Configuration Rules ⌛", href: ROUTES.CONFIGURATION.VALUES },
+  { name: "Module ⌛", href: ROUTES.MODULE.ROOT},
+
 ];
 
 export default function Home() {
   return (
     <Box
-      sx={{
-        height: "100vh",
+      sx={{   
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(to bottom, #000, #333)",
-        color: "white",
+        color: "black",
         textAlign: "center",
       }}
     >
       <Typography
-        variant="h2"
+        variant="h4"
         fontWeight="bold"
-        letterSpacing={2}
-        sx={{ mb: 4 }}
+        letterSpacing={1}
+        sx={{ mb: 4, mt: 5 }}
       >
         Super Admin NextGen
       </Typography>
@@ -52,12 +52,12 @@ export default function Home() {
               sx={{
                 fontSize: "14px",
                 borderRadius: "8px",
-                color: "white",
-                borderColor: "white",
+                color: "black",
+                borderColor: "black",
                 transition: "all 0.3s ease",
                 "&:hover": {
-                  backgroundColor: "white",
-                  color: "black",
+                  backgroundColor: "black",
+                  color: "white",
                 },
               }}
             >

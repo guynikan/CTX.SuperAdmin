@@ -1,18 +1,22 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import SegmentTypesPage from "./page";
 import { DictionaryProvider } from "@/i18n/DictionaryProvider";
-import { useSegmentTypes } from "@/hooks/useSegmentTypes";
-import { SegmentType } from "@/types/segment-type";
+import { useSegmentTypes } from "@/hooks/segments/useSegmentTypes";
+import { SegmentType } from "@/types/segments";
 
-jest.mock("@/hooks/useSegmentTypes", () => ({
+jest.mock("@/hooks/segments/useSegmentTypes", () => ({
   useSegmentTypes: jest.fn(),
-  useDeleteSegmentType: jest.fn(() => ({
+  useCreateSegmentType:jest.fn(() => ({
     mutate: jest.fn(),
     isPending: false, 
   })),
   useUpdateSegmentType: jest.fn(() => ({
     mutate: jest.fn(),
     isPending: false,
+  })),
+  useDeleteSegmentType: jest.fn(() => ({
+    mutate: jest.fn(),
+    isPending: false, 
   })),
 }));
 jest.mock("next/navigation", () => ({

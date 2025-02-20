@@ -18,11 +18,12 @@ import { useDictionary } from "@/i18n/DictionaryProvider";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { ROUTES } from "@/routes";
 
 
 export default function LoginPage() {
 
-  const { dictionary } = useDictionary();
+  const { dictionary } = useDictionary()!;
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -123,7 +124,7 @@ export default function LoginPage() {
 
               {/* Esqueci a Senha */}
               <Typography variant="body2" sx={{ mt: 3, color:'#434343', textAlign: "center" }}>
-                <Link href="/esqueci-minha-senha" underline="hover" fontWeight={600}>
+                <Link href={ROUTES.AUTH.FORGOT_PASSWORD} underline="hover" fontWeight={600}>
                   {dictionary?.forgot_password}
                 </Link>
               </Typography>

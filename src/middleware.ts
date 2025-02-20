@@ -7,15 +7,13 @@ export function middleware(request: NextRequest) {
   const locale = getPreferredLocale(request.headers);
   const url = request.nextUrl.clone();
 
-  // Pega o locale da URL
   const pathnameLocale = url.pathname.split("/")[1] as string;
 
-  // Se o locale na URL já for válido, não faz nada
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (i18n.locales.includes(pathnameLocale as any)) {
     return NextResponse.next();
   }
 
-  // Redireciona para a URL com o locale correto
   url.pathname = `/${locale}${url.pathname}`;
   return NextResponse.redirect(url);
 }
