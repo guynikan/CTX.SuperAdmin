@@ -1,14 +1,29 @@
 {
-  "title": "All Segment types",
-  "registerButton": "Register Segment Type",
-  "loading": "🔄 Loading segment types...",
-  "errorTitle": "⚠️ Error loading segment types.",
+  "actions": "Actions",
   "errorMessage": "Please try again later.",
-  "table": {
-    "name": "Name",
-    "description": "Description",
-    "priority": "Priority",
-    "actions": "Actions"
+  "types": {
+    "empty": "There is no Segment Types",
+    "errorTitle": "⚠️ Error loading Segment Types.",
+    "loading": "🔄 Loading Segment Types...",
+    "registerButton": "Register Segment Type",
+    "table": {
+      "actions": "Actions",
+      "description": "Description",
+      "name": "Name",
+      "priority": "Priority"
+    },
+    "title": "All Segment Types"
+  },
+  "values": {
+    "errorTitle": "⚠️ Error loading Segment Values.",
+    "loading": "🔄 Loading Segment Values...",
+    "registerButton": "Register Segment Value",
+    "table": {
+      "description": "Description",
+      "displayName": "Display Name",
+      "segmentType": "Segment Type",
+      "value": "Value"
+    },
+    "title": "All Segment Values"
   }
 }
-
