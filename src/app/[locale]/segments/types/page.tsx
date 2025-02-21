@@ -2,7 +2,7 @@
 
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useSegmentTypes } from "@/hooks/segments/useSegmentTypes";
-import { Box, Button, Typography, IconButton } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 import { ptBR, enUS } from "@mui/x-data-grid/locales";
 
@@ -12,7 +12,7 @@ import CreateModal from "./components/CreateModal";
 import EditModal from "./components/EditModal";
 import { SegmentType } from "@/types/segments";
 
-import EditButton from "./components/EditButton";
+import EditButton from "../components/EditButton";
 import DeleteButton from "./components/DeleteButton";
 
 import DeleteModal from "./components/DeleteModal";
