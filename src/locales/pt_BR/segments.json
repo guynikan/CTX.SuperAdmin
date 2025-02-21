@@ -8,23 +8,7 @@
     "loading": "🔄 Carregando Tipos de Segmento...",
     "registerButton": "Cadastrar Tipo de Segmento",
     "modal": {
-      "title": "Create Segment Value",
-      "segmentTypeLabel": "Segment Type",
-      "segmentTypePlaceholder": "Select a Segment Type",
-      "displayNameLabel": "Display Name",
-      "displayNamePlaceholder": "Enter display name",
-      "valueLabel": "Value",
-      "valuePlaceholder": "Enter value",
-      "descriptionLabel": "Description",
-      "descriptionPlaceholder": "Enter description (optional)",
-      "submitButton": "Create",
-      "loadingButton": "Creating...",
-      "closeButton": "Cancel",
-      "validations": {
-        "segmentTypeRequired": "Segment Type is required",
-        "displayNameRequired": "Display Name is required",
-        "valueRequired": "Value is required"
-      }
+      "title": "Criar Tipo de Segmento"
     },
     "table": {
       "actions": "Ações",
@@ -39,22 +23,22 @@
     "loading": "🔄 Carregando Valores de Segmento...",
     "registerButton": "Cadastrar Valor de Segmento",
     "modal": {
-      "title": "Create Segment Value",
-      "segmentTypeLabel": "Segment Type",
-      "segmentTypePlaceholder": "Select a Segment Type",
-      "displayNameLabel": "Display Name",
-      "displayNamePlaceholder": "Enter display name",
-      "valueLabel": "Value",
-      "valuePlaceholder": "Enter value",
-      "descriptionLabel": "Description",
-      "descriptionPlaceholder": "Enter description (optional)",
-      "submitButton": "Create",
-      "loadingButton": "Creating...",
-      "closeButton": "Cancel",
+      "title": "Criar Valor de Segmento",
+      "segmentTypeLabel": "Tipo de Segmento",
+      "segmentTypePlaceholder": "Selecione um Tipo de Segmento",
+      "displayNameLabel": "Nome de Exibição",
+      "displayNamePlaceholder": "Insira o nome de exibição",
+      "valueLabel": "Valor",
+      "valuePlaceholder": "Insira o valor",
+      "descriptionLabel": "Descrição",
+      "descriptionPlaceholder": "Insira uma descrição (opcional)",
+      "submitButton": "Criar",
+      "loadingButton": "Criando...",
+      "closeButton": "Cancelar",
       "validations": {
-        "segmentTypeRequired": "Segment Type is required",
-        "displayNameRequired": "Display Name is required",
-        "valueRequired": "Value is required"
+        "segmentTypeRequired": "O Tipo de Segmento é obrigatório",
+        "displayNameRequired": "O Nome de Exibição é obrigatório",
+        "valueRequired": "O Valor é obrigatório"
       }
     },
     "table": {

@@ -17,8 +17,6 @@ export default function CreateModal({ open, onClose }: Props) {
 
   const { dictionary  } = useDictionary();
 
-  console.log({dictionary});
-
   const schema = yup.object().shape({
     segmentTypeId: yup.string().required(dictionary?.values.modal.validations.segmentTypeRequired),
     displayName: yup.string().required(dictionary?.values.modal.validations?.displayNameRequired),

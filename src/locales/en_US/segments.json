@@ -8,23 +8,7 @@
     "loading": "🔄 Loading Segment Types...",
     "registerButton": "Register Segment Type",
     "modal": {
-      "title": "Create Segment Type",
-      "segmentTypeLabel": "Segment Type",
-      "segmentTypePlaceholder": "Select a Segment Type",
-      "displayNameLabel": "Display Name",
-      "displayNamePlaceholder": "Enter display name",
-      "valueLabel": "Value",
-      "valuePlaceholder": "Enter value",
-      "descriptionLabel": "Description",
-      "descriptionPlaceholder": "Enter description (optional)",
-      "submitButton": "Create",
-      "loadingButton": "Creating...",
-      "closeButton": "Cancel",
-      "validations": {
-        "segmentTypeRequired": "Segment Type is required",
-        "displayNameRequired": "Display Name is required",
-        "valueRequired": "Value is required"
-      }
+      "title": "Create Segment Type"
     },
     "table": {
       "actions": "Actions",
