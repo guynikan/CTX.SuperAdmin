@@ -87,8 +87,8 @@ export default function CreateModal({ open, onClose }: Props) {
             control={control}
             render={({ field, fieldState }) => (
               <FormControl fullWidth sx={{ mb: 2 }} error={!!fieldState.error}>
-                <InputLabel> {dictionary?.values.modal.segmentTypeLabel} </InputLabel>
-                <Select {...field} label={dictionary?.values.modal.segmentTypeLabel}>
+                <InputLabel id="segment-type-label"> {dictionary?.values.modal.segmentTypeLabel} </InputLabel>
+                <Select labelId="segment-type-label" {...field} label={dictionary?.values.modal.segmentTypeLabel}>
                   {isLoading ? <MenuItem disabled>{dictionary?.loading}</MenuItem> : segmentTypes.map((type) => (
                     <MenuItem key={type.id} value={type.id}>
                       {type.name}
