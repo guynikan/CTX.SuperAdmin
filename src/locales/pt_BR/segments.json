@@ -1,11 +1,31 @@
 {
   "actions": "Ações",
   "errorMessage": "Tente novamente mais tarde.",
+  "loading": "🔄 Carregando...",
   "types": {
     "empty": "Não existem Tipos de Segmento cadastrados",
     "errorTitle": "⚠️ Erro ao carregar os Tipos de Segmento.",
     "loading": "🔄 Carregando Tipos de Segmento...",
     "registerButton": "Cadastrar Tipo de Segmento",
+    "modal": {
+      "title": "Create Segment Value",
+      "segmentTypeLabel": "Segment Type",
+      "segmentTypePlaceholder": "Select a Segment Type",
+      "displayNameLabel": "Display Name",
+      "displayNamePlaceholder": "Enter display name",
+      "valueLabel": "Value",
+      "valuePlaceholder": "Enter value",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter description (optional)",
+      "submitButton": "Create",
+      "loadingButton": "Creating...",
+      "closeButton": "Cancel",
+      "validations": {
+        "segmentTypeRequired": "Segment Type is required",
+        "displayNameRequired": "Display Name is required",
+        "valueRequired": "Value is required"
+      }
+    },
     "table": {
       "actions": "Ações",
       "description": "Descrição",
@@ -18,6 +38,25 @@
     "errorTitle": "⚠️ Erro ao carregar os Valores de Segmento.",
     "loading": "🔄 Carregando Valores de Segmento...",
     "registerButton": "Cadastrar Valor de Segmento",
+    "modal": {
+      "title": "Create Segment Value",
+      "segmentTypeLabel": "Segment Type",
+      "segmentTypePlaceholder": "Select a Segment Type",
+      "displayNameLabel": "Display Name",
+      "displayNamePlaceholder": "Enter display name",
+      "valueLabel": "Value",
+      "valuePlaceholder": "Enter value",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter description (optional)",
+      "submitButton": "Create",
+      "loadingButton": "Creating...",
+      "closeButton": "Cancel",
+      "validations": {
+        "segmentTypeRequired": "Segment Type is required",
+        "displayNameRequired": "Display Name is required",
+        "valueRequired": "Value is required"
+      }
+    },
     "table": {
       "description": "Descrição",
       "displayName": "Nome de Exibição",

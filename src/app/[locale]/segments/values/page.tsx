@@ -9,6 +9,8 @@ import { useDictionary } from "@/i18n/DictionaryProvider";
 import { useSegmentValues } from "@/hooks/segments/useSegmentValues";
 
 import { Delete, Edit } from "@mui/icons-material";
+import CreateModal from "./components/CreateModal";
+import { useState } from "react";
 
 
 const DeleteButton = ({ id }: { id: string }) => {
@@ -44,6 +46,9 @@ export default function SegmentValuesPage() {
   const { data: segmentValues, isLoading, error } = useSegmentValues();
 
   const { dictionary } = useDictionary();
+
+  const [open, setOpen] = useState(false);
+  
  
   const columns: GridColDef[] = [
     { field: "displayName", headerName: dictionary?.values.table.displayName, width: 200 },
@@ -90,7 +95,7 @@ export default function SegmentValuesPage() {
         <Typography variant="h6" fontWeight="bold">
          {dictionary?.values.title}
         </Typography>
-        <Button variant="contained" color="primary" size="small">
+        <Button onClick={() => setOpen(true)}  variant="contained" color="primary" size="small">
          {dictionary?.values.registerButton}
         </Button>
       </Box>
@@ -102,6 +107,9 @@ export default function SegmentValuesPage() {
           pageSizeOptions={[5, 10, 100]}
         />
       </Box>
+
+      <CreateModal open={open} onClose={() => setOpen(false)} />
+      
     </Box>
   );
 }

@@ -16,7 +16,7 @@ export type SegmentValue = {
   segmentTypeId: string;
   value: string;
   displayName: string;
-  description: string;
+  description?: string;
   isActive: boolean;
 };
 
