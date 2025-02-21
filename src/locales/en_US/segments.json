@@ -35,6 +35,8 @@
       "submitButton": "Create",
       "loadingButton": "Creating...",
       "closeButton": "Cancel",
+      "successMessage": "Segment Value created successfully!",
+      "errorMessage": "An error occurred while creating the Segment Value.",
       "validations": {
         "segmentTypeRequired": "Segment Type is required",
         "displayNameRequired": "Display Name is required",

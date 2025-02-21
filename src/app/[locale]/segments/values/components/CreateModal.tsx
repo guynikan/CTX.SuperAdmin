@@ -2,6 +2,8 @@ import { Modal, Box, TextField, Button, Typography, MenuItem, Select, FormContro
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { toast } from "react-toastify";
+
 import { useState } from "react";
 import { useSegmentTypes } from "@/hooks/segments/useSegmentTypes";
 import { useCreateSegmentValue } from "@/hooks/segments/useSegmentValues";
@@ -27,14 +29,17 @@ export default function CreateModal({ open, onClose }: Props) {
   const { control, handleSubmit, reset } = useForm<CreateSegmentValue>({
     resolver: yupResolver(schema),
     mode: "onTouched",
+    defaultValues: {
+      segmentTypeId: "",
+      displayName: "",
+      value: "",
+    }
   });
-
 
   const createSegmentValue = useCreateSegmentValue();
   const { data: segmentTypes = [], isLoading } = useSegmentTypes();
 
   const [loading, setLoading] = useState(false);
-
 
   const onSubmit = async (data: CreateSegmentValue) => {
     setLoading(true);
@@ -45,9 +50,11 @@ export default function CreateModal({ open, onClose }: Props) {
         value: data.value,
         description: data.description || "",
       });
+      toast.success(dictionary?.values.modal.successMessage);
       onClose();
       reset();
     } catch (error) {
+      toast.error(dictionary?.values.modal.errorMessage);
       console.error("Erro ao criar Segment Value", error);
     } finally {
       setLoading(false);
