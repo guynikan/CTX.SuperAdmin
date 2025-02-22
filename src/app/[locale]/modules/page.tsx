@@ -74,7 +74,7 @@ export default function ModulesPage() {
         : 
           <Box>
             <Typography sx={{ fontSize: '16px', textAlign:'center'}} mb={2} mt={6} >
-              {dictionary?.table.empty} 
+              {dictionary?.empty} 
             </Typography>
           
           </Box>
