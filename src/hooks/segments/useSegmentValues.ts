@@ -8,6 +8,7 @@ import {
   deleteSegmentValue,
 } from "@/services/segments/values";
 import { CreateSegmentValue, SegmentValue } from "@/types/segments";
+import { toast } from "react-toastify";
 
 export function useSegmentValues() {
   return useQuery({

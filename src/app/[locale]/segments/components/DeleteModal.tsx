@@ -5,6 +5,7 @@ import { useDeleteSegmentValue } from "@/hooks/segments/useSegmentValues";
 import { SegmentType, SegmentValue } from "@/types/segments";
 import { Modal, Box, Button, Typography } from "@mui/material";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 type Props = {
   open: boolean;
@@ -21,22 +22,27 @@ export default function DeleteModal({ open, onClose, segment }: Props) {
 
   const confirmDelete = async (id: string) => {
     if (!segment) return;
+  
     setLoading(true);
+    
+    const isSegmentValue = "segmentTypeId" in segment;
+    const mutation = isSegmentValue ? deleteSegmentValue : deleteSegmentType;
+    const successMessage = isSegmentValue 
+      ? "Valor de Segmento removido com sucesso!" 
+      : "Tipo de Segmento removido com sucesso!";
+  
     try {
-
-      if("segmentTypeId" in segment){
-        await deleteSegmentValue.mutateAsync(id);
-      }
-      await deleteSegmentType.mutateAsync(id);
-      onClose();
-
+      await mutation.mutateAsync(id);
+      toast.success(successMessage);
+      onClose(); 
     } catch (error) {
-      console.error("Erro ao deletar Segment Type", error);
+      console.error("Erro ao deletar segmento:", error);
+      toast.error("Erro ao remover!");
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
     <Modal open={open} onClose={onClose}>
       <Box
