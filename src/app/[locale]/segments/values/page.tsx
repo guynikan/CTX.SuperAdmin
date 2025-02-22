@@ -2,7 +2,11 @@
 
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Button, Typography, IconButton } from "@mui/material";
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete } from "@mui/icons-material";
+import { SegmentValue } from "@/types/segments";
+import { useState } from "react";
+import EditButton from "../components/EditButton";
+import SegmentValueFormModal from "../components/SegmentValueFormModal";
 
 
 const segmentValues = [
@@ -89,21 +93,15 @@ const DeleteButton = ({ id }: { id: string }) => {
   );
 };
 
-const EditButton = ({ id }: { id: string }) => {
-  return (
-    <IconButton
-      color="primary"
-      size="small"
-      aria-label="edit"
-      data-testid="edit-button"
-      onClick={() => { alert( "edit for:" + id )}}
-    >
-      <Edit />
-    </IconButton>
-  );
-};
-
 export default function SegmentValuesPage() {
+
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedSegment, setSelectedSegment] = useState<SegmentValue>();
+
+  const handleEditClick = (segment: SegmentValue) => {
+    setSelectedSegment(segment);
+    setEditModalOpen(true);
+  };
  
   const columns: GridColDef[] = [
     { field: "displayName", headerName: "Nome de Exibição", width: 200 },
@@ -123,7 +121,7 @@ export default function SegmentValuesPage() {
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
           <DeleteButton id={params.row.id} />
-          <EditButton id={params.row.id} />
+          <EditButton segment={selectedSegment} onEdit={() => handleEditClick(params.row)}  />
         </Box>
       ),
     },
@@ -164,6 +162,13 @@ export default function SegmentValuesPage() {
           pageSizeOptions={[5, 10, 100]}
         />
       </Box>
+
+      <SegmentValueFormModal
+        initialValues={selectedSegment}
+        open={editModalOpen } 
+        onClose={() => setEditModalOpen(false)} 
+      />
+      
     </Box>
   );
 }
