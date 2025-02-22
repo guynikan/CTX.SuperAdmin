@@ -61,7 +61,7 @@ export default function DeleteModal({ open, onClose, segment }: Props) {
       >
         <Typography data-testid="remove-title" sx={{ fontSize: "16px", textAlign: "center" }} mb={2}>
           Deseja remover 
-            { segment && "segmentTypeId" in segment ?  "o Valor do Segmento" :  "O Tipo de Segmento" }:{" "}
+            { segment && "segmentTypeId" in segment ?  " O Valor do Segmento" :  " O Tipo de Segmento" }:{" "}
           <strong>{segment ? ("segmentTypeId" in segment ? segment.displayName : segment.name ) : "?"}</strong>?
         </Typography>
 
