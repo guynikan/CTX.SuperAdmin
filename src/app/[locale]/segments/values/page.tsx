@@ -2,7 +2,7 @@
 
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Button, Typography, IconButton } from "@mui/material";
-import { Delete, Edit } from "@mui/icons-material";
+import { Edit } from "@mui/icons-material";
 import { SegmentType, SegmentValue } from "@/types/segments";
 import { useState } from "react";
 import DeleteModal from "../components/DeleteModal";
@@ -102,7 +102,6 @@ export default function SegmentValuesPage() {
     setDeleteModalOpen(true);
   };
 
- 
   const columns: GridColDef[] = [
     { field: "displayName", headerName: "Nome de Exibição", width: 200 },
     { field: "value", headerName: "Valor", width: 180 },
