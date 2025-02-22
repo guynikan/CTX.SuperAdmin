@@ -4,6 +4,7 @@
   "loading": "🔄 Loading modules...",
   "errorTitle": "⚠️ Error loading modules",
   "errorMessage": "Please try again later.",
+  "empty": "No data for modules",
   "table": {
     "name": "Name",
     "description": "Description",

@@ -4,6 +4,7 @@
   "loading": "🔄 Carregando módulos..",
   "errorTitle": "⚠️ Erro ao carregar módulos",
   "errorMessage": "Tente novamente.",
+  "empty":"Não existem Módulos cadastrados",
   "table": {
     "name": "Nome",
     "description": "Descrição",
