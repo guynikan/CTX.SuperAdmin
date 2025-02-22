@@ -3,7 +3,10 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Button, Typography, IconButton } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
-
+import { SegmentType, SegmentValue } from "@/types/segments";
+import { useState } from "react";
+import DeleteModal from "../components/DeleteModal";
+import DeleteButton from "../components/DeleteButton";
 
 const segmentValues = [
   {
@@ -75,20 +78,6 @@ const segmentValues = [
   }
 ];
 
-const DeleteButton = ({ id }: { id: string }) => {
-  return (
-    <IconButton
-      color="error"
-      aria-label="delete"
-      data-testid="delete-button"
-      size="small"
-      onClick={() => {alert('delete for:' + id)}}  
-    >
-      <Delete />
-    </IconButton>
-  );
-};
-
 const EditButton = ({ id }: { id: string }) => {
   return (
     <IconButton
@@ -104,6 +93,15 @@ const EditButton = ({ id }: { id: string }) => {
 };
 
 export default function SegmentValuesPage() {
+
+  const [selectedSegment, setSelectedSegment] = useState<SegmentValue | SegmentType>();
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  const handleDeleteClick = (segment: SegmentType | SegmentValue) => {
+    setSelectedSegment(segment);
+    setDeleteModalOpen(true);
+  };
+
  
   const columns: GridColDef[] = [
     { field: "displayName", headerName: "Nome de Exibição", width: 200 },
@@ -122,7 +120,7 @@ export default function SegmentValuesPage() {
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
-          <DeleteButton id={params.row.id} />
+          <DeleteButton id={params.row.id} onDelete={() => handleDeleteClick(params.row)} />
           <EditButton id={params.row.id} />
         </Box>
       ),
@@ -164,6 +162,9 @@ export default function SegmentValuesPage() {
           pageSizeOptions={[5, 10, 100]}
         />
       </Box>
+
+      <DeleteModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false) } segment={selectedSegment} />
+      
     </Box>
   );
 }
