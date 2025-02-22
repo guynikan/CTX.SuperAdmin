@@ -13,4 +13,4 @@ export type Module = {
   configurations?: string[]
 }
 
-export type CreateModule = Pick<Module, "name">;
+export type CreateModule = Pick<Module, "name" | "description" | "parentId">;
