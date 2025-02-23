@@ -6,6 +6,8 @@ import { useDictionary } from "@/i18n/DictionaryProvider";
 import { ptBR, enUS } from "@mui/x-data-grid/locales";
 
 import { useModules } from "@/hooks/useModules";
+import TreeFlow from "./Tree";
+
 
 const localeMap = {
   pt_BR: ptBR,
@@ -62,7 +64,7 @@ export default function ModulesPage() {
         {dictionary?.registerButton} 
         </Button>
       </Box>
-      <Box sx={{ height: "500px", width: "100%", overflowX: "auto" }}>
+      <Box sx={{ height: "300px", width: "100%", overflowX: "auto" }}>
         {
           modules?.length ? 
             <DataGrid
@@ -80,6 +82,12 @@ export default function ModulesPage() {
           </Box>
         }
       </Box>
+
+      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+         <TreeFlow />
+      </Box>
+
+        
 
     </Box>
   );
