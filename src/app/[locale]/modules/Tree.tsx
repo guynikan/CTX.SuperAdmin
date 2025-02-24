@@ -1,38 +1,11 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { ReactFlow, addEdge, Controls, Handle, Position, useNodesState, useEdgesState, ReactFlowProvider } from "@xyflow/react";
-import dagre from "dagre";
+import { ReactFlow, addEdge, Controls, useNodesState, useEdgesState, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { Box, Button, CircularProgress, Modal, TextField, Typography } from "@mui/material";
+
+
 import CustomNode from "./CustomNode";
-
-const nodeWidth = 200;
-const nodeHeight = 100;
-
-const getLayoutedElements = (nodes, edges) => {
-  const dagreGraph = new dagre.graphlib.Graph();
-  dagreGraph.setDefaultEdgeLabel(() => ({}));
-  dagreGraph.setGraph({ rankdir: "TB" });
-
-  nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
-  });
-
-  edges.forEach((edge) => {
-    dagreGraph.setEdge(edge.source, edge.target);
-  });
-
-  dagre.layout(dagreGraph);
-
-  nodes.forEach((node) => {
-    const nodeWithPosition = dagreGraph.node(node.id);
-    node.position = {
-      x: nodeWithPosition.x - nodeWidth / 2,
-      y: nodeWithPosition.y - nodeHeight / 2,
-    };
-  });
-
-  return { nodes, edges };
-};
+import { getLayoutedElements } from "./getLayoutedElements";
 
 const TreeFlowComponent = ({ data }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
