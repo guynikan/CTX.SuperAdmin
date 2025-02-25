@@ -7,11 +7,11 @@ import { ROUTES } from "@/routes";
 
 const links = [
   { name: "Login ✅", href: ROUTES.AUTH.LOGIN },
+  { name: "Modules ✅ ", href: ROUTES.MODULE.ROOT},
   { name: "Segment Types ✅", href: ROUTES.SEGMENTS.TYPES },
   { name: "Segment Values ✅", href: ROUTES.SEGMENTS.VALUES },
   { name: "Configuration Types ⌛", href: ROUTES.CONFIGURATION.RULES },
   { name: "Configuration Rules ⌛", href: ROUTES.CONFIGURATION.VALUES },
-  { name: "Module ⌛", href: ROUTES.MODULE.ROOT},
 
 ];
 
@@ -20,6 +20,8 @@ export default function Home() {
     <Box
       sx={{   
         display: "flex",
+        maxWidth: '700px',
+        margin: 'auto',
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
@@ -41,7 +43,7 @@ export default function Home() {
           display: "flex",
           flexWrap: 'wrap',
           justifyContent:'center',
-          gap: 2,
+          gap: 3,
           alignItems: "center",
         }}
       >
@@ -51,6 +53,8 @@ export default function Home() {
               variant="outlined"
               sx={{
                 fontSize: "14px",
+                height:'150px',
+                width:'200px',
                 borderRadius: "8px",
                 color: "black",
                 borderColor: "black",

@@ -1,4 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+
 import {
   getSegmentValues,
   getSegmentValueById,
@@ -41,9 +43,11 @@ export function useCreateSegmentValue() {
     mutationFn: (data: CreateSegmentValue) => createSegmentValue(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["segment-values"] });
-    },
+    }
   });
 }
+
+
 
 export function useUpdateSegmentValue() {
   const queryClient = useQueryClient();

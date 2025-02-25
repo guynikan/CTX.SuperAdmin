@@ -1,20 +1,21 @@
 "use client";
 
+import { useState } from "react";
+
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useSegmentTypes } from "@/hooks/segments/useSegmentTypes";
 import { Box, Button, Typography } from "@mui/material";
-import { useDictionary } from "@/i18n/DictionaryProvider";
 import { ptBR, enUS } from "@mui/x-data-grid/locales";
 
-import { useState } from "react";
+import { useDictionary } from "@/i18n/DictionaryProvider";
+
+import { useSegmentTypes } from "@/hooks/segments/useSegmentTypes";
+
+import { SegmentType } from "@/types/segments";
 
 import CreateModal from "./components/CreateModal"; 
 import EditModal from "./components/EditModal";
-import { SegmentType } from "@/types/segments";
-
 import EditButton from "../components/EditButton";
 import DeleteButton from "./components/DeleteButton";
-
 import DeleteModal from "./components/DeleteModal";
 
 const localeMap = {
@@ -44,35 +45,33 @@ export default function SegmentTypesPage() {
   };
 
   const columns: GridColDef[] = [
-    { field: "name", headerName: dictionary?.table.name, width: 320 },
-    { field: "description", headerName: dictionary?.table.description, width: 350 },
-    { field: "priority", headerName: dictionary?.table.priority, width: 150 },
+    { field: "name", headerName: dictionary?.types.table.name, width: 320 },
+    { field: "description", headerName: dictionary?.types.table.description, width: 350 },
+    { field: "priority", headerName: dictionary?.types.table.priority, width: 150 },
     {
       field: "actions",
-      headerName:  dictionary?.table.actions,
+      headerName: dictionary?.types.table.actions,
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
-
           <DeleteButton id={params.row.id} onDelete={() => handleDeleteClick(params.row)} />
           <EditButton id={params.row.id} onEdit={() => handleEditClick(params.row)} />
         </Box>
       ),
     },
   ];
-  
 
   if (isLoading)
     return (
       <Typography sx={{ marginTop: 2, display: "flex", justifyContent: "center" }}>
-        {dictionary?.loading}
+        {dictionary?.types.loading}
       </Typography>
     );
 
   if (error)
     return (
       <Box sx={{ padding: 2, textAlign: "center", color: "red" }}>
-        <Typography> {dictionary?.errorTitle} </Typography>
+        <Typography> {dictionary?.types.errorTitle} </Typography>
         <Typography>{dictionary?.errorMessage}</Typography>
       </Box>
     );
@@ -81,38 +80,31 @@ export default function SegmentTypesPage() {
     <Box sx={{ width: "100%", maxWidth: "1000px", margin: "auto", padding: 2 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
         <Typography variant="h6" fontWeight="bold">
-
-        {dictionary?.title} 
-
+          {dictionary?.types.title}
         </Typography>
         <Button onClick={() => setOpen(true)} variant="contained" color="primary" size="small">
-        {dictionary?.registerButton} 
+          {dictionary?.types.registerButton}
         </Button>
       </Box>
       <Box sx={{ height: "500px", width: "100%", overflowX: "auto" }}>
-        {
-          segmentTypes?.length ? 
-            <DataGrid
+        {segmentTypes?.length ? (
+          <DataGrid
             localeText={localeMap[locale].components.MuiDataGrid.defaultProps.localeText}
             rows={segmentTypes}
             columns={columns}
             pageSizeOptions={[5, 10, 100]}
           />
-        : 
+        ) : (
           <Box>
-            <Typography sx={{ fontSize: '16px', textAlign:'center'}} mb={2} mt={6} > Não existem Tipos de Segmento cadastrados</Typography>
-          
+            <Typography sx={{ fontSize: "16px", textAlign: "center" }} mb={2} mt={6}>
+            {dictionary?.types.empty}
+            </Typography>
           </Box>
-        }
-  
+        )}
       </Box>
-
-      <EditModal open={editModalOpen } onClose={() => setEditModalOpen(false)} segment={selectedSegment} />
-
-      <DeleteModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false) } segment={selectedSegment} />
-
+      <EditModal open={editModalOpen} onClose={() => setEditModalOpen(false)} segment={selectedSegment} />
+      <DeleteModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} segment={selectedSegment} />
       <CreateModal open={open} onClose={() => setOpen(false)} />
-
     </Box>
   );
 }
