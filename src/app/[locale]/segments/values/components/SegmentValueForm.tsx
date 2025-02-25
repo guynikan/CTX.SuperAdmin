@@ -50,7 +50,7 @@ export default function SegmentValueForm({ initialValues }: Props) {
       }
       reset();
     } catch (error) {
-      console.error(error); // Apenas loga o erro para debugging
+      console.error(error);
     } finally {
       setLoading(false);
     }

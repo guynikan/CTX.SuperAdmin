@@ -15,8 +15,8 @@ import { SegmentType } from "@/types/segments";
 import CreateModal from "./components/CreateModal"; 
 import EditModal from "./components/EditModal";
 import EditButton from "../components/EditButton";
-import DeleteButton from "./components/DeleteButton";
-import DeleteModal from "./components/DeleteModal";
+import DeleteButton from "../components/DeleteButton";
+import DeleteModal from "../components/DeleteModal";
 
 const localeMap = {
   pt_BR: ptBR,
@@ -54,7 +54,7 @@ export default function SegmentTypesPage() {
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
-          <DeleteButton id={params.row.id} onDelete={() => handleDeleteClick(params.row)} />
+          <DeleteButton onDelete={() => handleDeleteClick(params.row)} />
           <EditButton id={params.row.id} onEdit={() => handleEditClick(params.row)} />
         </Box>
       ),

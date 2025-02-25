@@ -2,31 +2,19 @@
 
 
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Box, Button, Typography, IconButton } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 
 import { useDictionary } from "@/i18n/DictionaryProvider";
 
 import { useSegmentValues } from "@/hooks/segments/useSegmentValues";
 
-import { Delete } from "@mui/icons-material";
 import CreateModal from "./components/CreateModal";
 import { useState } from "react";
 import EditButton from "../components/EditButton";
+import DeleteModal from "../components/DeleteModal";
 
-
-const DeleteButton = ({ id }: { id: string }) => {
-  return (
-    <IconButton
-      color="error"
-      aria-label="delete"
-      data-testid="delete-button"
-      size="small"
-      onClick={() => {alert('delete for:' + id)}}  
-    >
-      <Delete />
-    </IconButton>
-  );
-};
+import { SegmentValue } from "@/types/segments";
+import DeleteButton from "../components/DeleteButton";
 
 export default function SegmentValuesPage() {
 
@@ -35,8 +23,14 @@ export default function SegmentValuesPage() {
   const { dictionary } = useDictionary();
 
   const [open, setOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedSegment, setSelectedSegment] = useState<SegmentValue | null>(null);
+
+   const handleDeleteClick = (segment: SegmentValue) => {
+    setSelectedSegment(segment);
+    setDeleteModalOpen(true);
+  };
   
- 
   const columns: GridColDef[] = [
     { field: "displayName", headerName: dictionary?.values.table.displayName, width: 200 },
     { field: "value", headerName: dictionary?.values.table.value, width: 180 },
@@ -54,7 +48,7 @@ export default function SegmentValuesPage() {
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
-          <DeleteButton id={params.row.id} onDelete={() => handleDeleteClick(params.row)} />
+          <DeleteButton onDelete={() => handleDeleteClick(params.row)} />
           <EditButton id={params.row.id} />
         </Box>
       ),
@@ -96,6 +90,9 @@ export default function SegmentValuesPage() {
       </Box>
 
       <CreateModal open={open} onClose={() => setOpen(false)} />
+
+      <DeleteModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} segment={selectedSegment} />
+        
       
     </Box>
   );
