@@ -88,7 +88,6 @@ export default function CreateModal({ open, onClose }: Props) {
             )}
           />
 
-      
           <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
             {loading ? "Criando..." : "Criar"}
           </Button>

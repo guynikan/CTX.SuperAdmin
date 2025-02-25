@@ -2,44 +2,20 @@
 
 
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Box, Button, Typography, IconButton } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 
 import { useDictionary } from "@/i18n/DictionaryProvider";
 
 import { useSegmentValues } from "@/hooks/segments/useSegmentValues";
 
-import { Delete, Edit } from "@mui/icons-material";
 import CreateModal from "./components/CreateModal";
 import { useState } from "react";
+import EditButton from "../components/EditButton";
+import DeleteModal from "../components/DeleteModal";
 
-
-const DeleteButton = ({ id }: { id: string }) => {
-  return (
-    <IconButton
-      color="error"
-      aria-label="delete"
-      data-testid="delete-button"
-      size="small"
-      onClick={() => {alert('delete for:' + id)}}  
-    >
-      <Delete />
-    </IconButton>
-  );
-};
-
-const EditButton = ({ id }: { id: string }) => {
-  return (
-    <IconButton
-      color="primary"
-      size="small"
-      aria-label="edit"
-      data-testid="edit-button"
-      onClick={() => { alert( "edit for:" + id )}}
-    >
-      <Edit />
-    </IconButton>
-  );
-};
+import { SegmentValue } from "@/types/segments";
+import DeleteButton from "../components/DeleteButton";
+import EditModal from "./components/EditModal";
 
 export default function SegmentValuesPage() {
 
@@ -48,8 +24,20 @@ export default function SegmentValuesPage() {
   const { dictionary } = useDictionary();
 
   const [open, setOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
+  const [selectedSegment, setSelectedSegment] = useState<SegmentValue>();
+
+  const handleDeleteClick = (segment: SegmentValue) => {
+    setSelectedSegment(segment);
+    setDeleteModalOpen(true);
+  };
+  const handleEditClick = (segment: SegmentValue) => {
+    setSelectedSegment(segment);
+    setEditModalOpen(true);
+  };
   
- 
   const columns: GridColDef[] = [
     { field: "displayName", headerName: dictionary?.values.table.displayName, width: 200 },
     { field: "value", headerName: dictionary?.values.table.value, width: 180 },
@@ -67,8 +55,8 @@ export default function SegmentValuesPage() {
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
-          <DeleteButton id={params.row.id} onDelete={() => handleDeleteClick(params.row)} />
-          <EditButton id={params.row.id} />
+          <DeleteButton onDelete={() => handleDeleteClick(params.row)} />
+          <EditButton onEdit={() => handleEditClick(params.row)} />
         </Box>
       ),
     },
@@ -100,7 +88,7 @@ export default function SegmentValuesPage() {
         </Button>
       </Box>
 
-      <Box sx={{ height: "500px", width: "100%", overflowX: "auto" }}>
+      <Box sx={{ height: "90vh", width: "100%", overflowX: "auto" }}>
         <DataGrid
           rows={segmentValues || []}
           columns={columns}
@@ -109,6 +97,11 @@ export default function SegmentValuesPage() {
       </Box>
 
       <CreateModal open={open} onClose={() => setOpen(false)} />
+
+      <EditModal segment={selectedSegment} open={editModalOpen} onClose={() => setEditModalOpen(false)} />
+
+      <DeleteModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} segment={selectedSegment} />
+        
       
     </Box>
   );

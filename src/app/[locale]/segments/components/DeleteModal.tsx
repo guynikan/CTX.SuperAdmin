@@ -1,16 +1,13 @@
-
-
 import { useDeleteSegmentType } from "@/hooks/segments/useSegmentTypes";
 import { useDeleteSegmentValue } from "@/hooks/segments/useSegmentValues";
 import { SegmentType, SegmentValue } from "@/types/segments";
 import { Modal, Box, Button, Typography } from "@mui/material";
 import { useState } from "react";
-import { toast } from "react-toastify";
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  segment: SegmentType | SegmentValue | null
+  segment: SegmentType | SegmentValue
 };
 
 export default function DeleteModal({ open, onClose, segment }: Props) {
@@ -20,24 +17,19 @@ export default function DeleteModal({ open, onClose, segment }: Props) {
 
   const [loading, setLoading] = useState(false);
 
+  const isSegmentValue = typeof segment === "object" && segment !== null && "segmentTypeId" in segment;
+
   const confirmDelete = async (id: string) => {
-    if (!segment) return;
+    if (!segment || typeof segment !== "object") return;
   
     setLoading(true);
     
-    const isSegmentValue = "segmentTypeId" in segment;
     const mutation = isSegmentValue ? deleteSegmentValue : deleteSegmentType;
-    const successMessage = isSegmentValue 
-      ? "Valor de Segmento removido com sucesso!" 
-      : "Tipo de Segmento removido com sucesso!";
-  
     try {
       await mutation.mutateAsync(id);
-      toast.success(successMessage);
       onClose(); 
     } catch (error) {
       console.error("Erro ao deletar segmento:", error);
-      toast.error("Erro ao remover!");
     } finally {
       setLoading(false);
     }
@@ -60,9 +52,9 @@ export default function DeleteModal({ open, onClose, segment }: Props) {
         }}
       >
         <Typography data-testid="remove-title" sx={{ fontSize: "16px", textAlign: "center" }} mb={2}>
-          Deseja remover 
-            { segment && "segmentTypeId" in segment ?  " O Valor do Segmento" :  " O Tipo de Segmento" }:{" "}
-          <strong>{segment ? ("segmentTypeId" in segment ? segment.displayName : segment.name ) : "?"}</strong>?
+          Deseja remover
+            { isSegmentValue ?  " O Valor do Segmento" :  " O Tipo de Segmento" }:{" "}
+          <strong>{segment ? (isSegmentValue ? segment.displayName : segment.name ) : "?"}</strong>?
         </Typography>
 
         <Box sx={{

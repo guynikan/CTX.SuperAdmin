@@ -2,13 +2,15 @@ import { Modal, Box, Typography} from "@mui/material";
 
 import { useDictionary } from "@/i18n/DictionaryProvider";
 import SegmentValueForm from "./SegmentValueForm";
+import { SegmentValue } from "@/types/segments";
 
 type Props = {
   open: boolean;
+  segment: SegmentValue; 
   onClose: () => void;
 };
 
-export default function CreateModal({ open, onClose }: Props) {
+export default function EditModal({ open, onClose, segment }: Props) {
 
   const { dictionary  } = useDictionary();
 
@@ -29,10 +31,10 @@ export default function CreateModal({ open, onClose }: Props) {
         }}
       >
         <Typography variant="h6" mb={2}>
-          { dictionary?.values.modal.titleCreate}
+          { dictionary?.values.modal.titleEdit}
         </Typography>
 
-        <SegmentValueForm onClose={onClose}   />
+        <SegmentValueForm onClose={onClose} initialValues={segment}  />
 
       </Box>
     </Modal>

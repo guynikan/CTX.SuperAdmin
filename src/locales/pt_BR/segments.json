@@ -23,7 +23,8 @@
     "loading": "🔄 Carregando Valores de Segmento...",
     "registerButton": "Cadastrar Valor de Segmento",
     "modal": {
-      "title": "Criar Valor de Segmento",
+      "titleCreate": "Criar Valor de Segmento",
+      "titleEdit": "Editar Valor de Segmento",
       "segmentTypeLabel": "Tipo de Segmento",
       "segmentTypePlaceholder": "Selecione um Tipo de Segmento",
       "displayNameLabel": "Nome de Exibição",
@@ -32,6 +33,7 @@
       "valuePlaceholder": "Insira o valor",
       "descriptionLabel": "Descrição",
       "descriptionPlaceholder": "Insira uma descrição (opcional)",
+      "editButton":"Editar",
       "submitButton": "Criar",
       "loadingButton": "Criando...",
       "closeButton": "Cancelar",

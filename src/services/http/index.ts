@@ -26,8 +26,7 @@ export const httpService = async <T>({
 
     if (!response.ok) {
       const errorBody = await response.text(); 
-      const errorMessage = `Erro ${response.status}: ${response.statusText}. ${errorBody}`;
-      throw new Error(errorMessage);
+      throw new Error(errorBody);
     }
 
   
