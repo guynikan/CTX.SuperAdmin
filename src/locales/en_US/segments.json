@@ -23,7 +23,8 @@
     "loading": "🔄 Loading Segment Values...",
     "registerButton": "Register Segment Value",
     "modal": {
-      "title": "Create Segment Value",
+      "titleCreate": "Create Segment Value",
+      "titleEdit": "Edit Segment Value",
       "segmentTypeLabel": "Segment Type",
       "segmentTypePlaceholder": "Select a Segment Type",
       "displayNameLabel": "Display Name",

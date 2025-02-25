@@ -1,14 +1,7 @@
-import { Modal, Box, TextField, Button, Typography, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { toast } from "react-toastify";
+import { Modal, Box, Typography} from "@mui/material";
 
-import { useState } from "react";
-import { useSegmentTypes } from "@/hooks/segments/useSegmentTypes";
-import { useCreateSegmentValue } from "@/hooks/segments/useSegmentValues";
-import { CreateSegmentValue } from "@/types/segments";
 import { useDictionary } from "@/i18n/DictionaryProvider";
+import SegmentValueForm from "./SegmentValueForm";
 
 type Props = {
   open: boolean;
@@ -18,48 +11,6 @@ type Props = {
 export default function CreateModal({ open, onClose }: Props) {
 
   const { dictionary  } = useDictionary();
-
-  const schema = yup.object().shape({
-    segmentTypeId: yup.string().required(dictionary?.values.modal.validations.segmentTypeRequired),
-    displayName: yup.string().required(dictionary?.values.modal.validations?.displayNameRequired),
-    value: yup.string().required(dictionary?.values.modal.validations?.valueRequired),
-    description: yup.string().optional(),
-  });
-
-  const { control, handleSubmit, reset } = useForm<CreateSegmentValue>({
-    resolver: yupResolver(schema),
-    mode: "onTouched",
-    defaultValues: {
-      segmentTypeId: "",
-      displayName: "",
-      value: "",
-    }
-  });
-
-  const createSegmentValue = useCreateSegmentValue();
-  const { data: segmentTypes = [], isLoading } = useSegmentTypes();
-
-  const [loading, setLoading] = useState(false);
-
-  const onSubmit = async (data: CreateSegmentValue) => {
-    setLoading(true);
-    try {
-      await createSegmentValue.mutateAsync({
-        segmentTypeId: data.segmentTypeId,
-        displayName: data.displayName,
-        value: data.value,
-        description: data.description || "",
-      });
-      toast.success(dictionary?.values.modal.successMessage);
-      onClose();
-      reset();
-    } catch (error) {
-      toast.error(dictionary?.values.modal.errorMessage);
-      console.error("Erro ao criar Segment Value", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -78,10 +29,10 @@ export default function CreateModal({ open, onClose }: Props) {
         }}
       >
         <Typography variant="h6" mb={2}>
-         {dictionary?.values.modal.title}
+          { dictionary?.values.modal.titleCreate}
         </Typography>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        {/* <form onSubmit={handleSubmit(onSubmit)}>
           <Controller
             name="segmentTypeId"
             control={control}
@@ -146,7 +97,10 @@ export default function CreateModal({ open, onClose }: Props) {
           <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
             {loading ? dictionary?.values.modal.loadingButton : dictionary?.values.modal.submitButton}
           </Button>
-        </form>
+        </form> */}
+
+        <SegmentValueForm  />
+
       </Box>
     </Modal>
   );

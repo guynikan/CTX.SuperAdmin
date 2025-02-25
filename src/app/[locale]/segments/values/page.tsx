@@ -8,9 +8,10 @@ import { useDictionary } from "@/i18n/DictionaryProvider";
 
 import { useSegmentValues } from "@/hooks/segments/useSegmentValues";
 
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete } from "@mui/icons-material";
 import CreateModal from "./components/CreateModal";
 import { useState } from "react";
+import EditButton from "../components/EditButton";
 
 
 const DeleteButton = ({ id }: { id: string }) => {
@@ -86,7 +87,7 @@ export default function SegmentValuesPage() {
         </Button>
       </Box>
 
-      <Box sx={{ height: "500px", width: "100%", overflowX: "auto" }}>
+      <Box sx={{ height: "90vh", width: "100%", overflowX: "auto" }}>
         <DataGrid
           rows={segmentValues || []}
           columns={columns}
