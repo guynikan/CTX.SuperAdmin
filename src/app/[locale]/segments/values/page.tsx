@@ -67,7 +67,7 @@ export default function SegmentValuesPage() {
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
-          <DeleteButton id={params.row.id} />
+          <DeleteButton id={params.row.id} onDelete={() => handleDeleteClick(params.row)} />
           <EditButton id={params.row.id} />
         </Box>
       ),
