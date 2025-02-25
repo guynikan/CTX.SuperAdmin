@@ -34,6 +34,7 @@
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "Enter description (optional)",
       "submitButton": "Create",
+      "editButton":"Edit",
       "loadingButton": "Creating...",
       "closeButton": "Cancel",
       "successMessage": "Segment Value created successfully!",

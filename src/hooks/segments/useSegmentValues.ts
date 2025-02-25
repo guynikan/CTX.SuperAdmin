@@ -60,6 +60,10 @@ export function useUpdateSegmentValue() {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["segment-value", id] });
       queryClient.invalidateQueries({ queryKey: ["segment-values"] });
+      toast.success("Segmento editado com sucesso!");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Ocorreu um erro ao criar o segmento.");
     },
   });
 }

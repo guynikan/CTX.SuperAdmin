@@ -15,6 +15,7 @@ import DeleteModal from "../components/DeleteModal";
 
 import { SegmentValue } from "@/types/segments";
 import DeleteButton from "../components/DeleteButton";
+import EditModal from "./components/EditModal";
 
 export default function SegmentValuesPage() {
 
@@ -24,11 +25,17 @@ export default function SegmentValuesPage() {
 
   const [open, setOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedSegment, setSelectedSegment] = useState<SegmentValue | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
-   const handleDeleteClick = (segment: SegmentValue) => {
+  const [selectedSegment, setSelectedSegment] = useState<SegmentValue>();
+
+  const handleDeleteClick = (segment: SegmentValue) => {
     setSelectedSegment(segment);
     setDeleteModalOpen(true);
+  };
+  const handleEditClick = (segment: SegmentValue) => {
+    setSelectedSegment(segment);
+    setEditModalOpen(true);
   };
   
   const columns: GridColDef[] = [
@@ -49,7 +56,7 @@ export default function SegmentValuesPage() {
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
           <DeleteButton onDelete={() => handleDeleteClick(params.row)} />
-          <EditButton id={params.row.id} />
+          <EditButton onEdit={() => handleEditClick(params.row)} />
         </Box>
       ),
     },
@@ -90,6 +97,8 @@ export default function SegmentValuesPage() {
       </Box>
 
       <CreateModal open={open} onClose={() => setOpen(false)} />
+
+      <EditModal segment={selectedSegment} open={editModalOpen} onClose={() => setEditModalOpen(false)} />
 
       <DeleteModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} segment={selectedSegment} />
         

@@ -32,7 +32,7 @@ export default function CreateModal({ open, onClose }: Props) {
           { dictionary?.values.modal.titleCreate}
         </Typography>
 
-        <SegmentValueForm  />
+        <SegmentValueForm onClose={onClose}   />
 
       </Box>
     </Modal>

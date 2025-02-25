@@ -6,15 +6,16 @@ import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import { useSegmentTypes } from "@/hooks/segments/useSegmentTypes";
 import { useCreateSegmentValue, useUpdateSegmentValue } from "@/hooks/segments/useSegmentValues";
-import { CreateSegmentValue } from "@/types/segments";
+import { CreateSegmentValue, SegmentValue } from "@/types/segments";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 
 type Props = {
-  initialValues?: CreateSegmentValue; 
+  initialValues?: SegmentValue; 
+  onClose: () => void;
 };
 
-export default function SegmentValueForm({ initialValues }: Props) {
+export default function SegmentValueForm({ initialValues, onClose }: Props) {
   const { dictionary } = useDictionary();
 
   const schema = yup.object().shape({
@@ -43,12 +44,15 @@ export default function SegmentValueForm({ initialValues }: Props) {
     setLoading(true);
     try {
       if (initialValues) {
-        await updateSegmentValue.mutateAsync({ ...initialValues, ...data });
-        toast.success("Sucesso Edição");
+        await updateSegmentValue.mutateAsync({
+          id: initialValues.id, 
+          data: { ...initialValues, ...data }, 
+        });
       } else {
         await createSegmentValue.mutateAsync(data);
       }
       reset();
+      onClose();
     } catch (error) {
       console.error(error);
     } finally {

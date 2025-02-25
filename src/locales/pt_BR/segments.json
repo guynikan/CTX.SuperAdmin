@@ -33,6 +33,7 @@
       "valuePlaceholder": "Insira o valor",
       "descriptionLabel": "Descrição",
       "descriptionPlaceholder": "Insira uma descrição (opcional)",
+      "editButton":"Editar",
       "submitButton": "Criar",
       "loadingButton": "Criando...",
       "closeButton": "Cancelar",
