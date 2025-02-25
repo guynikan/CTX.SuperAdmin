@@ -1,16 +1,12 @@
-
-
 import { useDeleteSegmentType } from "@/hooks/segments/useSegmentTypes";
 import { useDeleteSegmentValue } from "@/hooks/segments/useSegmentValues";
 import { SegmentType, SegmentValue } from "@/types/segments";
 import { Modal, Box, Button, Typography } from "@mui/material";
 import { useState } from "react";
-import { toast } from "react-toastify";
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  type: ""
   segment: SegmentType | SegmentValue
 };
 
@@ -22,7 +18,6 @@ export default function DeleteModal({ open, onClose, segment }: Props) {
   const [loading, setLoading] = useState(false);
 
   const isSegmentValue = typeof segment === "object" && segment !== null && "segmentTypeId" in segment;
-
 
   const confirmDelete = async (id: string) => {
     if (!segment || typeof segment !== "object") return;

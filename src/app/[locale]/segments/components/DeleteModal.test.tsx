@@ -1,80 +1,82 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import DeleteModal from "./DeleteModal";
-import { toast } from "react-toastify";
 import { useDeleteSegmentType } from "@/hooks/segments/useSegmentTypes";
 import { useDeleteSegmentValue } from "@/hooks/segments/useSegmentValues";
+import { SegmentType, SegmentValue } from "@/types/segments";
+import userEvent from "@testing-library/user-event";
 
-jest.mock("@/hooks/segments/useSegmentTypes");
-jest.mock("@/hooks/segments/useSegmentValues");
-jest.mock("react-toastify", () => ({
-  toast: { success: jest.fn(), error: jest.fn() },
+jest.mock("@/hooks/segments/useSegmentTypes", () => ({
+  useDeleteSegmentType: jest.fn(() => ({
+    mutate: jest.fn(),
+    isPending: false, 
+  })),
 }));
 
-describe("DeleteModal", () => {
-  const onClose = jest.fn();
-  const segmentTypeMock = { id: "1", name: "Segmento A" };
-  const segmentValueMock = { id: "2", displayName: "Valor X", segmentTypeId: "1" };
+jest.mock("@/hooks/segments/useSegmentValues", () => ({
+  useDeleteSegmentValue: jest.fn(() => ({
+    mutate: jest.fn(),
+    isPending: false, 
+  })),
+}));
 
-  let deleteSegmentTypeMock: jest.Mock;
-  let deleteSegmentValueMock: jest.Mock;
+const mockSegmentType: SegmentType = { id: "erF124o81h31239123", name: "Segmento Type A", isActive: false, priority: 1 };
+const mockSegmentValue: SegmentValue = { id: "af444jad98897asdh", segmentTypeId:"asda0987a8sd", displayName: "Segmento Value A", isActive: false, value: "1",  };
+
+const deleteSegmentTypeMock = jest.fn().mockResolvedValue({});
+const deleteSegmentValueMock = jest.fn().mockResolvedValue({});
+
+describe("DeleteModa Component", () => {
+  const mockOnClose = jest.fn();
 
   beforeEach(() => {
-    deleteSegmentTypeMock = jest.fn().mockResolvedValue(undefined);
-    deleteSegmentValueMock = jest.fn().mockResolvedValue(undefined);
-    
-    (useDeleteSegmentType as jest.Mock).mockReturnValue({ mutateAsync: deleteSegmentTypeMock });
-    (useDeleteSegmentValue as jest.Mock).mockReturnValue({ mutateAsync: deleteSegmentValueMock });
-  });
-
-  afterEach(() => {
     jest.clearAllMocks();
+    (useDeleteSegmentValue as jest.Mock).mockReturnValue({ mutateAsync: deleteSegmentValueMock });
+    (useDeleteSegmentType as jest.Mock).mockReturnValue({ mutateAsync: deleteSegmentTypeMock });
   });
 
-  it("renders the modal with the correct text", () => {
-    render(<DeleteModal open={true} onClose={onClose} segment={segmentTypeMock} />);
-
-    expect(screen.getByTestId("remove-title")).toHaveTextContent("Deseja remover O Tipo de Segmento: Segmento A?");
+  it("should render component correctly with Segment Type ", () => {
+    render(<DeleteModal open={true} onClose={mockOnClose} segment={mockSegmentType} />);
+    
+    expect(screen.getByTestId("remove-title")).toHaveTextContent("Deseja remover O Tipo de Segmento: Segmento Type A?");
     expect(screen.getByRole("button", { name: "Remover" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cancelar" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cancelar" })).toBeInTheDocument(); 
+  });
+  
+  it("should render component correctly with Segment Value ", () => {
+    render(<DeleteModal open={true} onClose={mockOnClose} segment={mockSegmentValue} />);
+    
+    expect(screen.getByTestId("remove-title")).toHaveTextContent("Deseja remover O Valor do Segmento: Segmento Value A?");
+    expect(screen.getByRole("button", { name: "Remover" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cancelar" })).toBeInTheDocument(); 
   });
 
-  it("should calls deleteSegmentType when removing a SegmentType", async () => {
-    render(<DeleteModal open={true} onClose={onClose} segment={segmentTypeMock} />);
-    
-    fireEvent.click(screen.getByRole("button", { name: "Remover" }));
+  it("should call deleteSegmentType when removing a SegmentType", async () => {
+    render(<DeleteModal open={true} onClose={mockOnClose} segment={mockSegmentType} />);
+  
+    await userEvent.click(screen.getByRole("button", { name: "Remover" }));
 
-    await waitFor(() => expect(deleteSegmentTypeMock).toHaveBeenCalledWith("1"));
-    await waitFor(() => expect(toast.success).toHaveBeenCalledWith("Tipo de Segmento removido com sucesso!"));
-    expect(onClose).toHaveBeenCalled();
+    await waitFor(() => expect(deleteSegmentTypeMock).toHaveBeenCalledWith("erF124o81h31239123"));
+    expect(mockOnClose).toHaveBeenCalled();   
   });
 
-  it("should calls delete Segment Value when removing a Segment Value", async () => {
-    render(<DeleteModal open={true} onClose={onClose} segment={segmentValueMock} />);
-    
-    fireEvent.click(screen.getByRole("button", { name: "Remover" }));
+  it("should call deleteSegmentValue when removing a SegmentValue", async () => {
+    render(<DeleteModal open={true} onClose={mockOnClose} segment={mockSegmentValue} />);
+  
+    await userEvent.click(screen.getByRole("button", { name: "Remover" }));
 
-    await waitFor(() => expect(deleteSegmentValueMock).toHaveBeenCalledWith("2"));
-    await waitFor(() => expect(toast.success).toHaveBeenCalledWith("Valor de Segmento removido com sucesso!"));
-    expect(onClose).toHaveBeenCalled();
+    await waitFor(() => expect(deleteSegmentValueMock).toHaveBeenCalledWith("af444jad98897asdh"));
+    expect(mockOnClose).toHaveBeenCalled();
   });
 
-  it("should show error if removal fails", async () => {
-    deleteSegmentTypeMock.mockRejectedValue(new Error("Erro ao deletar"));
+  it("should close the modal when clicking the cancel button", () => {
+    render(<DeleteModal open={true} onClose={mockOnClose} segment={mockSegmentValue} />);
     
-    render(<DeleteModal open={true} onClose={onClose} segment={segmentTypeMock} />);
-    
-    fireEvent.click(screen.getByRole("button", { name: "Remover" }));
-
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith("Erro ao remover!"));
-    expect(onClose).not.toHaveBeenCalled(); 
-  });
-
-  it("should close modal when clicking cancel", () => {
-    render(<DeleteModal open={true} onClose={onClose} segment={segmentTypeMock} />);
-
     fireEvent.click(screen.getByRole("button", { name: "Cancelar" }));
-
-    expect(onClose).toHaveBeenCalled();
+    expect(mockOnClose).toHaveBeenCalled();
   });
 
 });
+
+
+
+

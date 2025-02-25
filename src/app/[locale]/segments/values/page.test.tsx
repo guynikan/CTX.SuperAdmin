@@ -1,9 +1,10 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import SegmentValuesPage from "./page";
-import { useSegmentValues } from "@/hooks/segments/useSegmentValues";
 import { SegmentType, SegmentValue } from "@/types/segments";
 import { DictionaryProvider } from "@/i18n/DictionaryProvider";
+
 import { useSegmentTypes } from "@/hooks/segments/useSegmentTypes";
+import { useSegmentValues } from "@/hooks/segments/useSegmentValues";
 
 jest.mock("@/hooks/segments/useSegmentValues", () => ({
   useSegmentValues: jest.fn(),
@@ -23,6 +24,18 @@ jest.mock("@/hooks/segments/useSegmentValues", () => ({
 
 jest.mock("@/hooks/segments/useSegmentTypes", () => ({
   useSegmentTypes: jest.fn(),
+  useCreateSegmentType:jest.fn(() => ({
+    mutate: jest.fn(),
+    isPending: false, 
+  })),
+  useUpdateSegmentType: jest.fn(() => ({
+    mutate: jest.fn(),
+    isPending: false,
+  })),
+  useDeleteSegmentType: jest.fn(() => ({
+    mutate: jest.fn(),
+    isPending: false, 
+  })),
 }));
 
 jest.mock("next/navigation", () => ({
@@ -30,22 +43,24 @@ jest.mock("next/navigation", () => ({
 }));
 
 const mockDictionary = {
-  title: "Todos os Valores de Segmentos",
-  registerButton: "Cadastrar Valor de Segmento",
-  loading: "🔄 Carregando Valores de Segmentos...",
-  errorTitle: "⚠️ Erro ao carregar os Valores de Segmentos.",
-  errorMessage: "Tente novamente mais tarde.",
-  table: {
-    displayName: "Nome de Exibição",
-    value: "Valor",
-    description: "Descrição",
-    segmentType: "Tipo de Segmento",
-    actions: "Ações",
+  values: {
+    title: "Todos os Valores de Segmentos",
+    registerButton: "Cadastrar Valor de Segmento",
+    loading: "🔄 Carregando Valores de Segmentos...",
+    errorTitle: "⚠️ Erro ao carregar os Valores de Segmentos.",
+    errorMessage: "Tente novamente mais tarde.",
+    table: {
+      displayName: "Nome de Exibição",
+      value: "Valor",
+      description: "Descrição",
+      segmentType: "Tipo de Segmento",
+      actions: "Ações",
+    },
   },
 };
 
 const mockSegmentValues: SegmentValue[] = [
-  { id: "f892487f-52c2-4d97-8be5", displayName: "Valor 1", description: "Desc Valor 1", value: "value 1", segmentTypeId: "2222", isActive: false  },
+  { id: "f892487f-52c2-4d97-8be5", displayName: "Valor 1", description: "Desc Valor 1", value: "value 1", segmentTypeId: "2222", isActive: false },
   { id: "f892487f-52c2-4d97-8be5-d5ef085763b", displayName: "Valor 2", description: "Desc Valor 2", value: "value 2", segmentTypeId: "1111", isActive: true },
 ];
 
@@ -56,7 +71,7 @@ const mockSegmentTypes: SegmentType[] = [
 
 const renderWithProvider = async () => {
   render(
-    <DictionaryProvider namespace="segments">
+    <DictionaryProvider namespace="segments" mockDictionary={mockDictionary}>
       <SegmentValuesPage />
     </DictionaryProvider>
   );
@@ -66,40 +81,37 @@ const renderWithProvider = async () => {
 };
 
 describe("SegmentValuesPage", () => {
-
   beforeEach(() => {
     jest.clearAllMocks();
-    
+    jest.resetModules();
   });
 
-  it("render page correctly", async () => {
-
-    (useSegmentValues as jest.Mock).mockReturnValue({ 
+  it("renderiza corretamente a página", async () => {
+    (useSegmentValues as jest.Mock).mockReturnValue({
       data: mockSegmentValues,
       isLoading: false,
-      isPending: false,
       error: null,
     });
 
-    (useSegmentTypes as jest.Mock).mockReturnValue({ 
+    (useSegmentTypes as jest.Mock).mockReturnValue({
       data: mockSegmentTypes,
+      isLoading: false,
+      error: null,
     });
-    
+
     await renderWithProvider();
 
-    expect(screen.getByText(mockDictionary.title)).toBeInTheDocument();
-    expect(screen.getByText(mockDictionary.registerButton)).toBeInTheDocument();
-    expect(screen.getByText(mockDictionary.table.displayName)).toBeInTheDocument();
-    expect(screen.getByText(mockDictionary.table.value)).toBeInTheDocument();
-    expect(screen.getByText(mockDictionary.table.description)).toBeInTheDocument();
-    expect(screen.getByText(mockDictionary.table.segmentType)).toBeInTheDocument();
-    expect(screen.getByText(mockDictionary.table.actions)).toBeInTheDocument();
+    expect(screen.getByText(mockDictionary.values.title)).toBeInTheDocument();
+    expect(screen.getByText(mockDictionary.values.registerButton)).toBeInTheDocument();
+    expect(screen.getByText(mockDictionary.values.table.displayName)).toBeInTheDocument();
+    expect(screen.getByText(mockDictionary.values.table.value)).toBeInTheDocument();
+    expect(screen.getByText(mockDictionary.values.table.description)).toBeInTheDocument();
+    expect(screen.getByText(mockDictionary.values.table.segmentType)).toBeInTheDocument();
+    expect(screen.getByText(mockDictionary.values.table.actions)).toBeInTheDocument();
   });
 
-
-  it("render retrieved data inside data grid", async () => {
-
-    (useSegmentValues as jest.Mock).mockReturnValue({ 
+  it("renderiza os dados recuperados dentro do DataGrid", async () => {
+    (useSegmentValues as jest.Mock).mockReturnValue({
       data: mockSegmentValues,
       isLoading: false,
       error: null,
@@ -114,8 +126,5 @@ describe("SegmentValuesPage", () => {
     expect(screen.getByText("Valor 2")).toBeInTheDocument();
     expect(screen.getByText("Desc Valor 2")).toBeInTheDocument();
     expect(screen.getByText("value 2")).toBeInTheDocument();
-        
   });
-
-
 });

@@ -10,7 +10,7 @@ import {
   deleteSegmentValue,
 } from "@/services/segments/values";
 import { CreateSegmentValue, SegmentValue } from "@/types/segments";
-import { toast, ToastContent } from "react-toastify";
+import { toast } from "react-toastify";
 
 export function useSegmentValues() {
   return useQuery({
