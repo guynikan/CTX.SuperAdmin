@@ -16,7 +16,6 @@ export interface ProvidersProps {
   lang: Locale;
 }
 
-
 const Providers = ({ children, lang }: ProvidersProps) => {
   const [error, setError] = useState<string | null>(null);
 
