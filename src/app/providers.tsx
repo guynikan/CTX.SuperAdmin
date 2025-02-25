@@ -2,25 +2,22 @@
 
 import { ReactNode, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider, CssBaseline } from "@mui/material";
 import { Locale } from "@/i18n/config";
 import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
-
+import { theme } from "@/styles/theme";
 
 export interface ProvidersProps {
   children: ReactNode;
   lang: Locale;
-  disableReactQueryDevtools?: boolean;
 }
 
-const Providers = ({
-  children,
-  lang,
-}: ProvidersProps) => {
+
+const Providers = ({ children, lang }: ProvidersProps) => {
   const [error, setError] = useState<string | null>(null);
 
   const queryClient = new QueryClient({
@@ -48,10 +45,13 @@ const Providers = ({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ToastContainer position="top-right" autoClose={3000} />
-      <DictionaryProvider namespace="common" lang={lang}>
-        {children}
-      </DictionaryProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <ToastContainer position="top-right" autoClose={3000} />
+        <DictionaryProvider namespace="common" lang={lang}>
+          {children}
+        </DictionaryProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };
