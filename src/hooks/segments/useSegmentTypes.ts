@@ -51,8 +51,9 @@ export function useUpdateSegmentType() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { id: string; values: Partial<SegmentType> }) => updateSegmentType(data.id, data.values),
-    onSuccess: () => {
+    mutationFn: ({ id, data }: { id: string; data: Partial<SegmentType> }) => updateSegmentType(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["segment-type", id] });
       queryClient.invalidateQueries({ queryKey: ["segment-types"] });
       toast.success("Segmento atualizado com sucesso!");
     },

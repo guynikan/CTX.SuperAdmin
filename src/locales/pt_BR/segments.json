@@ -8,7 +8,21 @@
     "loading": "🔄 Carregando Tipos de Segmento...",
     "registerButton": "Cadastrar Tipo de Segmento",
     "modal": {
-      "title": "Criar Tipo de Segmento"
+      "titleCreate": "Criar Tipo de Segmento",
+      "titleEdit": "Editar Tipo de Segmento",
+      "nameLabel": "Nome",
+      "descriptionLabel": "Descrição",
+      "priorityLabel": "Prioridade",
+      "editButton":"Editar",
+      "submitButton": "Criar",
+      "loadingButton": "Criando...",
+      "closeButton": "Cancelar",
+      "successMessage": "Valor de Segmento criado com sucesso!",
+      "errorMessage": "Ocorreu um erro ao criar o Tipo de Segmento.",
+      "validations": {
+        "nameRequired": "Nome é Obrigatório",
+        "priorityRequired": "Prioridade é obrigatória"
+      }
     },
     "table": {
       "actions": "Ações",

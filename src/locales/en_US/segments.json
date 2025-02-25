@@ -8,7 +8,21 @@
     "loading": "🔄 Loading Segment Types...",
     "registerButton": "Register Segment Type",
     "modal": {
-      "title": "Create Segment Type"
+      "titleCreate": "Create Segment Type",
+      "titleEdit": "Edit Segment Type",
+      "nameLabel": "Name",
+      "descriptionLabel": "Description",
+      "priorityLabel": "Priority",
+      "editButton":"Edit",
+      "submitButton": "Create",
+      "loadingButton": "Creating...",
+      "closeButton": "Cancel",
+      "successMessage": "Segment Type created successfully!",
+      "errorMessage": "An error occurred while creating the Segment Type.",
+      "validations": {
+        "nameRequired": "Name is a required field",
+        "priorityRequired": "Priority is a required field"
+      }
     },
     "table": {
       "actions": "Actions",
