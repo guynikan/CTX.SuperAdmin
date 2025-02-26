@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { ReactFlow, addEdge, Controls, useNodesState, useEdgesState, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { Box, Button, CircularProgress, Modal, TextField, Typography } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 
 
 import CustomNode from "./CustomNode";
 import { getLayoutedElements } from "../functions/getLayoutedElements";
 import { useCreateModule } from "@/hooks/useModules";
 import { toast } from "react-toastify";
+import AddModuleModal from "./AddModuleModal";
 
 const TreeFlowComponent = ({ data }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -22,7 +23,6 @@ const TreeFlowComponent = ({ data }) => {
   },[]);
   
   const handleCloseModal = () => setOpenModal(false);
-
 
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
@@ -132,29 +132,14 @@ const TreeFlowComponent = ({ data }) => {
         fitView>
         <Controls />
       </ReactFlow>
-      <Modal open={openModal} onClose={handleCloseModal}>
-        <Box  sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 600,
-            bgcolor: "background.paper",
-            borderTop:'5px solid #333',
-            boxShadow: 20,
-            p: 5,
-            borderRadius: 1,
-          }}>
-          <Typography variant="h6">Adicionar Novo Módulo</Typography>
-          <TextField label="Nome" fullWidth margin="dense" value={newNodeData.name} onChange={(e) => setNewNodeData({ ...newNodeData, name: e.target.value })} />
-          <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
-            <Button onClick={handleCloseModal} color="secondary" sx={{ mr: 1 }}>Cancelar</Button>
-            <Button onClick={handleAddNode} variant="outlined" color="primary" disabled={loading}>
-              Adicionar
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
+      <AddModuleModal
+        open={openModal}
+        onClose={handleCloseModal}
+        onSubmit={handleAddNode}
+        value={newNodeData.name}
+        setValue={(name) => setNewNodeData((prev) => ({ ...prev, name }))}
+        loading={loading}
+      />
     </div>
   );
 };
