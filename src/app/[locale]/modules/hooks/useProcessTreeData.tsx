@@ -3,7 +3,7 @@ import { Node, Edge } from "@xyflow/react";
 import { getLayoutedElements } from "../functions/getLayoutedElements";
 import { SetState } from "@/types/modules";
 
-interface TreeNode {
+type TreeNode = {
   id: string;
   name: string;
   level: number;

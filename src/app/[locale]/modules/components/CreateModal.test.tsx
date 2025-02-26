@@ -6,7 +6,7 @@ const mockOnClose = jest.fn();
 const mockOnSubmit = jest.fn();
 const mockSetValue = jest.fn();
 
-interface CreateModalProps {
+type CreateModalProps = {
   open: boolean;
   onClose: () => void;
   onSubmit: () => void;

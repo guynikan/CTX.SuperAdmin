@@ -2,7 +2,7 @@
 
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
 
-interface CreateModalProps {
+type CreateModalProps =  {
   open: boolean;
   onClose: () => void;
   onSubmit: () => void;

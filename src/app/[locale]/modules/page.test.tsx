@@ -3,7 +3,6 @@ import ModulesPage from "./page";
 import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 import { useModules } from "@/hooks/useModules";
 import { Module } from "@/types/modules";
-import userEvent from "@testing-library/user-event";
 
 jest.mock("@/hooks/useModules", () => ({
   useModules: jest.fn(),

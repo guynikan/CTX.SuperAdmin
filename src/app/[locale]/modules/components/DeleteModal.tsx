@@ -3,7 +3,7 @@
 import { Modal, Box, Button, Typography } from "@mui/material";
 import { useState } from "react";
 
-type Props = {
+type DeleteModalProps = {
   open: boolean;
   onClose: () => void;
   confirmDelete: (nodeId: string) => void;
@@ -11,7 +11,7 @@ type Props = {
   hasChildren: boolean;
 };
 
-export default function DeleteModal({ open, onClose, confirmDelete, module, hasChildren }: Props) {
+export default function DeleteModal({ open, onClose, confirmDelete, module, hasChildren }: DeleteModalProps) {
   const [loading] = useState(false);
 
   return (
