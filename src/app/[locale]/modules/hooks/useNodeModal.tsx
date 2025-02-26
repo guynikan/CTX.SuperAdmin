@@ -16,6 +16,7 @@ export function useNodeModal() {
     handleOpenModal,
     handleCloseModal,
     newNodeData,
+    setOpenModal,
     setNewNodeData,
   };
 }

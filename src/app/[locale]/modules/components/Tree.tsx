@@ -7,58 +7,20 @@ import { toast } from "react-toastify";
 import CustomNode from "./CustomNode";
 import AddModuleModal from "./AddModuleModal";
 
-import { getLayoutedElements } from "../functions/getLayoutedElements";
-
 import { useCreateModule } from "@/hooks/useModules";
 import { useNodeModal } from "../hooks/useNodeModal";
+import { useProcessTreeData } from "../hooks/useProcessTreeData";
+
 
 const TreeFlowComponent = ({ data }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const [loading, setLoading] = useState(false);
-
-  const { openModal, handleOpenModal, handleCloseModal, newNodeData, setNewNodeData } = useNodeModal();
-
+  const { openModal, setOpenModal, handleOpenModal, handleCloseModal, newNodeData, setNewNodeData } = useNodeModal();
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
-  const traverseTree = (node, parentId, nodesMap, edgesList) => {
-    if (!node || nodesMap.has(node.id)) return;
-  
-    nodesMap.set(node.id, {
-      id: node.id,
-      data: { 
-        label: node.name,
-        parentId: node.id,
-      },
-      position: { x: 0, y: 0 },
-      type: "custom",
-      draggable: false,
-    });
-  
-    if (parentId) {
-      edgesList.push({ id: `${parentId}-${node.id}`, source: parentId, target: node.id });
-    }
-  
-    if (node.children?.length) {
-      node.children.forEach((child) => traverseTree(child, node.id, nodesMap, edgesList));
-    }
-  };
-
-  const processTreeData = useCallback(() => {
-    if (!data || data.length === 0) return;
-
-    const nodesMap = new Map();
-    const edgesList = [];
-
-    data.filter(n => n.level === 0).forEach(rootNode => traverseTree(rootNode, null, nodesMap, edgesList));
-
-    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(Array.from(nodesMap.values()), edgesList);
-
-    setNodes(layoutedNodes);
-    setEdges(layoutedEdges);
-  }, [data]);
-
+  const processTreeData = useProcessTreeData(setNodes, setEdges);
 
   const createModuleMutation = useCreateModule();
 
@@ -111,9 +73,8 @@ const TreeFlowComponent = ({ data }) => {
   );
 
   useEffect(() => {
-    processTreeData();
-  }, [processTreeData]);
-
+    processTreeData(data);
+  }, [data, processTreeData]);
 
   return (
     <div style={{ width: "100%", height: "600px", position: "relative" }}>
