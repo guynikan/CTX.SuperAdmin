@@ -1,3 +1,5 @@
+"use client";
+
 import { useDictionary } from "@/i18n/DictionaryProvider";
 import { Module } from "@/types/modules";
 import { Box, Typography } from "@mui/material";

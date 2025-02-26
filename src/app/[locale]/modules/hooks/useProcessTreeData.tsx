@@ -22,7 +22,7 @@ export function useProcessTreeData(setNodes: SetState<Node[]>, setEdges: SetStat
 
       nodesMap.set(node.id, {
         id: node.id,
-        data: { label: node.name, parentId: node.id },
+        data: { id: node.id, label: node.name, parentId},
         position: { x: 0, y: 0 },
         type: "custom",
         draggable: false,

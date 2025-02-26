@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { ReactFlow, addEdge, Controls, useNodesState, useEdgesState, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -5,9 +7,11 @@ import { CircularProgress } from "@mui/material";
 import { toast } from "react-toastify";
 
 import CustomNode from "./CustomNode";
-import AddModuleModal from "./AddModuleModal";
+import CreateModal from "./CreateModal";
+import DeleteModal from "./DeleteModal";
 
-import { useCreateModule } from "@/hooks/useModules";
+
+import { useCreateModule, useDeleteModule } from "@/hooks/useModules";
 import { useNodeModal } from "../hooks/useNodeModal";
 import { useProcessTreeData } from "../hooks/useProcessTreeData";
 
@@ -17,20 +21,30 @@ const TreeFlowComponent = ({ data }) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const [loading, setLoading] = useState(false);
-  const { openModal, setOpenModal, handleOpenModal, handleCloseModal, newNodeData, setNewNodeData } = useNodeModal();
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+  const { openModal, setOpenModal, handleAddModal, handleCloseModal, newNodeData, setNewNodeData } = useNodeModal();
+
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [selectedModule, setSelectedModule] = useState<string | null>(null);
+  const [hasChildren, setHasChildren] = useState(false);
+
 
   const processTreeData = useProcessTreeData(setNodes, setEdges);
 
   const createModuleMutation = useCreateModule();
 
-  const handleAddNode = async () => {
+  const handleDeleteModal = useCallback( (module: string) => {
+
+    const moduleHasChildren = edges.some((edge) => edge.source === module);
+    setSelectedModule(module);
+    setHasChildren(moduleHasChildren);
+    setOpenConfirm(true);
+  },[edges]);
+
+  const addNode = async () => {
     if (!newNodeData.name.trim()) {
       toast.error("O nome do módulo é obrigatório.");
       return;
     }
-    console.log({newNodeData})
-
     setLoading(true);
     try {
       await createModuleMutation.mutateAsync({
@@ -46,30 +60,40 @@ const TreeFlowComponent = ({ data }) => {
     }
   };
 
-  const removeNode = useCallback(async (nodeId: string) => {
-    setLoading(true);
-    try {
-      setNodes((nds) => nds.filter((node) => node.id !== nodeId));
-      setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }, [setNodes, setEdges]);
 
+  const { mutateAsync: deleteModule } = useDeleteModule();
+
+  const deleteNode = useCallback(async () => {
+      if (!selectedModule) {
+        toast.error("Módulo não encontrado.");
+        return;
+      }
+      try {
+        await deleteModule(selectedModule);
+        setNodes((nds) => nds.filter((node) => node.id !== selectedModule));
+        setEdges((eds) => eds.filter((edge) => edge.source !== selectedModule && edge.target !== selectedModule));
+      } catch (error) {
+        console.error(error);
+      } finally{
+        setOpenConfirm(false)
+      }
+    },
+    [setNodes, selectedModule, setEdges, deleteModule]
+  );
+  
+  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
   
   const nodeTypes = useMemo(
     () => ({
       custom: (nodeProps) => (
         <CustomNode
           {...nodeProps}
-          handleOpenModal={handleOpenModal}
-          removeNode={removeNode}
+          handleAddModal={handleAddModal}
+          deleteNode={handleDeleteModal}
         />
       ),
     }),
-    [handleOpenModal, removeNode]
+    [handleAddModal, handleDeleteModal]
   );
 
   useEffect(() => {
@@ -77,7 +101,7 @@ const TreeFlowComponent = ({ data }) => {
   }, [data, processTreeData]);
 
   return (
-    <div style={{ width: "100%", height: "600px", position: "relative" }}>
+    <div style={{ width: "100%", height: "90vh", position: "relative" }}>
       {loading && <CircularProgress style={{ position: "absolute", top: "50%", left: "50%", zIndex: 10 }} />}
       <ReactFlow 
         nodes={nodes} 
@@ -89,15 +113,25 @@ const TreeFlowComponent = ({ data }) => {
         fitView>
         <Controls />
       </ReactFlow>
-      <AddModuleModal
+
+      <CreateModal
         open={openModal}
         onClose={handleCloseModal}
-        onSubmit={handleAddNode}
+        onSubmit={addNode}
         value={newNodeData.name}
         setValue={(name) => setNewNodeData((prev) => ({ ...prev, name }))}
         loading={loading}
       />
+
+      <DeleteModal
+        confirmDelete={deleteNode}
+        open={openConfirm}
+        onClose={() => setOpenConfirm(false)}
+        module={selectedModule}
+        hasChildren={hasChildren}
+      />;
     </div>
+    
   );
 };
 
