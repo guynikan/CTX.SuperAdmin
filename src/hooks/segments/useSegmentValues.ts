@@ -1,4 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+
 import {
   getSegmentValues,
   getSegmentValueById,
@@ -8,6 +10,7 @@ import {
   deleteSegmentValue,
 } from "@/services/segments/values";
 import { CreateSegmentValue, SegmentValue } from "@/types/segments";
+import { toast } from "react-toastify";
 
 export function useSegmentValues() {
   return useQuery({
@@ -37,10 +40,15 @@ export function useSegmentValuesByType(segmentTypeId: string) {
 
 export function useCreateSegmentValue() {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (data: CreateSegmentValue) => createSegmentValue(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["segment-values"] });
+      toast.success("Segmento criado com sucesso!");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Ocorreu um erro ao criar o segmento.");
     },
   });
 }
@@ -52,6 +60,10 @@ export function useUpdateSegmentValue() {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["segment-value", id] });
       queryClient.invalidateQueries({ queryKey: ["segment-values"] });
+      toast.success("Segmento editado com sucesso!");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Ocorreu um erro ao criar o segmento.");
     },
   });
 }

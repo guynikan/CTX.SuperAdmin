@@ -72,9 +72,8 @@ export function useDeleteSegmentType() {
       queryClient.invalidateQueries({ queryKey: ["segment-types"] }); 
       toast.success("Segmento removido com sucesso!");
     },
-    onError: (error) => {
-      toast.error("Erro ao remover segmento. Tente novamente.");
-      console.error("Erro ao remover segmento:", error);
+    onError: (error: Error) => {
+      toast.error(error.message || "Ocorreu um erro ao remover o segmento.");
     },
   });
 }

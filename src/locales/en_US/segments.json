@@ -1,14 +1,56 @@
 {
-  "title": "All Segment types",
-  "registerButton": "Register Segment Type",
-  "loading": "🔄 Loading segment types...",
-  "errorTitle": "⚠️ Error loading segment types.",
+  "actions": "Actions",
   "errorMessage": "Please try again later.",
-  "table": {
-    "name": "Name",
-    "description": "Description",
-    "priority": "Priority",
-    "actions": "Actions"
+  "loading": "🔄 Loading...",
+  "types": {
+    "empty": "There is no Segment Types",
+    "errorTitle": "⚠️ Error loading Segment Types.",
+    "loading": "🔄 Loading Segment Types...",
+    "registerButton": "Register Segment Type",
+    "modal": {
+      "title": "Create Segment Type"
+    },
+    "table": {
+      "actions": "Actions",
+      "description": "Description",
+      "name": "Name",
+      "priority": "Priority"
+    },
+    "title": "All Segment Types"
+  },
+  "values": {
+    "errorTitle": "⚠️ Error loading Segment Values.",
+    "loading": "🔄 Loading Segment Values...",
+    "registerButton": "Register Segment Value",
+    "modal": {
+      "titleCreate": "Create Segment Value",
+      "titleEdit": "Edit Segment Value",
+      "segmentTypeLabel": "Segment Type",
+      "segmentTypePlaceholder": "Select a Segment Type",
+      "displayNameLabel": "Display Name",
+      "displayNamePlaceholder": "Enter display name",
+      "valueLabel": "Value",
+      "valuePlaceholder": "Enter value",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter description (optional)",
+      "submitButton": "Create",
+      "editButton":"Edit",
+      "loadingButton": "Creating...",
+      "closeButton": "Cancel",
+      "successMessage": "Segment Value created successfully!",
+      "errorMessage": "An error occurred while creating the Segment Value.",
+      "validations": {
+        "segmentTypeRequired": "Segment Type is required",
+        "displayNameRequired": "Display Name is required",
+        "valueRequired": "Value is required"
+      }
+    },
+    "table": {
+      "description": "Description",
+      "displayName": "Display Name",
+      "segmentType": "Segment Type",
+      "value": "Value"
+    },
+    "title": "All Segment Values"
   }
 }
-

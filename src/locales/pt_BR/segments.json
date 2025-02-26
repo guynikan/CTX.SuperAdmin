@@ -1,13 +1,56 @@
 {
-  "title": "Todos os Tipos de Segmentos",
-  "registerButton": "Cadastrar Tipo de Segmento",
-  "loading": "🔄 Carregando Tipos de Segmento...",
-  "errorTitle": "⚠️ Erro ao carregar os Tipos de Segmento.",
+  "actions": "Ações",
   "errorMessage": "Tente novamente mais tarde.",
-  "table": {
-    "name": "Nome",
-    "description": "Descrição",
-    "priority": "Prioridade",
-    "actions": "Ações"
+  "loading": "🔄 Carregando...",
+  "types": {
+    "empty": "Não existem Tipos de Segmento cadastrados",
+    "errorTitle": "⚠️ Erro ao carregar os Tipos de Segmento.",
+    "loading": "🔄 Carregando Tipos de Segmento...",
+    "registerButton": "Cadastrar Tipo de Segmento",
+    "modal": {
+      "title": "Criar Tipo de Segmento"
+    },
+    "table": {
+      "actions": "Ações",
+      "description": "Descrição",
+      "name": "Nome",
+      "priority": "Prioridade"
+    },
+    "title": "Todos os Tipos de Segmentos"
+  },
+  "values": {
+    "errorTitle": "⚠️ Erro ao carregar os Valores de Segmento.",
+    "loading": "🔄 Carregando Valores de Segmento...",
+    "registerButton": "Cadastrar Valor de Segmento",
+    "modal": {
+      "titleCreate": "Criar Valor de Segmento",
+      "titleEdit": "Editar Valor de Segmento",
+      "segmentTypeLabel": "Tipo de Segmento",
+      "segmentTypePlaceholder": "Selecione um Tipo de Segmento",
+      "displayNameLabel": "Nome de Exibição",
+      "displayNamePlaceholder": "Insira o nome de exibição",
+      "valueLabel": "Valor",
+      "valuePlaceholder": "Insira o valor",
+      "descriptionLabel": "Descrição",
+      "descriptionPlaceholder": "Insira uma descrição (opcional)",
+      "editButton":"Editar",
+      "submitButton": "Criar",
+      "loadingButton": "Criando...",
+      "closeButton": "Cancelar",
+      "successMessage": "Valor de Segmento criado com sucesso!",
+      "errorMessage": "Ocorreu um erro ao criar o Valor de Segmento.",
+      "validations": {
+        "segmentTypeRequired": "O Tipo de Segmento é obrigatório",
+        "displayNameRequired": "O Nome de Exibição é obrigatório",
+        "valueRequired": "O Valor é obrigatório"
+      }
+    },
+    "table": {
+      "description": "Descrição",
+      "displayName": "Nome de Exibição",
+      "segmentType": "Tipo de Segmento",
+      "value": "Valor"
+    },
+    "title": "Todos os Valores de Segmentos"
   }
 }

@@ -4,6 +4,22 @@ import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 import { useSegmentTypes } from "@/hooks/segments/useSegmentTypes";
 import { SegmentType } from "@/types/segments";
 
+jest.mock("@/hooks/segments/useSegmentValues", () => ({
+  useSegmentValues: jest.fn(),
+  useCreateSegmentValue: jest.fn(() => ({
+    mutate: jest.fn(),
+    isPending: false, 
+  })),
+  useUpdateSegmentValue: jest.fn(() => ({
+    mutate: jest.fn(),
+    isPending: false,
+  })),
+  useDeleteSegmentValue: jest.fn(() => ({
+    mutate: jest.fn(),
+    isPending: false, 
+  })),
+}));
+
 jest.mock("@/hooks/segments/useSegmentTypes", () => ({
   useSegmentTypes: jest.fn(),
   useCreateSegmentType:jest.fn(() => ({
@@ -19,6 +35,8 @@ jest.mock("@/hooks/segments/useSegmentTypes", () => ({
     isPending: false, 
   })),
 }));
+
+
 jest.mock("next/navigation", () => ({
   usePathname: jest.fn(() => "/pt_BR/segments/types"),
 }));

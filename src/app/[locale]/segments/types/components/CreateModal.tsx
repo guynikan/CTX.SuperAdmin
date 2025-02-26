@@ -88,18 +88,6 @@ export default function CreateModal({ open, onClose }: Props) {
             )}
           />
 
-          {/* <Controller
-            name="parentModule"
-            control={control}
-            render={({ field }) => (
-              <TextField {...field} label="Módulo Pai (opcional)" fullWidth select sx={{ mb: 2 }}>
-                <MenuItem value="">Nenhum</MenuItem>
-                <MenuItem value="module1">Módulo 1</MenuItem>
-                <MenuItem value="module2">Módulo 2</MenuItem>
-              </TextField>
-            )}
-          /> */}
-
           <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
             {loading ? "Criando..." : "Criar"}
           </Button>

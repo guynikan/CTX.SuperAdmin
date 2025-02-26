@@ -24,6 +24,12 @@ export const httpService = async <T>({
       return;
     }
 
+    if (!response.ok) {
+      const errorBody = await response.text(); 
+      throw new Error(errorBody);
+    }
+
+  
     return callback?.(response);
   } catch (error) {
     throw defaultErrorHandling(error);
