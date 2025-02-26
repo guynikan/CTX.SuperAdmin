@@ -2,30 +2,25 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { ReactFlow, addEdge, Controls, useNodesState, useEdgesState, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { CircularProgress } from "@mui/material";
-
+import { toast } from "react-toastify";
 
 import CustomNode from "./CustomNode";
-import { getLayoutedElements } from "../functions/getLayoutedElements";
-import { useCreateModule } from "@/hooks/useModules";
-import { toast } from "react-toastify";
 import AddModuleModal from "./AddModuleModal";
+
+import { getLayoutedElements } from "../functions/getLayoutedElements";
+
+import { useCreateModule } from "@/hooks/useModules";
+import { useNodeModal } from "../hooks/useNodeModal";
 
 const TreeFlowComponent = ({ data }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [openModal, setOpenModal] = useState(false);
-  const [newNodeData, setNewNodeData] = useState({ name: "", parentId: "" });
+
   const [loading, setLoading] = useState(false);
 
-  const handleOpenModal = useCallback(async (parentId: string) => {
-    setNewNodeData({ name: "", parentId });
-    setOpenModal(true);
-  },[]);
-  
-  const handleCloseModal = () => setOpenModal(false);
+  const { openModal, handleOpenModal, handleCloseModal, newNodeData, setNewNodeData } = useNodeModal();
 
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
-
 
   const traverseTree = (node, parentId, nodesMap, edgesList) => {
     if (!node || nodesMap.has(node.id)) return;
@@ -63,7 +58,6 @@ const TreeFlowComponent = ({ data }) => {
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
   }, [data]);
-
 
 
   const createModuleMutation = useCreateModule();
