@@ -3,6 +3,9 @@ export const ROUTES = {
   MODULES:{
     ROOT: '/modules'
   },
+  ENTITIES:{
+    NEW: '/new-entity'
+  },
   AUTH: {
     ROOT: "/auth",
     LOGIN: "/auth/login",

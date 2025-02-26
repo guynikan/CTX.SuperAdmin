@@ -1,23 +1,17 @@
 "use client";
 
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Button, Typography } from "@mui/material";
 import { useDictionary } from "@/i18n/DictionaryProvider";
-import { ptBR, enUS } from "@mui/x-data-grid/locales";
 import { useModules } from "@/hooks/useModules";
-import TreeFlow from "./Tree";
+import TreeFlow from "./components/Tree";
 import { useState, useMemo } from "react";
-
-const localeMap = {
-  pt_BR: ptBR,
-  en_US: enUS,
-};
+import DataTable from "./components/DataTable";
 
 export default function ModulesPage() {
   const { data: modules, isLoading, error } = useModules();
-  const { locale, dictionary } = useDictionary();
+  const {  dictionary } = useDictionary();
 
-  const [viewMode, setViewMode] = useState<"table" | "tree">("tree");
+  const [viewMode, setViewMode] = useState<"table" | "tree">("table");
 
   const treeData = useMemo(() => {
     const convertToTree = (items) => {
@@ -42,22 +36,7 @@ export default function ModulesPage() {
     return convertToTree(modules || []);
   }, [modules]);
 
-  const columns: GridColDef[] = [
-    { field: "name", headerName: dictionary?.table.name, width: 320 },
-    { field: "description", headerName: dictionary?.table.description, width: 250 },
-    { field: "level", headerName: dictionary?.table.level, width: 150 },
-    { field: "parent", headerName: dictionary?.table.parent, width: 150 },
-    {
-      field: "actions",
-      headerName: dictionary?.table.actions,
-      width: 120,
-      renderCell: () => (
-        <Box sx={{ display: "flex", gap: 1 }}>
-          {/* Botões de ação aqui */}
-        </Box>
-      ),
-    },
-  ];
+
 
   if (isLoading)
     return (
@@ -80,7 +59,7 @@ export default function ModulesPage() {
         <Typography variant="h6" fontWeight="bold">{dictionary?.title}</Typography>
         
         <Button
-          variant="contained"
+          variant="outlined"
           color="secondary"
           size="small"
           onClick={() => setViewMode(viewMode === "table" ? "tree" : "table")}
@@ -90,20 +69,8 @@ export default function ModulesPage() {
       </Box>
 
       <Box sx={{ height: "800px", width: "100%", overflowX: "auto" }}>
-        {viewMode === "table" ? (
-          modules?.length ? (
-            <DataGrid
-              localeText={localeMap[locale].components.MuiDataGrid.defaultProps.localeText}
-              rows={modules}
-              columns={columns}
-              pageSizeOptions={[5, 10, 100]}
-            />
-          ) : (
-            <Typography sx={{ fontSize: "16px", textAlign: "center" }} mb={2} mt={6}>
-              {dictionary?.empty}
-            </Typography>
-          )
-        ) : (
+        {viewMode === "table" ? 
+        ( <DataTable modules={modules} />) : (
           <TreeFlow data={treeData} />
         )}
       </Box>

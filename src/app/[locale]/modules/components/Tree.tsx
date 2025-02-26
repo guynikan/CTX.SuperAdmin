@@ -5,7 +5,7 @@ import { Box, Button, CircularProgress, Modal, TextField, Typography } from "@mu
 
 
 import CustomNode from "./CustomNode";
-import { getLayoutedElements } from "./getLayoutedElements";
+import { getLayoutedElements } from "../functions/getLayoutedElements";
 
 const TreeFlowComponent = ({ data }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);

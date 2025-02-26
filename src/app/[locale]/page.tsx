@@ -7,13 +7,12 @@ import { ROUTES } from "@/routes";
 
 const links = [
   { name: "Login ✅", href: ROUTES.AUTH.LOGIN },
-  { name: "Modules ✅ ", href: ROUTES.MODULE.ROOT},
+  { name: "Criar Nova Entidade⌛", href: ROUTES.ENTITIES.NEW },
+  { name: "Modules ✅ ", href: ROUTES.MODULES.ROOT},
   { name: "Segment Types ✅", href: ROUTES.SEGMENTS.TYPES },
   { name: "Segment Values ✅", href: ROUTES.SEGMENTS.VALUES },
-  { name: "Modules ✅", href: ROUTES.MODULES.ROOT},
   { name: "Configuration Types ⌛", href: ROUTES.CONFIGURATION.RULES },
   { name: "Configuration Rules ⌛", href: ROUTES.CONFIGURATION.VALUES },
-
 ];
 
 export default function Home() {
@@ -53,9 +52,9 @@ export default function Home() {
             <Button
               variant="outlined"
               sx={{
-                fontSize: "14px",
-                height:'150px',
-                width:'200px',
+                fontSize: "13px",
+                height:'130px',
+                width:'180px',
                 borderRadius: "8px",
                 color: "black",
                 borderColor: "black",
