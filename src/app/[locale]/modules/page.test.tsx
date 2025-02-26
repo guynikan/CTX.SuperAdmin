@@ -46,7 +46,7 @@ describe("Modules Page", () => {
     await renderWithProvider();
 
     expect(screen.getByText("Todos os Módulos")).toBeInTheDocument();
-    expect(screen.getByText("Novo Módulo")).toBeInTheDocument();
+    expect(screen.getByText("Ver como Árvore")).toBeInTheDocument();
     expect(screen.getByText("Nome")).toBeInTheDocument();
     expect(screen.getByText("Descrição")).toBeInTheDocument();
     expect(screen.getByText("Nível")).toBeInTheDocument();
