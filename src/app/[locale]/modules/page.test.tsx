@@ -3,11 +3,22 @@ import ModulesPage from "./page";
 import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 import { useModules } from "@/hooks/useModules";
 import { Module } from "@/types/modules";
+import userEvent from "@testing-library/user-event";
 
 jest.mock("@/hooks/useModules", () => ({
   useModules: jest.fn(),
-
+  useCreateModule:jest.fn(() => ({
+    mutate: jest.fn(),
+    isPending: false, 
+  })),
+  useDeleteModule: jest.fn(() => ({
+    mutate: jest.fn(),
+    isPending: false, 
+  })),
 }));
+ 
+jest.mock("./components/Tree", () => () => <div data-testid="tree-flow">Tree Flow</div>);
+
 jest.mock("next/navigation", () => ({
   usePathname: jest.fn(() => "/pt_BR/modules"),
 }));
@@ -34,7 +45,7 @@ describe("Modules Page", () => {
     jest.clearAllMocks();
   });
 
-  it("render page correctly", async () => {
+  it("render page correctly as tree view", async () => {
     // Precisei fazer o casting do Mock aqui porque o React Query nao aceita o tipo da função mockReturnValue 
     (useModules as jest.Mock).mockReturnValue({ 
       data: mockModules,
@@ -42,15 +53,10 @@ describe("Modules Page", () => {
       isPending: false,
       error: null,
     });
-
     await renderWithProvider();
-
     expect(screen.getByText("Todos os Módulos")).toBeInTheDocument();
-    expect(screen.getByText("Ver como Árvore")).toBeInTheDocument();
-    expect(screen.getByText("Nome")).toBeInTheDocument();
-    expect(screen.getByText("Descrição")).toBeInTheDocument();
-    expect(screen.getByText("Nível")).toBeInTheDocument();
-    expect(screen.getByText("Ações")).toBeInTheDocument();
+    expect(screen.getByText("Ver como Tabela")).toBeInTheDocument();
+  
   });
 
   it("shows error message when data load fails", async () => {

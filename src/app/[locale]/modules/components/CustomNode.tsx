@@ -7,11 +7,11 @@ import { Handle, Position } from "@xyflow/react";
 interface CustomNodeProps {
   data: {  id: string, label: string, parentId: string };
   id: string;
-  handleAddModal: (parentId: string) => void;
+  handleModal: (parentId: string) => void;
   deleteNode: (nodeId: string) => Promise<void>;
 }
 
-export default function CustomNode({ data, id, handleAddModal, deleteNode }: CustomNodeProps) {
+export default function CustomNode({ data, id, handleModal, deleteNode }: CustomNodeProps) {
   return (
     <Box
       sx={{
@@ -48,7 +48,7 @@ export default function CustomNode({ data, id, handleAddModal, deleteNode }: Cus
         }}
       >
         <Button
-          onClick={() => handleAddModal(id)}
+          onClick={() => handleModal(id)}
           variant="text"
           color="primary"
           size="small"

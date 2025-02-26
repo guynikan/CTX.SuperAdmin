@@ -59,6 +59,7 @@ export default function ModulesPage() {
         <Typography variant="h6" fontWeight="bold">{dictionary?.title}</Typography>
         
         <Button
+          data-testid="view-mode"
           variant="outlined"
           color="secondary"
           size="small"

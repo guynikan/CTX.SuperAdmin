@@ -33,11 +33,11 @@ export default function DeleteModal({ open, onClose, confirmDelete, module, hasC
         <Typography sx={{ fontSize: "16px", textAlign: "center" }} mb={2}>
           {hasChildren ? (
             <span>
-              Não é possível remover o módulo <strong>{module?.name}</strong>, pois ele contém submódulos.
+              Não é possível remover o módulo, pois ele contém submódulos.
             </span>
           ) : (
             <span>
-              Deseja remover o módulo <strong>{module?.name}</strong>?
+              Deseja remover o módulo?
             </span>
           )}
         </Typography>
