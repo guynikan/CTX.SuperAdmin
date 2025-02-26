@@ -39,7 +39,13 @@ export default function DataTable({ modules }: { modules: Module[] }) {
     { field: "name", headerName: dictionary?.table.name, width: 320 },
     { field: "description", headerName: dictionary?.table.description, width: 250 },
     { field: "level", headerName: dictionary?.table.level, width: 150 },
-    { field: "parent", headerName: dictionary?.table.parent, width: 150 },
+    { field: "parent", 
+      headerName: dictionary?.table.parent, 
+      width: 150,    
+      renderCell: (params) => {
+        return <>{params.row.parent?.name}</>;
+      },
+    },
     {
       field: "actions",
       headerName: dictionary?.table.actions,
