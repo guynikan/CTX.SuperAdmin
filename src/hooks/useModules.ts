@@ -17,13 +17,13 @@ export function useModules() {
   });
 }
 
-export function useCreateSegmentType() {
+export function useCreateModule() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (data: CreateModule) => createModule(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["segment-types"] });
+      queryClient.invalidateQueries({ queryKey: ["modules"] });
       toast.success("Módulo criado com sucesso!");
     },
     onError: (error) => {

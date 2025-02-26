@@ -6,6 +6,8 @@ import { Box, Button, CircularProgress, Modal, TextField, Typography } from "@mu
 
 import CustomNode from "./CustomNode";
 import { getLayoutedElements } from "../functions/getLayoutedElements";
+import { useCreateModule } from "@/hooks/useModules";
+import { toast } from "react-toastify";
 
 const TreeFlowComponent = ({ data }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -14,12 +16,13 @@ const TreeFlowComponent = ({ data }) => {
   const [newNodeData, setNewNodeData] = useState({ name: "", parentId: "" });
   const [loading, setLoading] = useState(false);
 
-  const handleOpenModal = (parentId) => {
+  const handleOpenModal = useCallback(async (parentId: string) => {
     setNewNodeData({ name: "", parentId });
     setOpenModal(true);
-  };
-
+  },[]);
+  
   const handleCloseModal = () => setOpenModal(false);
+
 
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
@@ -34,11 +37,13 @@ const TreeFlowComponent = ({ data }) => {
 
       nodesMap.set(node.id, {
         id: node.id,
-        data: { label: node.name },
+        data: { 
+          label: node.name,
+          parentId
+        },
         position: { x: 0, y: 0 },
         type: "custom",
-        draggable: false, 
-
+        draggable: false,
       });
 
       if (parentId) {
@@ -58,11 +63,33 @@ const TreeFlowComponent = ({ data }) => {
     setEdges(layoutedEdges);
   }, [data]);
 
-  
-  const removeNode = async (nodeId: string) => {
+
+  const createModuleMutation = useCreateModule();
+
+  const handleAddNode = async () => {
+    if (!newNodeData.name.trim()) {
+      toast.error("O nome do módulo é obrigatório.");
+      return;
+    }
+
     setLoading(true);
     try {
-      // UseModulesHook para remover
+      await createModuleMutation.mutateAsync({
+        name: newNodeData.name,
+        description: "",
+        parentId: newNodeData.parentId,
+      });
+      setOpenModal(false);
+    } catch (error) {
+      console.error("Erro ao adicionar Módulo:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeNode = useCallback(async (nodeId: string) => {
+    setLoading(true);
+    try {
       setNodes((nds) => nds.filter((node) => node.id !== nodeId));
       setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
     } catch (error) {
@@ -70,9 +97,21 @@ const TreeFlowComponent = ({ data }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [setNodes, setEdges]);
 
-  const nodeTypes = useMemo(() => ({ custom: CustomNode }), []);
+  
+  const nodeTypes = useMemo(
+    () => ({
+      custom: (nodeProps) => (
+        <CustomNode
+          {...nodeProps}
+          handleOpenModal={handleOpenModal}
+          removeNode={removeNode}
+        />
+      ),
+    }),
+    [handleOpenModal, removeNode]
+  );
 
   useEffect(() => {
     processTreeData();
@@ -93,12 +132,25 @@ const TreeFlowComponent = ({ data }) => {
         <Controls />
       </ReactFlow>
       <Modal open={openModal} onClose={handleCloseModal}>
-        <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 300, bgcolor: "background.paper", borderRadius: 2, boxShadow: 24, p: 3 }}>
+        <Box  sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 600,
+            bgcolor: "background.paper",
+            borderTop:'5px solid #333',
+            boxShadow: 20,
+            p: 5,
+            borderRadius: 1,
+          }}>
           <Typography variant="h6">Adicionar Novo Módulo</Typography>
           <TextField label="Nome" fullWidth margin="dense" value={newNodeData.name} onChange={(e) => setNewNodeData({ ...newNodeData, name: e.target.value })} />
           <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
             <Button onClick={handleCloseModal} color="secondary" sx={{ mr: 1 }}>Cancelar</Button>
-            {/* <Button onClick={handleAddNode} variant="contained" color="primary" disabled={loading}>Adicionar</Button> */}
+            <Button onClick={handleAddNode} variant="outlined" color="primary" disabled={loading}>
+              Adicionar
+            </Button>
           </Box>
         </Box>
       </Modal>

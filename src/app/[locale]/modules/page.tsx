@@ -11,7 +11,7 @@ export default function ModulesPage() {
   const { data: modules, isLoading, error } = useModules();
   const {  dictionary } = useDictionary();
 
-  const [viewMode, setViewMode] = useState<"table" | "tree">("table");
+  const [viewMode, setViewMode] = useState<"table" | "tree">("tree");
 
   const treeData = useMemo(() => {
     const convertToTree = (items) => {

@@ -3,7 +3,7 @@ import { Box, Button, Typography } from "@mui/material";
 import { Handle, Position } from "@xyflow/react";
 
 interface CustomNodeProps {
-  data: { label: string };
+  data: { label: string, parentId: string };
   id: string;
   handleOpenModal: (parentId: string) => void;
   removeNode: (nodeId: string) => Promise<void>;
@@ -44,7 +44,7 @@ export default function CustomNode({ data, id, handleOpenModal, removeNode }: Cu
         }}
       >
         <Button
-          onClick={() => handleOpenModal(id)}
+          onClick={() => handleOpenModal(data.parentId)}
           variant="text"
           color="primary"
           size="small"
@@ -52,15 +52,20 @@ export default function CustomNode({ data, id, handleOpenModal, removeNode }: Cu
         >
           add
         </Button>
-        <Button
-          onClick={() => removeNode(id)}
-          variant="text"
-          color="error"
-          size="small"
-          sx={{ fontSize: 8, minWidth: 0, padding: "1px 3px", background: "#ff4e75", color: "#fff" }}
-        >
-          remove
-        </Button>
+        {data.parentId ? (
+          <Button
+            onClick={() => removeNode(id)}
+            variant="text"
+            color="error"
+            size="small"
+            sx={{ fontSize: 8, minWidth: 0, padding: "1px 3px", background: "#ff4e75", color: "#fff" }}
+          >
+            remove
+          </Button>
+          ) : (
+            <></>
+          )}
+        
       </Box>
     </Box>
   );
