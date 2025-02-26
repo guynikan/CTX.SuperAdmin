@@ -52,7 +52,7 @@ export default function CustomNode({ data, id, handleOpenModal, removeNode }: Cu
         >
           add
         </Button>
-        {data.parentId ? (
+        {data.parentId && (
           <Button
             onClick={() => removeNode(id)}
             variant="text"
@@ -62,10 +62,7 @@ export default function CustomNode({ data, id, handleOpenModal, removeNode }: Cu
           >
             remove
           </Button>
-          ) : (
-            <></>
           )}
-        
       </Box>
     </Box>
   );

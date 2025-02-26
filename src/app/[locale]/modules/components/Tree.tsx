@@ -39,7 +39,7 @@ const TreeFlowComponent = ({ data }) => {
         id: node.id,
         data: { 
           label: node.name,
-          parentId
+          parentId: node.id,
         },
         position: { x: 0, y: 0 },
         type: "custom",
@@ -71,6 +71,7 @@ const TreeFlowComponent = ({ data }) => {
       toast.error("O nome do módulo é obrigatório.");
       return;
     }
+    console.log({newNodeData})
 
     setLoading(true);
     try {
