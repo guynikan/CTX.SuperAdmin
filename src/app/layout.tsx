@@ -3,6 +3,7 @@
 import { getPreferredLocale } from "@/i18n/getPreferredLocale";
 import { DM_Sans } from "next/font/google";
 import Providers from "./providers";
+import Header from "./components/Header";
 
 const appFont = DM_Sans({
   weight: ["400", "600"],
@@ -21,6 +22,7 @@ export default function RootLayout({
     <html>
      <body style={ {padding:0, boxSizing:'border-box', margin: 0,}} className={appFont.className}>
         <Providers lang={locale}>
+          <Header/>
           {children}
         </Providers>
       </body>
