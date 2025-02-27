@@ -83,7 +83,7 @@ export default function SegmentValuesPage() {
         <Typography variant="h6" fontWeight="bold">
          {dictionary?.values.title}
         </Typography>
-        <Button onClick={() => setOpen(true)}  variant="contained" color="primary" size="small">
+        <Button onClick={() => setOpen(true)}  variant="outlined" color="primary" size="small">
          {dictionary?.values.registerButton}
         </Button>
       </Box>

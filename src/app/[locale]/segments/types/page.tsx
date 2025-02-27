@@ -82,7 +82,7 @@ export default function SegmentTypesPage() {
         <Typography variant="h6" fontWeight="bold">
           {dictionary?.types.title}
         </Typography>
-        <Button onClick={() => setOpen(true)} variant="contained" color="primary" size="small">
+        <Button onClick={() => setOpen(true)} variant="outlined" color="primary" size="small">
           {dictionary?.types.registerButton}
         </Button>
       </Box>
@@ -102,9 +102,9 @@ export default function SegmentTypesPage() {
           </Box>
         )}
       </Box>
+      <CreateModal open={open} onClose={() => setOpen(false)} />
       <EditModal open={editModalOpen} onClose={() => setEditModalOpen(false)} segment={selectedSegment} />
       <DeleteModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} segment={selectedSegment} />
-      <CreateModal open={open} onClose={() => setOpen(false)} />
     </Box>
   );
 }
