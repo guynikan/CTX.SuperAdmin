@@ -1,0 +1,15 @@
+{
+  "title": "Todos os Módulos",
+  "registerButton": "Novo Módulo",
+  "loading": "🔄 Carregando módulos..",
+  "errorTitle": "⚠️ Erro ao carregar módulos",
+  "errorMessage": "Tente novamente.",
+  "empty":"Não existem Módulos cadastrados",
+  "table": {
+    "name": "Nome",
+    "description": "Descrição",
+    "level": "Nível",
+    "parent": "Pai",
+    "actions": "Ações"
+  }
+}

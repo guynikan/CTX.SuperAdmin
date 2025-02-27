@@ -1,7 +1,10 @@
 export const ROUTES = {
   HOME: "/home",
-  MODULE:{
-    ROOT: '/module'
+  MODULES:{
+    ROOT: '/modules'
+  },
+  ENTITIES:{
+    NEW: '/new-entity'
   },
   AUTH: {
     ROOT: "/auth",
