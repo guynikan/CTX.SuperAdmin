@@ -1,38 +1,36 @@
 import { render, screen } from "@testing-library/react";
 import CreateModal from "./CreateModal";
+import { useDictionary } from "@/i18n/DictionaryProvider";
 
-jest.mock("@/hooks/segments/useSegmentValues", () => ({
-  useCreateSegmentValue: jest.fn(() => ({
-    mutate: jest.fn(),
-    isPending: false, 
-  })),
-  useUpdateSegmentValue: jest.fn(() => ({
-    mutate: jest.fn(),
-    isPending: false,
-  })),
+jest.mock("@/i18n/DictionaryProvider", () => ({
+  useDictionary: jest.fn(),
 }));
 
-jest.mock("@/hooks/segments/useSegmentTypes", () => ({
-  useCreateSegmentType:jest.fn(() => ({
-    mutate: jest.fn(),
-    isPending: false, 
-  })),
-  useUpdateSegmentType: jest.fn(() => ({
-    mutate: jest.fn(),
-    isPending: false,
-  })),
-}));
+jest.mock("./SegmentTypeForm", () => {
+  const MockSegmentTypeForm = () => <div data-testid="segment-type-form">Mock Form</div>;
+  // ESlint reclama por não ter display name, por isso adicinei
+  MockSegmentTypeForm.displayName = "MockSegmentTypeForm"; 
+  return MockSegmentTypeForm;
+});
 
-const mockDictionary = {
-  title: "Criar Segment Type",
-};
+describe("Create Modal", () => {
+  const mockOnClose = jest.fn();  
 
-describe("Modal Create Segment Type", () => {
-
-  it("render modal correctly", async () => {
-
-    render(<CreateModal open={true} onClose={() => {}} />);
-    expect(screen.getByText(mockDictionary.title)).toBeInTheDocument();   
+  beforeEach(() => {
+    (useDictionary as jest.Mock).mockReturnValue({
+      dictionary: {
+        types: {
+          modal: {
+            titleCreate: "Criar Novo Tipo de Segmento",
+          },
+        },
+      },
+    });
   });
 
+  it("render component correctly", () => {
+    render(<CreateModal open={true} onClose={mockOnClose} />);
+    expect(screen.getByText("Criar Novo Tipo de Segmento")).toBeInTheDocument();
+    expect(screen.getByTestId("segment-type-form")).toBeInTheDocument();
+  });
 });
