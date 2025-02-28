@@ -3,7 +3,7 @@ import { Node, Edge } from "@xyflow/react";
 import { getLayoutedElements } from "../functions/getLayoutedElements";
 import { SetState } from "@/types/modules";
 
-interface TreeNode {
+type TreeNode = {
   id: string;
   name: string;
   level: number;
@@ -22,7 +22,7 @@ export function useProcessTreeData(setNodes: SetState<Node[]>, setEdges: SetStat
 
       nodesMap.set(node.id, {
         id: node.id,
-        data: { label: node.name, parentId: node.id },
+        data: { id: node.id, label: node.name, parentId},
         position: { x: 0, y: 0 },
         type: "custom",
         draggable: false,
@@ -35,7 +35,7 @@ export function useProcessTreeData(setNodes: SetState<Node[]>, setEdges: SetStat
       node.children?.forEach((child) => traverseTree(child, node.id));
     };
 
-    data.filter(n => n.level === 0).forEach(rootNode => traverseTree(rootNode));
+    data.filter(node => node.level === 0).forEach(rootNode => traverseTree(rootNode));
 
     const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
       Array.from(nodesMap.values()),

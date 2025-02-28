@@ -54,11 +54,12 @@ export default function ModulesPage() {
     );
 
   return (
-    <Box sx={{ width: "100%", maxWidth: "1000px", margin: "auto", padding: 2 }}>
+    <Box sx={{ width: "100%", maxWidth: "90%", margin: "auto", padding: 2 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
         <Typography variant="h6" fontWeight="bold">{dictionary?.title}</Typography>
         
         <Button
+          data-testid="view-mode"
           variant="outlined"
           color="secondary"
           size="small"

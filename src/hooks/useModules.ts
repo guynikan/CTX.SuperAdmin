@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   createModule,
+  deleteModule,
   getModules,
 } from "@/services/modules";
 import { CreateModule } from "@/types/modules";
@@ -33,5 +34,18 @@ export function useCreateModule() {
   });
 }
 
+export function useDeleteModule() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteModule(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["modules"] }); 
+      toast.success("Módulo removido com sucesso!");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Ocorreu um erro ao remover o modulo.");
+    },
+  });
+}
 
 

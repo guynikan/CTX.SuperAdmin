@@ -4,7 +4,7 @@ export function useNodeModal() {
   const [openModal, setOpenModal] = useState(false);
   const [newNodeData, setNewNodeData] = useState({ name: "", parentId: "" });
 
-  const handleOpenModal = useCallback((parentId: string) => {
+  const handleAddModal = useCallback((parentId: string) => {
     setNewNodeData({ name: "", parentId });
     setOpenModal(true);
   }, []);
@@ -13,7 +13,7 @@ export function useNodeModal() {
 
   return {
     openModal,
-    handleOpenModal,
+    handleAddModal,
     handleCloseModal,
     newNodeData,
     setOpenModal,
