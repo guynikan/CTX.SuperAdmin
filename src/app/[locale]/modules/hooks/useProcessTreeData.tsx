@@ -35,7 +35,7 @@ export function useProcessTreeData(setNodes: SetState<Node[]>, setEdges: SetStat
       node.children?.forEach((child) => traverseTree(child, node.id));
     };
 
-    data.filter(n => n.level === 0).forEach(rootNode => traverseTree(rootNode));
+    data.filter(node => node.level === 0).forEach(rootNode => traverseTree(rootNode));
 
     const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
       Array.from(nodesMap.values()),

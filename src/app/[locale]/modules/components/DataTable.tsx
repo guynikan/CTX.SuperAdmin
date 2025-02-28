@@ -20,13 +20,13 @@ const transformModulesToTree = (modules: Module[]): any[] => {
   });
 
   // Construindo a hierarquia
-  modules.forEach((mod) => {
-    if (mod.parentId && map.has(mod.parentId)) {
-      const parent = map.get(mod.parentId);
-      parent.children.push(map.get(mod.id));
-      map.get(mod.id).path = [...parent.path, mod.name]; // Construindo path
+  modules.forEach((module) => {
+    if (module.parentId && map.has(module.parentId)) {
+      const parent = map.get(module.parentId);
+      parent.children.push(map.get(module.id));
+      map.get(module.id).path = [...parent.path, module.name]; // Construindo path
     } else {
-      map.get(mod.id).path = [mod.name]; // Raízes começam do próprio nome
+      map.get(module.id).path = [module.name]; // Raízes começam do próprio nome
       roots.push(map.get(mod.id));
     }
   });
