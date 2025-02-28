@@ -13,4 +13,6 @@ export type Module = {
   configurations?: string[]
 }
 
+export type SetState<T> = React.Dispatch<React.SetStateAction<T>>;
+
 export type CreateModule = Pick<Module, "name" | "description" | "parentId">;
