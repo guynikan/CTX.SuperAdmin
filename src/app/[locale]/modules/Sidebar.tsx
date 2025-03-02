@@ -2,15 +2,24 @@
 
 import { Paper, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { AccountCircle, Login, TrendingUp } from "@mui/icons-material";
 
+const modules = [
+  { label: "Manutenção cadastral", icon: <AccountCircle />, path: "/modules/manutencao-cadastral" },
+  { label: "Adesão", icon: <Login />, path: "/modules/adesao" },
+  { label: "Rentabilidade", icon: <TrendingUp />, path: "/modules/rentabilidade" },
+];
 
-type SidebarProps =  {
-  modules: { label: string; icon: Element; active: boolean }[];
-  onAddModule: () => void;
-}
+const handleAddModule = () => {
+  console.log("Adicionar módulo");
+};
 
-export default function Sidebar({ modules, onAddModule }: SidebarProps) {
+export default function Sidebar() {
   const hasModules = modules.length > 0;
+
+  const pathname = usePathname();
 
   return (
     <>
@@ -21,9 +30,9 @@ export default function Sidebar({ modules, onAddModule }: SidebarProps) {
         }} 
         variant="outlined" 
         fullWidth 
-        onClick={onAddModule}
+        onClick={handleAddModule}
         startIcon={<AddIcon />}>
-          Adicionar módulo
+          Adicionar módulo 
        </Button>
 
       {hasModules && <Paper
@@ -37,27 +46,29 @@ export default function Sidebar({ modules, onAddModule }: SidebarProps) {
       >
 
         { modules.map((item, index) => (
-          <Button
-            key={index}
-            fullWidth
-            variant="outlined"
-            startIcon={item.icon}
-            sx={{
-              justifyContent: "flex-start",
-              mb: 1,
-              p: 2,
-              borderRadius: 2,
-              fontSize: "1rem",
-              fontWeight: 500,
-              color: item.active ? "white" : "black",
-              backgroundColor: item.active ? "black" : "#FFF",
-              "&:hover": {
-                backgroundColor: item.active ? "black" : "#f3f3f3",
-              },
-            }}
-          >
-            {item.label}
-          </Button>
+           <Link key={item.path} href={item.path} passHref>
+      
+           <Button
+             variant="outlined"
+             fullWidth
+             startIcon={item.icon}
+             sx={{
+               justifyContent: "flex-start",
+               p: 1.8,
+               my:1, 
+               borderRadius: 3,
+               fontSize: "1rem",
+               fontWeight: 500,
+               color: pathname === item.path ? "red" : "black",
+               backgroundColor: pathname === item.path ? "red" : "white",
+               "&:hover": {
+                 backgroundColor: pathname === item.path ? "red" : "#ebebeb",
+               },
+             }}
+           >
+             {item.label}
+           </Button>
+         </Link>
         ))}
       </Paper>}
     </>
