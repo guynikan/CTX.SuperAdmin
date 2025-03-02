@@ -1,23 +1,21 @@
 "use client";
 
-import { Paper, Button } from "@mui/material";
+import { Paper, Button, Box, Typography, CircularProgress } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AccountCircle, Login, TrendingUp } from "@mui/icons-material";
 
-const modules = [
-  { label: "Manutenção cadastral", icon: <AccountCircle />, path: "/modules/manutencao-cadastral" },
-  { label: "Adesão", icon: <Login />, path: "/modules/adesao" },
-  { label: "Rentabilidade", icon: <TrendingUp />, path: "/modules/rentabilidade" },
-];
+import { useModules } from "@/hooks/useModules";
 
 const handleAddModule = () => {
   console.log("Adicionar módulo");
 };
 
 export default function Sidebar() {
-  const hasModules = modules.length > 0;
+
+  const { data: modules, isLoading } = useModules();
+
+  const rootModules = modules?.filter((module) => !module.parentId) || [];
 
   const pathname = usePathname();
 
@@ -35,42 +33,54 @@ export default function Sidebar() {
           Adicionar módulo 
        </Button>
 
-      {hasModules && <Paper
-        elevation={1}
-        sx={{
-          borderRadius: 2,
-          overflow: "hidden",
-          p: 2,
-          backgroundColor: "white",
-        }}
-      >
-
-        { modules.map((item, index) => (
-           <Link key={item.path} href={item.path} passHref>
-      
-           <Button
-             variant="outlined"
-             fullWidth
-             startIcon={item.icon}
-             sx={{
-               justifyContent: "flex-start",
-               p: 1.8,
-               my:1, 
-               borderRadius: 3,
-               fontSize: "1rem",
-               fontWeight: 500,
-               color: pathname === item.path ? "red" : "black",
-               backgroundColor: pathname === item.path ? "red" : "white",
-               "&:hover": {
-                 backgroundColor: pathname === item.path ? "red" : "#ebebeb",
-               },
-             }}
-           >
-             {item.label}
-           </Button>
-         </Link>
-        ))}
-      </Paper>}
+       <Paper
+      elevation={3}
+      sx={{
+        borderRadius: 3,
+        overflow: "hidden",
+        p: 1.5,
+        backgroundColor: "white",
+        display: "flex",
+        flexDirection: "column",
+        gap: 1,
+      }}
+    >
+      {isLoading ? (
+        <Box sx={{ textAlign: "center", py: 3 }}>
+          <CircularProgress size={24} />
+        </Box>
+      ) : rootModules.length > 0 ? (
+        rootModules.map((item) => (
+          <Link key={item.id} href={`/modules/${item.id}`} passHref>
+            <Button
+              variant="outlined"
+              fullWidth
+              sx={{
+                justifyContent: "flex-start",
+                p: 1.8,
+                borderRadius: 3,
+                fontSize: "1rem",
+                fontWeight: 500,
+                color: pathname === `/modules/${item.id}` ? "white" : "black",
+                backgroundColor: pathname === `/modules/${item.id}` ? "black" : "#white",
+                "&:hover": {
+                  backgroundColor: pathname === `/modules/${item.id}` ? "black" : "#E0E0E0",
+                },
+              }}
+            >
+              {item.name}
+            </Button>
+          </Link>
+        ))
+      ) : (
+        <Box sx={{ textAlign: "center", py: 3 }}>
+          <Typography sx={{ fontSize: "0.9rem", color: "#666", mb: 1 }}>
+            Nenhum módulo cadastrado
+          </Typography>
+        
+        </Box>
+      )}
+    </Paper>
     </>
   );
 }

@@ -3,10 +3,8 @@
 import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 
 import Grid from "@mui/material/Grid2";
-
 import Sidebar from "./Sidebar";
-import { Box, Typography } from "@mui/material";
-import { Home } from "@mui/icons-material";
+import { Box } from "@mui/material";
 
 export default function ModulesLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -32,10 +30,7 @@ export default function ModulesLayout({ children }: { children: React.ReactNode 
           flexDirection: "column",
           height: "100vh",
         }}>
-
-        
           {children}
-
         </Grid>
       </Grid>
     </Box>

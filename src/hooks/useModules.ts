@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createModule,
   deleteModule,
+  getModuleById,
   getModules,
 } from "@/services/modules";
 import { CreateModule } from "@/types/modules";
@@ -15,6 +16,14 @@ export function useModules() {
     staleTime: 1000 * 60 * 5, 
     retry: 3, 
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000), // Backoff exponencial
+  });
+}
+
+export function useModuleById(id: string) {
+  return useQuery({
+    queryKey: ["modules", id],
+    queryFn: () => getModuleById(id),
+    enabled: !!id,
   });
 }
 
