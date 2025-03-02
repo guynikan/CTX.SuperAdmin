@@ -7,7 +7,6 @@ import { ROUTES } from "@/routes";
 
 const links = [
   { name: "Login ✅", href: ROUTES.AUTH.LOGIN },
-  { name: "Criar Nova Entidade⌛", href: ROUTES.ENTITIES.NEW },
   { name: "Modules ✅ ", href: ROUTES.MODULES.ROOT},
   { name: "Segment Types ✅", href: ROUTES.SEGMENTS.TYPES },
   { name: "Segment Values ✅", href: ROUTES.SEGMENTS.VALUES },

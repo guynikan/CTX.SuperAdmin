@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import ModulesPage from "./page";
+import ModulesPage from "./view";
 import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 import { useModules } from "@/hooks/useModules";
 import { Module } from "@/types/modules";

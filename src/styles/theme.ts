@@ -10,7 +10,7 @@ export const theme = createTheme({
       main: '#FFC107', 
     },
     background: {
-      default: '#F8F9FA', 
+      default: '#FFF', 
       paper: '#FFFFFF', 
     },
     text: {
@@ -38,6 +38,9 @@ export const theme = createTheme({
           borderRadius: '8px', 
           padding: '10px 16px',
         },
+        outlined:{
+          borderColor:'#E9E9E9',
+        }
       },
     },
     MuiCard: {

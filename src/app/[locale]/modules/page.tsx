@@ -1,80 +1,100 @@
 "use client";
 
-import { Box, Button, Typography } from "@mui/material";
-import { useDictionary } from "@/i18n/DictionaryProvider";
-import { useModules } from "@/hooks/useModules";
-import TreeFlow from "./components/Tree";
-import { useState, useMemo } from "react";
-import DataTable from "./components/DataTable";
+import { Box, Button, Typography, Divider } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+import AddIcon from "@mui/icons-material/Add";
+import { AccountCircle, Login, TrendingUp } from "@mui/icons-material";
+
+import SettingsIcon from "@mui/icons-material/Settings";
+import FolderOpenIcon from "@mui/icons-material/FolderOpen";
+// import FilterListIcon from "@mui/icons-material/FilterList";
+import HomeIcon from "@mui/icons-material/Home";
+import Sidebar from "./Sidebar";
 
 export default function ModulesPage() {
-  const { data: modules, isLoading, error } = useModules();
-  const {  dictionary } = useDictionary();
 
-  const [viewMode, setViewMode] = useState<"table" | "tree">("tree");
+  const modules = [
+    { label: "Manutenção cadastral", icon: <AccountCircle />, active: true },
+    { label: "Adesão", icon: <Login />, active: false },
+    { label: "Rentabilidade", icon: <TrendingUp />, active: false },
+  ];
 
-  const treeData = useMemo(() => {
-    const convertToTree = (items) => {
-      const map = new Map();
-      const tree = [];
-
-      items.forEach((item) => {
-        map.set(item.id, { ...item, children: [] });
-      });
-
-      items.forEach((item) => {
-        if (item.parentId) {
-          map.get(item.parentId)?.children.push(map.get(item.id));
-        } else {
-          tree.push(map.get(item.id));
-        }
-      });
-
-      return tree;
-    };
-
-    return convertToTree(modules || []);
-  }, [modules]);
-
-
-
-  if (isLoading)
-    return (
-      <Typography sx={{ marginTop: 2, display: "flex", justifyContent: "center" }}>
-        {dictionary?.loading}
-      </Typography>
-    );
-
-  if (error)
-    return (
-      <Box sx={{ padding: 2, textAlign: "center", color: "red" }}>
-        <Typography>{dictionary?.errorTitle}</Typography>
-        <Typography>{dictionary?.errorMessage}</Typography>
-      </Box>
-    );
+  const handleAddModule = () => {
+    console.log("Adicionar módulo");
+  };
 
   return (
-    <Box sx={{ width: "100%", maxWidth: "90%", margin: "auto", padding: 2 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-        <Typography variant="h6" fontWeight="bold">{dictionary?.title}</Typography>
-        
-        <Button
-          data-testid="view-mode"
-          variant="outlined"
-          color="secondary"
-          size="small"
-          onClick={() => setViewMode(viewMode === "table" ? "tree" : "table")}
-        >
-          {viewMode === "table" ? "Ver como Árvore" : "Ver como Tabela"}
-        </Button>
-      </Box>
 
-      <Box sx={{ height: "800px", width: "100%", overflowX: "auto" }}>
-        {viewMode === "table" ? 
-        ( <DataTable modules={modules} />) : (
-          <TreeFlow data={treeData} />
+    <Box sx={{ maxWidth: 1100, mx: "auto", width: "100%" }}>
+      <Grid container sx={{ marginTop:'40px', height: "100vh" }}>
+        {/* Sidebar */}
+        <Grid sx={{
+            flex: "0 0 30%",
+            p: 1,
+            display: "flex",
+            flexDirection: "column",
+            height: "100vh",
+          }}>
+         <Sidebar modules={modules} onAddModule={handleAddModule} />
+        </Grid>
+        
+        {/* Main Content */}
+        <Grid sx={{
+          flex: "0 0 70%",
+          px: 3,
+          display: "flex",
+          flexDirection: "column",
+          height: "100vh",
+        }}>
+
+           {/* Header */}
+           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <HomeIcon fontSize="small" sx={{ color: "#757575" }} />
+                <Typography variant="subtitle2" sx={{ color: "#757575" }}>Home / Módulos</Typography>
+              </Box>
+              {/* <IconButton>
+                <FilterListIcon />
+              </IconButton> */}
+            </Box>
+
+            {modules.length > 0 ? (
+              <>
+              
+            
+            <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>Manutenção cadastral</Typography>
+            
+            {/* Actions */}
+            <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+              <Button variant="outlined" startIcon={<AddIcon />}>Novo Submódulo</Button>
+              <Button variant="outlined" startIcon={<SettingsIcon />}>Nova Configuração</Button>
+            </Box>
+            
+            {/* Submodules */}
+            <Typography variant="subtitle1" fontWeight={600}>Submódulos</Typography>
+            <Divider sx={{ my: 1 }} />
+            
+            {/* Empty State */}
+            
+          </>
+        ) : (
+          <Box sx={{ textAlign: "center" }}>
+           <Box sx={{ display: "flex", justifyContent:'flex-start', flexDirection: "column", textAlign:'center', alignItems: "center", mt: 6 }}>
+              <FolderOpenIcon sx={{ fontSize: 60, color: "#BDBDBD" }} />
+              <Typography sx={{ color: "#757575" }}>Nenhum módulo cadastrado<br/>Crie no menu à esquerda</Typography>
+          
+            </Box>
+           
+          </Box>
         )}
-      </Box>
+         
+
+
+
+        </Grid>
+      </Grid>
     </Box>
+
+    
   );
 }
