@@ -3,9 +3,9 @@
 import { Box, Button, Typography } from "@mui/material";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 import { useModules } from "@/hooks/useModules";
-import TreeFlow from "./components/Tree";
+import TreeFlow from "./Tree";
 import { useState, useMemo } from "react";
-import DataTable from "./components/DataTable";
+import DataTable from "./DataTable";
 
 export default function ModulesView() {
   const { data: modules, isLoading, error } = useModules();

@@ -3,7 +3,7 @@
 import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 
 import Grid from "@mui/material/Grid2";
-import Sidebar from "./Sidebar";
+import Sidebar from "./components/Sidebar";
 import { Box } from "@mui/material";
 
 export default function ModulesLayout({ children }: { children: React.ReactNode }) {

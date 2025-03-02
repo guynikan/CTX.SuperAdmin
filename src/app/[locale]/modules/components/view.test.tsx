@@ -16,7 +16,7 @@ jest.mock("@/hooks/useModules", () => ({
   })),
 }));
  
-jest.mock("./components/Tree", () => () => <div data-testid="tree-flow">Tree Flow</div>);
+jest.mock("./Tree", () => () => <div data-testid="tree-flow">Tree Flow</div>);
 
 jest.mock("next/navigation", () => ({
   usePathname: jest.fn(() => "/pt_BR/modules"),
