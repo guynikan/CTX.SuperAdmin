@@ -20,7 +20,6 @@ export default function ModulePageDetail() {
           <CircularProgress size={24} />
         </Box>
       ) : module ? (
-
         <>
          {/* Header */}
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
@@ -32,9 +31,7 @@ export default function ModulePageDetail() {
               <FilterListIcon />
             </IconButton>
           </Box>
-
-          <Typography variant="h6" fontWeight={600} sx={{ mb: 2, textAlign:"left" }}>Módulo - {module.name}</Typography>
-                
+          <Typography variant="h6" fontWeight={600} sx={{ mb: 2, textAlign:"left" }}>Módulo - {module.name}</Typography>    
           {/* Actions */}
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
             <Button variant="outlined" startIcon={<AddIcon />}>Novo Submódulo</Button>
@@ -48,7 +45,6 @@ export default function ModulePageDetail() {
       ) : (
         <Typography variant="h5">Módulo não encontrado</Typography>
       )}
-     
     </Box>
   );
 }

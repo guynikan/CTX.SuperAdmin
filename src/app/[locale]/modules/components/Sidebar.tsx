@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { useModules } from "@/hooks/useModules";
+import { useDictionary } from "@/i18n/DictionaryProvider";
 
 const handleAddModule = () => {
   console.log("Adicionar módulo");
@@ -14,6 +15,7 @@ const handleAddModule = () => {
 export default function Sidebar() {
 
   const { data: modules, isLoading } = useModules();
+  const {  dictionary } = useDictionary();
 
   const rootModules = modules?.filter((module) => !module.parentId) || [];
 
@@ -30,7 +32,7 @@ export default function Sidebar() {
         fullWidth 
         onClick={handleAddModule}
         startIcon={<AddIcon />}>
-          Adicionar módulo 
+        {dictionary?.registerButton}
        </Button>
 
        <Paper
@@ -62,7 +64,7 @@ export default function Sidebar() {
                 fontSize: "1rem",
                 fontWeight: 500,
                 color: pathname === `/modules/${item.id}` ? "white" : "black",
-                backgroundColor: pathname === `/modules/${item.id}` ? "black" : "#white",
+                backgroundColor: pathname === `/modules/${item.id}` ? "black" : "white",
                 "&:hover": {
                   backgroundColor: pathname === `/modules/${item.id}` ? "black" : "#E0E0E0",
                 },
