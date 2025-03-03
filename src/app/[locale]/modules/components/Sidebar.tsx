@@ -8,14 +8,10 @@ import { usePathname } from "next/navigation";
 import { useModules } from "@/hooks/useModules";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 
-const handleAddModule = () => {
-  console.log("Adicionar módulo");
-};
-
-export default function Sidebar() {
+export default function Sidebar({ handleAddModule }: { handleAddModule: () => void }) {
 
   const { data: modules, isLoading } = useModules();
-  const {  dictionary } = useDictionary();
+  const { dictionary } = useDictionary();
 
   const rootModules = modules?.filter((module) => !module.parentId) || [];
 

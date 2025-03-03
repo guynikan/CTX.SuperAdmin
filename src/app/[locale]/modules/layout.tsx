@@ -1,12 +1,19 @@
 "use client";
 
-import { DictionaryProvider } from "@/i18n/DictionaryProvider";
-
+import { Box } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import Sidebar from "./components/Sidebar";
-import { Box } from "@mui/material";
+
+import { DictionaryProvider } from "@/i18n/DictionaryProvider";
+
+import CreateModal from "./components/CreateModal";
+import { useState } from "react";
+
 
 export default function ModulesLayout({ children }: { children: React.ReactNode }) {
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
   <DictionaryProvider namespace="modules">
     <Box sx={{ maxWidth: '1260px', mx: "auto", width: "100%" }}>
@@ -19,7 +26,7 @@ export default function ModulesLayout({ children }: { children: React.ReactNode 
             flexDirection: "column",
             height: "100vh",
           }}>
-          <Sidebar />
+          <Sidebar handleAddModule={() => setIsModalOpen(true)} />
         </Grid>
         
         {/* Main Content */}
@@ -33,6 +40,7 @@ export default function ModulesLayout({ children }: { children: React.ReactNode 
           {children}
         </Grid>
       </Grid>
+      <CreateModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </Box>
   </DictionaryProvider>); 
 }
