@@ -5,6 +5,11 @@
   "errorTitle": "⚠️ Error loading modules",
   "errorMessage": "Please try again later.",
   "empty": "No data for modules",
+  "rootName": "Modules",
+  "rootNameSingle": "Module",
+  "newSubModule":"New Submodule",
+  "newConfiguration":"New Configuration",
+  "subModules":"Submodules",
   "table": {
     "name": "Name",
     "description": "Description",

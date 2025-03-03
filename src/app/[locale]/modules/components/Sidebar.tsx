@@ -77,9 +77,8 @@ export default function Sidebar() {
       ) : (
         <Box sx={{ textAlign: "center", py: 3 }}>
           <Typography sx={{ fontSize: "0.9rem", color: "#666", mb: 1 }}>
-            Nenhum módulo cadastrado
+            {dictionary?.empty}
           </Typography>
-        
         </Box>
       )}
     </Paper>

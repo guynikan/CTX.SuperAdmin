@@ -11,12 +11,10 @@ jest.mock("next/navigation", () => ({
   usePathname: jest.fn(() => "pt_BR/modules/mod123"),
 }));
 
-
 const mockModules = [
   { id: "mod123", name: "Módulo Teste", parentId: null },
   { id: "mod456", name: "Outro Módulo", parentId: null },
 ];
-
 
 const renderWithProvider = async () => {
   render(
@@ -28,7 +26,6 @@ const renderWithProvider = async () => {
     expect(screen.queryByText("Carregando traduções...")).not.toBeInTheDocument();
   });
 };
-
 
 describe("Sidebar Component", () => {
   beforeEach(() => {
