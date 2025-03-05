@@ -11,7 +11,6 @@ import { useDictionary } from "@/i18n/DictionaryProvider";
 
 import { useModuleById } from "@/hooks/useModules";
 
-
 export default function ModulePageDetail() {
   const {  dictionary } = useDictionary();
   
@@ -36,7 +35,9 @@ export default function ModulePageDetail() {
               <FilterListIcon />
             </IconButton>
           </Box>
-          <Typography variant="h6" fontWeight={600} sx={{ mb: 2, textAlign:"left" }}>{module.name}</Typography>    
+          <Typography variant="h6" fontWeight={600} sx={{ textAlign:"left" }}>{module.name}</Typography>   
+          <Typography sx={{ mb: 2, textAlign:"left" }}>{module.description}</Typography>    
+ 
           {/* Actions */}
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
             <Button variant="outlined" startIcon={<AddIcon />}>{dictionary?.newSubModule}</Button>
