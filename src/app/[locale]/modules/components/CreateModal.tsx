@@ -8,31 +8,38 @@ import { Box, Button, Modal, TextField, Typography } from "@mui/material";
 type ModuleFormData = {
   name: string;
   description?: string;
+  parentId?: string; 
 };
-interface CreateModalProps {
+
+interface CreateModuleModalProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: ModuleFormData) => void;
+  parentId?: string; // 🔹 Pode ser passado ou não
   loading: boolean;
 }
 
+// 📌 Validação Yup
 const schema = yup.object().shape({
   name: yup.string().trim().required("O nome do módulo é obrigatório"),
   description: yup.string().optional(),
+  parentId: yup.string().optional(), 
 });
 
-export default function CreateModal({ open, onClose, onSubmit, loading }: CreateModalProps) {
+export default function CreateModuleModal({ open, onClose, onSubmit, parentId, loading }: CreateModuleModalProps) {
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<ModuleFormData>({
     resolver: yupResolver(schema),
     mode: "onTouched",
-    defaultValues: { name: "", description: "" },
+    defaultValues: { name: "", description: "", parentId: parentId || undefined },
   });
 
   const handleClose = () => {
+    reset(); // Resetar os campos ao fechar
     onClose();
   };
 
@@ -52,9 +59,11 @@ export default function CreateModal({ open, onClose, onSubmit, loading }: Create
           borderRadius: 1,
         }}
       >
-        <Typography variant="h6">Adicionar Novo Módulo</Typography>
+        <Typography variant="h6">
+          {parentId ? "Adicionar Novo Submódulo" : "Adicionar Novo Módulo"}
+        </Typography>
 
-        {/* Nome do módulo */}
+        {/* Nome do Módulo */}
         <Controller
           name="name"
           control={control}
@@ -70,7 +79,7 @@ export default function CreateModal({ open, onClose, onSubmit, loading }: Create
           )}
         />
 
-        {/* Descrição do módulo */}
+        {/* Descrição do Módulo */}
         <Controller
           name="description"
           control={control}
@@ -79,8 +88,11 @@ export default function CreateModal({ open, onClose, onSubmit, loading }: Create
           )}
         />
 
+        {/* ID do Módulo Pai (oculto, apenas se for submódulo) */}
+        {parentId && <input type="hidden" value={parentId} {...control.register("parentId")} />}
+
         <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
-          <Button onClick={handleClose} color="error" sx={{ mr: 1 }}>
+          <Button onClick={handleClose} color="secondary" sx={{ mr: 1 }}>
             Cancelar
           </Button>
           <Button type="submit" variant="outlined" color="primary" disabled={loading} onClick={handleSubmit(onSubmit)}>

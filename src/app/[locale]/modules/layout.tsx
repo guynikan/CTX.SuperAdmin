@@ -24,20 +24,20 @@ export default function ModulesLayout({ children }: { children: React.ReactNode 
   });
 
   const addModule = async (moduleData: object) => {
-      setLoading(true);
-      try {
-        await createModuleMutation.mutateAsync({
-          name: moduleData.name,
-          description: moduleData.description,
-        });
-        setIsModalOpen(false);
-        setModuleData({ name: "", description: "" }); 
-      } catch (error) {
-        console.error("Erro ao adicionar Módulo:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    setLoading(true);
+    try {
+      await createModuleMutation.mutateAsync({
+        name: moduleData.name,
+        description: moduleData.description,
+      });
+      setIsModalOpen(false);
+      setModuleData({ name: "", description: "" }); 
+    } catch (error) {
+      console.error("Erro ao adicionar Módulo:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   
 
   return (

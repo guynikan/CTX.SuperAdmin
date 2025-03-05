@@ -9,13 +9,42 @@ import SettingsIcon from "@mui/icons-material/Settings";
 
 import { useDictionary } from "@/i18n/DictionaryProvider";
 
-import { useModuleById } from "@/hooks/useModules";
+import { useCreateModule, useModuleById } from "@/hooks/useModules";
+import { useState } from "react";
+import CreateModuleModal from "../components/CreateModal";
 
 export default function ModulePageDetail() {
   const {  dictionary } = useDictionary();
   
   const { module: id } = useParams();
   const { data: module, isLoading } = useModuleById(String(id));
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const createModuleMutation = useCreateModule();
+  
+  const [moduleData, setModuleData] = useState({
+    name: "",
+    description: "",
+  });
+
+  const addModule = async (moduleData: object) => {
+    setLoading(true);
+    try {
+      await createModuleMutation.mutateAsync({
+        parentId: module?.id,
+        name: moduleData.name,
+        description: moduleData.description,
+      });
+      setIsModalOpen(false);
+      setModuleData({ name: "", description: "" }); 
+    } catch (error) {
+      console.error("Erro ao adicionar Módulo:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Box sx={{ textAlign: "center" }}>
@@ -40,7 +69,7 @@ export default function ModulePageDetail() {
  
           {/* Actions */}
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-            <Button variant="outlined" startIcon={<AddIcon />}>{dictionary?.newSubModule}</Button>
+            <Button onClick={()=> setIsModalOpen(true)} variant="outlined" startIcon={<AddIcon />}>{dictionary?.newSubModule}</Button>
             <Button variant="outlined" startIcon={<SettingsIcon />}>{dictionary?.newConfiguration}</Button>
           </Box>
 
@@ -51,6 +80,14 @@ export default function ModulePageDetail() {
       ) : (
         <Typography variant="h5">{dictionary?.emptySingle}</Typography>
       )}
+
+      <CreateModuleModal 
+        open={isModalOpen} 
+        onSubmit={addModule}
+        moduleData={moduleData}
+        setModuleData={setModuleData}
+        loading={loading}
+        onClose={() => setIsModalOpen(false)} />
     </Box>
   );
 }
