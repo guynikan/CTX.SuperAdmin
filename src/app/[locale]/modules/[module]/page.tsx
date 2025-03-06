@@ -1,6 +1,5 @@
 "use client";
 
-import { useParams } from "next/navigation";
 import { Box, Button, CircularProgress, Divider, IconButton, Typography } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { Home } from "@mui/icons-material";
@@ -11,10 +10,13 @@ import { useDictionary } from "@/i18n/DictionaryProvider";
 
 import { useModuleById } from "@/hooks/useModules";
 
+import { useParams } from "next/navigation";
+
+import Link from "next/link";
 
 export default function ModulePageDetail() {
-  const {  dictionary } = useDictionary();
-  
+  const { dictionary } = useDictionary();
+
   const { module: id } = useParams();
   const { data: module, isLoading } = useModuleById(String(id));
 
@@ -40,7 +42,11 @@ export default function ModulePageDetail() {
           {/* Actions */}
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
             <Button variant="outlined" startIcon={<AddIcon />}>{dictionary?.newSubModule}</Button>
-            <Button variant="outlined" startIcon={<SettingsIcon />}>{dictionary?.newConfiguration}</Button>
+            <Link href={`configuration/new?moduleId=${module.id}&name=${module.name}`} passHref>
+              <Button variant="outlined" startIcon={<SettingsIcon />}>
+                {dictionary?.newConfiguration}
+              </Button>
+            </Link>
           </Box>
 
           {/* Submodules */}
