@@ -77,11 +77,9 @@ export default function ModulePageDetail() {
           <Typography sx={{textAlign:"left" }} variant="subtitle1" fontWeight={600}>{dictionary?.subModules}</Typography>
           <Divider sx={{ my: 1 }} />
 
-          {/* {module.children && module.children?.map((item) => (
-            <h1 key={item}>{item}</h1>
-          ))} */}
+        
 
-          {module.children?.map(submodule => (<><h1 key={submodule.id}>{submodule.name}</h1></>))}
+          {module.children?.map(submodule => (<><p key={submodule.id}>{submodule.name}</p></>))}
        
         </>
       ) : (
