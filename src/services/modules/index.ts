@@ -15,6 +15,14 @@ export const getModuleById = async (id: string): Promise<Module | undefined> => 
   });
 };
 
+export const getSubModulesByParentId = async (parentId: string): Promise<Module | undefined> => {
+  return await httpService<Module>({
+    path: `/api/Module/${parentId}/children`,
+    options: { method: "GET" },
+  });
+};
+
+
 export const createModule = async (module: CreateModule): Promise<Module | undefined> => {
   return await httpService<Module>({
     path: "/api/Module",
