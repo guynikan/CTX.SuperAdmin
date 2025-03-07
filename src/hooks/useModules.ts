@@ -5,6 +5,7 @@ import {
   deleteModule,
   getModuleById,
   getModules,
+  getSubModulesByParentId,
 } from "@/services/modules";
 import { CreateModule } from "@/types/modules";
 import { toast } from "react-toastify";
@@ -26,6 +27,16 @@ export function useModuleById(id: string) {
     enabled: !!id,
   });
 }
+
+export function useSubModuleByParentId(id: string) {
+  return useQuery({
+    queryKey: ["modules", id],
+    queryFn: () => getSubModulesByParentId(id),
+    enabled: !!id,
+  });
+}
+
+
 
 export function useCreateModule() {
   const queryClient = useQueryClient();
