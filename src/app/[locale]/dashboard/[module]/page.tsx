@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Button, CircularProgress, Divider, IconButton, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Divider, IconButton, Paper, Tab, Tabs, Typography } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { Home } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
@@ -14,7 +14,7 @@ import { useParams } from "next/navigation";
 
 import Link from "next/link";
 import CreateModuleModal from "../../modules/components/CreateModal";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 export default function ModulePageDetail() {
   const { dictionary } = useDictionary();
@@ -24,6 +24,7 @@ export default function ModulePageDetail() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
 
   const createModuleMutation = useCreateModule();
   
@@ -56,39 +57,43 @@ export default function ModulePageDetail() {
           <CircularProgress size={24} />
         </Box>
       ) : module ? (
-        <>
+          <Fragment key={module.id}>
+
+       
          {/* Header */}
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Home fontSize="small" sx={{ color: "#757575" }} />
-              <Typography variant="subtitle2" sx={{ color: "#757575" }}>Home / {dictionary?.rootName} / {module.name}</Typography>
+            <Box sx={{ alignItems: "center", gap: 1 }}>
+              <Typography variant="h6" fontWeight={600} sx={{ textAlign:"left" }}>{module.name}</Typography>   
+              <Typography sx={{ mb: 2, textAlign:"left" }}>{module.description}</Typography>    
             </Box>
             <IconButton>
               <FilterListIcon />
             </IconButton>
           </Box>
-          <Typography variant="h6" fontWeight={600} sx={{ textAlign:"left" }}>{module.name}</Typography>   
-          <Typography sx={{ mb: 2, textAlign:"left" }}>{module.description}</Typography>    
- 
+          
           {/* Actions */}
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-            <Button variant="outlined" startIcon={<AddIcon />}>{dictionary?.newSubModule}</Button>
-            <Link href={`configuration/new?moduleId=${module.id}&name=${module.name}`} passHref>
+            <Link href={`new?moduleId=${module.id}&name=${module.name}`} passHref>
               <Button variant="outlined" startIcon={<SettingsIcon />}>
                 {dictionary?.newConfiguration}
               </Button>
             </Link>
+            <Button onClick={()=>setIsModalOpen(true)} variant="outlined" startIcon={<AddIcon />}>{dictionary?.newSubModule}</Button>
+            
           </Box>
 
+
+
           {/* Submodules */}
-          <Typography sx={{textAlign:"left" }} variant="subtitle1" fontWeight={600}>{dictionary?.subModules}</Typography>
-          <Divider sx={{ my: 1 }} />
+          {!!module.children?.length && 
+            <Paper sx={{ p: 3, mb: 3 }}>
+              <Tabs sx={{borderBottom:'1px solid #e5e5e5'}} value={activeTab} onChange={(_, newValue) => setActiveTab(newValue)}>  
+                {module.children?.map(submodule => (<Tab key={submodule.id}  label={submodule.name} />))}
+              </Tabs>
+            </Paper>
+          }
 
-        
-
-          {module.children?.map(submodule => (<><p key={submodule.id}>{submodule.name}</p></>))}
-       
-        </>
+          </Fragment>
       ) : (
         <Typography variant="h5">{dictionary?.emptySingle}</Typography>
       )}

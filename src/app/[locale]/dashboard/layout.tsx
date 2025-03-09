@@ -43,7 +43,7 @@ export default function ModulesLayout({ children }: { children: React.ReactNode 
 
   return (
   <DictionaryProvider namespace="modules">
-    <Box sx={{ maxWidth: '1260px', mx: "auto", width: "100%" }}>
+    <Box sx={{ maxWidth: '90%', mx: "auto"}}>
       <Grid container sx={{ marginTop:'40px', height: "100vh" }}>
         {/* Sidebar */}
         <Grid sx={{

@@ -49,7 +49,7 @@ export default function Sidebar({ handleAddModule }: { handleAddModule: () => vo
         </Box>
       ) : rootModules.length > 0 ? (
         rootModules.map((item) => (
-          <Link key={item.id} href={`/modules/${item.id}`} passHref>
+          <Link key={item.id} href={`/dashboard/${item.id}`} passHref>
             <Button
               variant="outlined"
               fullWidth
@@ -59,10 +59,10 @@ export default function Sidebar({ handleAddModule }: { handleAddModule: () => vo
                 borderRadius: 3,
                 fontSize: "1rem",
                 fontWeight: 500,
-                color: pathname === `/modules/${item.id}` ? "white" : "black",
-                backgroundColor: pathname === `/modules/${item.id}` ? "black" : "white",
+                color: pathname === `/dashboard/${item.id}` ? "white" : "black",
+                backgroundColor: pathname === `/dashboard/${item.id}` ? "black" : "white",
                 "&:hover": {
-                  backgroundColor: pathname === `/modules/${item.id}` ? "black" : "#E0E0E0",
+                  backgroundColor: pathname === `/dashboard/${item.id}` ? "black" : "#E0E0E0",
                 },
               }}
             >

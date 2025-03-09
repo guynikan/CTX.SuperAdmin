@@ -62,10 +62,9 @@ export default function ConfigurationPage() {
     <>
       <Paper sx={{ p: 3, mb: 3 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Home fontSize="small" sx={{ color: "#757575" }} />
-          <Typography variant="subtitle2" sx={{ color: "#757575" }}>Home / {dictionary?.rootName} / {moduleName} </Typography>
+          <Typography variant="subtitle2" sx={{ color: "#757575" }}>{moduleName} </Typography>
         </Box>  
-        <Typography variant="h6" mt={2}>Nova configuração</Typography>
+        <Typography variant="h6" mt={1}>Nova configuração</Typography>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <Controller
