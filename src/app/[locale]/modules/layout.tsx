@@ -8,11 +8,37 @@ import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 
 import CreateModal from "./components/CreateModal";
 import { useState } from "react";
+import { useCreateModule } from "@/hooks/useModules";
 
 
 export default function ModulesLayout({ children }: { children: React.ReactNode }) {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const createModuleMutation = useCreateModule();
+  
+  const [moduleData, setModuleData] = useState({
+    name: "",
+    description: "",
+  });
+
+  const addModule = async (moduleData: object) => {
+    setLoading(true);
+    try {
+      await createModuleMutation.mutateAsync({
+        name: moduleData.name,
+        description: moduleData.description,
+      });
+      setIsModalOpen(false);
+      setModuleData({ name: "", description: "" }); 
+    } catch (error) {
+      console.error("Erro ao adicionar Módulo:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
 
   return (
   <DictionaryProvider namespace="modules">
@@ -40,7 +66,13 @@ export default function ModulesLayout({ children }: { children: React.ReactNode 
           {children}
         </Grid>
       </Grid>
-      <CreateModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <CreateModal 
+        open={isModalOpen} 
+        onSubmit={addModule}
+        moduleData={moduleData}
+        setModuleData={setModuleData}
+        loading={loading}
+        onClose={() => setIsModalOpen(false)} />
     </Box>
   </DictionaryProvider>); 
 }

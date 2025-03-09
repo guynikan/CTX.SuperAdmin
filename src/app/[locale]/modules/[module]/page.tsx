@@ -8,17 +8,46 @@ import SettingsIcon from "@mui/icons-material/Settings";
 
 import { useDictionary } from "@/i18n/DictionaryProvider";
 
-import { useModuleById } from "@/hooks/useModules";
+import { useCreateModule, useModuleById } from "@/hooks/useModules";
 
 import { useParams } from "next/navigation";
 
 import Link from "next/link";
+import CreateModuleModal from "../components/CreateModal";
+import { useState } from "react";
 
 export default function ModulePageDetail() {
   const { dictionary } = useDictionary();
 
   const { module: id } = useParams();
   const { data: module, isLoading } = useModuleById(String(id));
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const createModuleMutation = useCreateModule();
+  
+  const [moduleData, setModuleData] = useState({
+    name: "",
+    description: "",
+  });
+
+  const addModule = async (moduleData: object) => {
+    setLoading(true);
+    try {
+      await createModuleMutation.mutateAsync({
+        parentId: module?.id,
+        name: moduleData.name,
+        description: moduleData.description,
+      });
+      setIsModalOpen(false);
+      setModuleData({ name: "", description: "" }); 
+    } catch (error) {
+      console.error("Erro ao adicionar Módulo:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Box sx={{ textAlign: "center" }}>
@@ -38,7 +67,9 @@ export default function ModulePageDetail() {
               <FilterListIcon />
             </IconButton>
           </Box>
-          <Typography variant="h6" fontWeight={600} sx={{ mb: 2, textAlign:"left" }}>{module.name}</Typography>    
+          <Typography variant="h6" fontWeight={600} sx={{ textAlign:"left" }}>{module.name}</Typography>   
+          <Typography sx={{ mb: 2, textAlign:"left" }}>{module.description}</Typography>    
+ 
           {/* Actions */}
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
             <Button variant="outlined" startIcon={<AddIcon />}>{dictionary?.newSubModule}</Button>
@@ -52,10 +83,23 @@ export default function ModulePageDetail() {
           {/* Submodules */}
           <Typography sx={{textAlign:"left" }} variant="subtitle1" fontWeight={600}>{dictionary?.subModules}</Typography>
           <Divider sx={{ my: 1 }} />
+
+        
+
+          {module.children?.map(submodule => (<><p key={submodule.id}>{submodule.name}</p></>))}
+       
         </>
       ) : (
         <Typography variant="h5">{dictionary?.emptySingle}</Typography>
       )}
+
+      <CreateModuleModal
+        open={isModalOpen} 
+        onSubmit={addModule}
+        moduleData={moduleData}
+        setModuleData={setModuleData}
+        loading={loading}
+        onClose={() => setIsModalOpen(false)} />
     </Box>
   );
 }

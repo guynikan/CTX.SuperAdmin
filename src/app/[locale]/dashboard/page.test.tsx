@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import ModulesPage from "./page";
+import ModulesPage from "../modules/page";
 import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 
 jest.mock("next/navigation", () => ({
