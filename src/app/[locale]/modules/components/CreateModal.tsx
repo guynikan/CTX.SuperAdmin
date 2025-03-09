@@ -15,7 +15,12 @@ interface CreateModuleModalProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: ModuleFormData) => void;
-  parentId?: string; // 🔹 Pode ser passado ou não
+  parentId?: string; 
+  moduleData: {
+    name: string;
+    description: string;
+  };
+  setModuleData: (data: { name: string; description: string }) => void;
   loading: boolean;
 }
 
@@ -26,7 +31,7 @@ const schema = yup.object().shape({
   parentId: yup.string().optional(), 
 });
 
-export default function CreateModuleModal({ open, onClose, onSubmit, parentId, loading }: CreateModuleModalProps) {
+export default function CreateModuleModal({ open, onClose, onSubmit, moduleData, setModuleData, parentId, loading }: CreateModuleModalProps) {
   const {
     control,
     handleSubmit,
@@ -92,7 +97,7 @@ export default function CreateModuleModal({ open, onClose, onSubmit, parentId, l
         {parentId && <input type="hidden" value={parentId} {...control.register("parentId")} />}
 
         <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
-          <Button onClick={handleClose} color="secondary" sx={{ mr: 1 }}>
+          <Button onClick={handleClose} color="error" sx={{ mr: 1 }}>
             Cancelar
           </Button>
           <Button type="submit" variant="outlined" color="primary" disabled={loading} onClick={handleSubmit(onSubmit)}>

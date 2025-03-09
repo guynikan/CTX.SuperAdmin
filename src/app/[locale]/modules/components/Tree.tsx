@@ -88,7 +88,7 @@ const TreeFlowComponent = ({ data }) => {
       custom: (nodeProps) => (
         <CustomNode
           {...nodeProps}
-          handleAddModal={handleAddModal}
+          handleModal={handleAddModal}
           deleteNode={handleDeleteModal}
         />
       ),
@@ -118,8 +118,8 @@ const TreeFlowComponent = ({ data }) => {
         open={openModal}
         onClose={handleCloseModal}
         onSubmit={addNode}
-        value={newNodeData.name}
-        setValue={(name) => setNewNodeData((prev) => ({ ...prev, name }))}
+        moduleData={newNodeData}
+        setModuleData={(module) => setNewNodeData(module)}
         loading={loading}
       />
 

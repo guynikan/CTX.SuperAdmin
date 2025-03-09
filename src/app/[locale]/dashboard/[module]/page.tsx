@@ -13,7 +13,7 @@ import { useCreateModule, useModuleById } from "@/hooks/useModules";
 import { useParams } from "next/navigation";
 
 import Link from "next/link";
-import CreateModuleModal from "../components/CreateModal";
+import CreateModuleModal from "../../modules/components/CreateModal";
 import { useState } from "react";
 
 export default function ModulePageDetail() {
