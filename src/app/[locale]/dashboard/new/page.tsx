@@ -9,7 +9,7 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDictionary } from "@/i18n/DictionaryProvider";
-import { Home } from "@mui/icons-material";
+import { useConfiguration } from "@/hooks/useConfiguration";
 
 const schema = yup.object().shape({
   title: yup.string().required("O título é obrigatório"),
@@ -41,7 +41,7 @@ export default function ConfigurationPage() {
     },
   });
 
-  const selectedType = watch("type"); // 🔥 Acompanha o valor do select
+  const selectedType = watch("type");
 
   const onSubmit = (data) => {
     const payload = {
@@ -57,6 +57,30 @@ export default function ConfigurationPage() {
     { id: 3, name: "Gênero", type: "Select" },
     { id: 4, name: "PPE", type: "Radio" },
   ];
+
+  const { mutate: createFullConfig } = useConfiguration();
+
+const handleCreateConfiguration = () => {
+  createFullConfig({
+    configuration: {
+      title: "Configuração Teste",
+      description: "Configuração de exemplo",
+      configurationTypeId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      moduleId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    },
+    items: [
+      { name: "Campo A", order: 1, properties: "{}" },
+      { name: "Campo B", order: 2, properties: "{}" },
+    ],
+    sections: [
+      { name: "Seção 1", order: 1, properties: "{}" },
+      { name: "Seção 2", order: 2, properties: "{}" },
+    ],
+    sectionItemAssociations: [
+      { sectionId: "sec1", itemIds: ["itemA", "itemB"] },
+    ],
+  });
+};
 
   return (
     <>
@@ -97,7 +121,6 @@ export default function ConfigurationPage() {
               </FormControl>
             )}
           />
-          <Button variant="contained" color="primary" type="submit" sx={{ mt: 2 }}>Salvar</Button>
         </form>
       </Paper>
 
@@ -139,7 +162,10 @@ export default function ConfigurationPage() {
 
           <Button variant="outlined" sx={{ mt: 2, float: "right" }}>Novo Campo</Button>
         </Paper>
+        
       )}
+      <Button onClick={()=> handleCreateConfiguration()} variant="contained" color="primary" type="submit" sx={{ mt: 2 }}>Salvar</Button>
+
     </>
   );
 }
