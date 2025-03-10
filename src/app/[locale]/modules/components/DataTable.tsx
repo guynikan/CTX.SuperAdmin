@@ -45,7 +45,6 @@ const transformModulesToTree = (modules: Module[]): any[] => {
 export default function DataTable({ modules }: { modules: Module[] }) {
   const { locale, dictionary } = useDictionary();
 
-  //const [editModalOpen, setEditModalOpen] = useState(false);
   const [hasChildren, setHasChildren] = useState(false);
   const [selectedModule, setSelectedModule] = useState<Module| null>(null);
   const [openConfirm, setOpenConfirmDelete] = useState(false);
@@ -55,7 +54,6 @@ export default function DataTable({ modules }: { modules: Module[] }) {
 
   const handleEditClick = (module: Module) => {
     setSelectedModule(module);
-    setEditModalOpen(true);
   };
   
   const handleDeleteClick = (module: Module) => {
