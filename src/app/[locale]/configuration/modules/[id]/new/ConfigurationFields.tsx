@@ -24,32 +24,26 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { useForm, Controller } from "react-hook-form";
+import { Item } from "@/types/configuration";
 
-interface FieldItem {
-  id: string;
-  name: string;
-  order: number;
-  properties: string;
-}
-
-interface ConfigurationFieldsProps {
-  fields: FieldItem[];
-  onFieldsChange: (updatedFields: FieldItem[]) => void;
+type ConfigurationFieldsProps = {
+  fields: Item[];
+  onFieldsChange: (updatedFields: Item[]) => void;
 }
 
 const fieldTypes = ["Text", "Number", "Phone", "Textarea", "Select", "Date", "Radio", "Checkbox"];
-const fieldSizes = ["1/3", "1/2", "1/1"];
+const fieldSizes = ["1/3", "50%", "100%"];
 
 export default function ConfigurationFields({ fields, onFieldsChange }: ConfigurationFieldsProps) {
   const [open, setOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   const { control, handleSubmit, reset } = useForm({
-    defaultValues: { name: "", type: "Text", size: "1/1" },
+    defaultValues: { name: "", type: "Text", size: "100%" },
   });
 
   const handleAddField = (data: { name: string; type: string; size: string }) => {
-    const newField: FieldItem = {
+    const newField: Item = {
       id: crypto.randomUUID(),
       name: data.name,
       order: fields.length,

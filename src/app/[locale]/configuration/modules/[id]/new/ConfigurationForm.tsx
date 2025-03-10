@@ -4,20 +4,19 @@ import { useState } from "react";
 import { Paper, Tab, Tabs } from "@mui/material";
 import ConfigurationFields from "./ConfigurationFields";
 import ConfigurationSections from "./ConfigurationSections";
-import { Section } from "@/types/configuration";
+import { Item, Section } from "@/types/configuration";
 
-interface FieldItem {
-  id: string;
-  name: string;
-  order: number;
-  properties: string;
-}
-
-interface ConfigurationFormProps {
-  fields: FieldItem[];
-  setFields: (updatedFields: FieldItem[]) => void;
+type ConfigurationFormProps =  {
+  fields: Item[];
+  setFields: (updatedFields: Item[]) => void;
   sections: Partial<Section>[];
   setSections: (updatedSections: Partial<Section>[]) => void;
+}
+
+enum ConfigurationTabs {
+  FIELDS = 0,
+  SECTIONS = 1,
+  RULES = 2,
 }
 
 export default function ConfigurationForm({ fields, sections, setFields, setSections }: ConfigurationFormProps) {
@@ -35,8 +34,14 @@ export default function ConfigurationForm({ fields, sections, setFields, setSect
         <Tab label="REGRAS" />
       </Tabs>
 
-      {activeTab === 0 && <ConfigurationFields fields={fieldsAvailable} onFieldsChange={setFields} />}
-      {activeTab === 1 && <ConfigurationSections fields={fields} sections={sections} onSectionChange={setSections}  onFieldsChange={setFields} />}
+      {activeTab === ConfigurationTabs.FIELDS && 
+        <ConfigurationFields fields={fieldsAvailable} onFieldsChange={setFields} />}
+      {activeTab === ConfigurationTabs.SECTIONS && 
+        <ConfigurationSections 
+          fields={fields} 
+          sections={sections} 
+          onSectionChange={setSections}  
+          onFieldsChange={setFields} />}
     </Paper>
   );
 }

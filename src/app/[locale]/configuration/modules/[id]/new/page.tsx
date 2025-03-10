@@ -8,8 +8,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 import { useConfiguration } from "@/hooks/useConfiguration";
-import ConfigurationFields from "./ConfigurationFields";
-import ConfigurationSections from "./ConfigurationSections";
 import ConfigurationForm from "./ConfigurationForm";
 
 const schema = yup.object().shape({
@@ -20,8 +18,8 @@ const schema = yup.object().shape({
 
 const configurationTypes = [
   { id: "1", name: "Formulário" },
-  { id: "2", name: "Workflow" },
-  { id: "3", name: "Relatório" },
+  { id: "2", name: "Temas" },
+  { id: "3", name: "Stepper" },
 ];
 
 export default function ConfigurationPage() {
@@ -110,7 +108,6 @@ export default function ConfigurationPage() {
           />
         </Paper>
 
-        {/* Only Show Fields & Sections if Form Type is "Formulário" */}
         {selectedType === "1" && (
           <>
             <ConfigurationForm fields={fields} setFields={setFields} sections={sections} setSections={setSections}  />

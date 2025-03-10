@@ -6,20 +6,14 @@ import AddIcon from "@mui/icons-material/Add";
 import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 import Grid from "@mui/material/Grid2";
 
-import { Section } from "@/types/configuration";
+import { Item, Section } from "@/types/configuration";
 import { useState } from "react";
 
-interface FieldItem {
-  id: string;
-  name: string;
-  order: number;
-  properties: string;
-}
 
-interface ConfigurationSectionsProps {
+type ConfigurationSectionsProps =  {
   sections: Partial<Section>[];
-  fields: FieldItem[];
-  onFieldsChange: (updatedFields: FieldItem[]) => void;
+  fields: Item[];
+  onFieldsChange: (updatedFields: Item[]) => void;
   onSectionChange: (updatedSections: Partial<Section>[]) => void;
 }
 
@@ -37,19 +31,22 @@ export default function ConfigurationSections({ fields, sections, onFieldsChange
   };
 
   const handleDrop = (fieldId: string, sectionId: string) => {
-    if (!assignedFields.has(fieldId)) {
-      setAssignedFields((prev) => new Set(prev).add(fieldId));
-
-      const updatedSections = sections.map((section) =>
-        section.id === sectionId
-          ? { ...section, items: [...new Set([...(section.items || []), fieldId])] }
-          : section
-      );
-      onSectionChange(updatedSections);
-    }
+    if (assignedFields.has(fieldId)) return; 
+  
+    setAssignedFields((prev) => new Set([...prev, fieldId]));
+  
+    const updatedSections = sections.map((section) => {
+      if (section.id !== sectionId) return section; 
+  
+      const updatedItems = new Set([...(section.items || []), fieldId]);
+      return { ...section, items: Array.from(updatedItems) };
+    });
+  
+    onSectionChange(updatedSections);
   };
+  
 
-  const DraggableField = ({ field }: { field: FieldItem }) => {
+  const DraggableField = ({ field }: { field: Item }) => {
     const { attributes, listeners, setNodeRef } = useDraggable({
       id: field.id,
       data: { field },
@@ -120,7 +117,6 @@ export default function ConfigurationSections({ fields, sections, onFieldsChange
       }}
     >
       <Grid container spacing={2} sx={{ mt: 2 }}>
-        {/* Available Fields (Left - 30%) */}
         <Grid  size={{xs:12, md:4}}>
           <Typography variant="subtitle1" mb={1}>Campos Disponíveis</Typography>
           {fields.length > 0 ? (
@@ -132,7 +128,6 @@ export default function ConfigurationSections({ fields, sections, onFieldsChange
           )}
         </Grid>
 
-        {/* Sections (Right - 70%) */}
         <Grid size={{xs:12, md:8}}>
           <Typography variant="subtitle1" mb={1}>Seções</Typography>
           {sections.map((section) => <DroppableSection key={section.id} section={section} />)}

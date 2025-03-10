@@ -21,7 +21,7 @@ export type ConfigurationData = {
 
 export type Item = {
   id: string;
-  sectionId: string;
+  sectionId?: string;
   name: string;
   order: number;
   properties: string;
