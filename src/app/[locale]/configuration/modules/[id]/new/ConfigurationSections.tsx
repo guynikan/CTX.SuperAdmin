@@ -1,11 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { Paper, Typography, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-
 import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 import Grid from "@mui/material/Grid2";
-
 import { Section } from "@/types/configuration";
 
 interface FieldItem {
@@ -39,18 +38,19 @@ export default function ConfigurationSections({
   };
 
   const handleDrop = (fieldId: string, sectionId: string) => {
-    // Remove field from available fields list
-    const updatedFields = fields.filter((field) => field.id !== fieldId);
-    onFieldsChange(updatedFields);
-
-    // Add field to section
     const updatedSections = sections.map((section) =>
       section.id === sectionId
         ? { ...section, items: [...new Set([...(section.items || []), fieldId])] }
         : section
     );
 
+    // Atualiza os campos removendo apenas aqueles que foram dropados
+    const remainingFields = fields.filter(
+      (field) => !updatedSections.some((section) => section.items?.includes(field.id))
+    );
+
     onSectionChange(updatedSections);
+    onFieldsChange(remainingFields);
   };
 
   const DraggableField = ({ field }: { field: FieldItem }) => {
@@ -124,7 +124,7 @@ export default function ConfigurationSections({
       }}
     >
       <Grid container spacing={2} sx={{ mt: 2 }}>
-        {/* Available Fields (Left - 30%) */}
+        {/* Campos Disponíveis (30%) */}
         <Grid xs={12} md={4}>
           <Typography variant="subtitle1" mb={1}>Campos Disponíveis</Typography>
           {fields.length > 0 ? (
@@ -136,7 +136,7 @@ export default function ConfigurationSections({
           )}
         </Grid>
 
-        {/* Sections (Right - 70%) */}
+        {/* Seções (70%) */}
         <Grid xs={12} md={8}>
           <Typography variant="subtitle1" mb={1}>Seções</Typography>
           {sections.map((section) => <DroppableSection key={section.id} section={section} />)}

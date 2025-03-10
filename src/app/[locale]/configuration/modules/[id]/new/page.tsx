@@ -8,6 +8,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 import { useConfiguration } from "@/hooks/useConfiguration";
+import ConfigurationFields from "./ConfigurationFields";
+import ConfigurationSections from "./ConfigurationSections";
+import ConfigurationForm from "./ConfigurationForm";
 
 const schema = yup.object().shape({
   title: yup.string().required("O título é obrigatório"),
@@ -73,7 +76,7 @@ export default function ConfigurationPage() {
      <form onSubmit={handleSubmit(handleCreateConfiguration)}>
         <Paper sx={{ p: 3, mb: 3 }}>
          
-          <Typography variant="h6" mt={1}>{dictionary?.newConfiguration}</Typography>
+          <Typography variant="h6">{dictionary?.newConfiguration}</Typography>
 
           <Controller
             name="title"
@@ -110,8 +113,7 @@ export default function ConfigurationPage() {
         {/* Only Show Fields & Sections if Form Type is "Formulário" */}
         {selectedType === "1" && (
           <>
-            <ConfigurationFields fields={fields} onFieldsChange={setFields} />
-            <ConfigurationSections fields={fields} sections={sections} setSections={setSections} />
+            <ConfigurationForm fields={fields} setFields={setFields} sections={sections} setSections={setSections}  />
           </>
         )}
 

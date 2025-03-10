@@ -23,7 +23,9 @@ interface ConfigurationFormProps {
 export default function ConfigurationForm({ fields, sections, setFields, setSections }: ConfigurationFormProps) {
   const [activeTab, setActiveTab] = useState(0);
 
-  const fieldsAvailable = fields;
+  const assignedFieldIds = sections.flatMap((section) => section.items);
+  const fieldsAvailable = fields.filter((field) => !assignedFieldIds.includes(field.id));
+
 
   return (
     <Paper sx={{ p: 2 }}>
@@ -33,8 +35,8 @@ export default function ConfigurationForm({ fields, sections, setFields, setSect
         <Tab label="REGRAS" />
       </Tabs>
 
-      {activeTab === 0 && <ConfigurationFields fields={fields} onFieldsChange={setFields} />}
-      {activeTab === 1 && <ConfigurationSections fields={fieldsAvailable} sections={sections}  onFieldsChange={setFields} />}
+      {activeTab === 0 && <ConfigurationFields fields={fieldsAvailable} onFieldsChange={setFields} />}
+      {activeTab === 1 && <ConfigurationSections fields={fields} sections={sections} onSectionChange={setSections}  onFieldsChange={setFields} />}
     </Paper>
   );
 }
