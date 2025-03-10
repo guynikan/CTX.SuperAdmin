@@ -11,7 +11,6 @@ import { useCreateModule } from "@/hooks/useModules";
 import Sidebar from "../components/Sidebar";
 import CreateModuleModal from "../../modules/components/CreateModal";
 
-
 export default function ModulesLayout({ children }: { children: React.ReactNode }) {
 
   const [isModalOpen, setIsModalOpen] = useState(false);

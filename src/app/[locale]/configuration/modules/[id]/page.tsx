@@ -19,7 +19,7 @@ import { Fragment, useState } from "react";
 export default function ModulePageDetail() {
   const { dictionary } = useDictionary();
 
-  const { module: id } = useParams();
+  const { id } = useParams();
   const { data: module, isLoading } = useModuleById(String(id));
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -73,7 +73,7 @@ export default function ModulePageDetail() {
           
           {/* Actions */}
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-            <Link href={`/configuration/new?moduleId=${module.id}&name=${module.name}`} passHref>
+            <Link href={`/configuration/modules/${module.id}/new?&name=${module.name}`} passHref>
               <Button variant="outlined" startIcon={<SettingsIcon />}>
                 {dictionary?.newConfiguration}
               </Button>

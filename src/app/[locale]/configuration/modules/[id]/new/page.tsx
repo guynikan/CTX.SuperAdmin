@@ -8,7 +8,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 import { useConfiguration } from "@/hooks/useConfiguration";
-import ConfigurationForm from "../../../configuration/modules/[slug]/new/ConfigurationForm";
 
 const schema = yup.object().shape({
   title: yup.string().required("O título é obrigatório"),
@@ -28,7 +27,6 @@ export default function ConfigurationPage() {
   
   const searchParams = useSearchParams();
   const moduleId = searchParams.get("moduleId");
-  const moduleName = searchParams.get("name");
   const [fields, setFields] = useState<{ name: string; order: number; properties: string }[]>([]);
   const [sections, setSections] = useState<Partial<Section>[]>([]);
 
@@ -72,7 +70,53 @@ export default function ConfigurationPage() {
 
   return (
     <>
-    <h1>Teste</h1>
+     <form onSubmit={handleSubmit(handleCreateConfiguration)}>
+        <Paper sx={{ p: 3, mb: 3 }}>
+         
+          <Typography variant="h6" mt={1}>{dictionary?.newConfiguration}</Typography>
+
+          <Controller
+            name="title"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField {...field} label="Título" fullWidth margin="normal" error={!!fieldState.error} helperText={fieldState.error?.message} />
+            )}
+          />
+          <Controller
+            name="description"
+            control={control}
+            render={({ field }) => (
+              <TextField {...field} label="Descrição (opcional)" fullWidth margin="normal" />
+            )}
+          />
+          <Controller
+            name="type"
+            control={control}
+            render={({ field, fieldState }) => (
+              <FormControl fullWidth margin="normal" error={!!fieldState.error}>
+                <InputLabel>Tipo de Configuração</InputLabel>
+                <Select {...field} label="Tipo de Configuração">
+                  {configurationTypes.map((option) => (
+                    <MenuItem key={option.id} value={option.id}>
+                      {option.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+          />
+        </Paper>
+
+        {/* Only Show Fields & Sections if Form Type is "Formulário" */}
+        {selectedType === "1" && (
+          <>
+            <ConfigurationFields fields={fields} onFieldsChange={setFields} />
+            <ConfigurationSections fields={fields} sections={sections} setSections={setSections} />
+          </>
+        )}
+
+        <Button variant="contained" color="primary" type="submit" sx={{ maxWidth: '200px', mt: 2 }}>Salvar</Button>
+      </form>
       
     </>
   );
