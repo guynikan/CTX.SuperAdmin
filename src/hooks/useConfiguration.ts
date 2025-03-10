@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createConfiguration, createConfigurationItems, createConfigurationSection, associateSectionItems } from "@/services/configuration";
-import { Configuration } from "@/types/configuration";
+import { createConfiguration, createConfigurationItems, createConfigurationSection, associateSectionItems } from "@/services/configurations";
+import { Configuration, CreateConfiguration } from "@/types/configuration";
 import { toast } from "react-toastify";
 
 interface CreateFullConfigurationInput {
-  configuration: Omit<Configuration, "id">; 
+  configuration: CreateConfiguration; 
   items: { name: string; order: number; properties: string }[];
   sections: { name: string; order: number; properties: string }[];
   sectionItemAssociations: { sectionId: string; itemIds: string[] }[];
@@ -19,7 +19,7 @@ export function useConfiguration() {
        
         const createdConfig = await createConfiguration({
           ...configuration,
-          isActive: true, 
+          isActive: true,
         });
 
         if (!createdConfig?.id) throw new Error("Falha ao criar a configuração");

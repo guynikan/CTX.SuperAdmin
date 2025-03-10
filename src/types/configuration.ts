@@ -40,7 +40,7 @@ export type Configuration = {
   configurationTypeId: string;
   moduleId: string;
   title: string;
-  description: string;
+  description?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -50,3 +50,5 @@ export type Configuration = {
   sections: Section[];
   items: Item[];
 };
+
+export type CreateConfiguration = Pick<Configuration, "title" | "description" | "moduleId"|  "configurationTypeId">;

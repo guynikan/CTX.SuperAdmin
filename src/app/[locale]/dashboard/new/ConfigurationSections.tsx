@@ -1,0 +1,125 @@
+"use client";
+
+import { useState } from "react";
+import { Paper, Typography, Button } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+
+import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
+
+import { Section } from "@/types/configuration";
+import Grid from "@mui/material/Grid2";
+
+
+interface FieldItem {
+  id: string;
+  name: string;
+  order: number;
+  properties: string;
+}
+
+interface ConfigurationSectionsProps {
+  fields: FieldItem[];
+  onFieldsChange: (updatedFields: FieldItem[]) => void;
+}
+
+export default function ConfigurationSections({ fields, onFieldsChange }: ConfigurationSectionsProps) {
+  const [sections, setSections] = useState<Partial<Section>[]>([]);
+
+  const handleAddSection = () => {
+    const newSection: Partial<Section> = {
+      id: crypto.randomUUID(),
+      name: `Seção ${sections.length + 1}`,
+      items: [],
+    };
+    setSections([...sections, newSection]);
+  };
+
+  const handleDrop = (fieldId: string, sectionId: string) => {
+    // Remove o campo da lista de disponíveis
+    onFieldsChange(fields.filter((field) => field.id !== fieldId));
+
+    // Adiciona o campo à seção correspondente
+    setSections((prevSections) =>
+      prevSections.map((section) =>
+        section.id === sectionId
+          ? { ...section, items: [...new Set([...section.items, fieldId])] }
+          : section
+      )
+    );
+  };
+
+  const DraggableField = ({ field }: { field: FieldItem }) => {
+    const { attributes, listeners, setNodeRef } = useDraggable({
+      id: field.id,
+      data: { field },
+    });
+
+    return (
+      <Paper
+        ref={setNodeRef}
+        {...listeners}
+        {...attributes}
+        sx={{ p: 1, mb: 1, cursor: "grab", backgroundColor: "#f5f5f5" }}
+      >
+        {field.name}
+      </Paper>
+    );
+  };
+
+  const DroppableSection = ({ section }: { section: Section }) => {
+    const { setNodeRef } = useDroppable({
+      id: section.id,
+    });
+
+    return (
+      <Paper ref={setNodeRef} sx={{ p: 2, mb: 2, minHeight: 100, backgroundColor: "white", border: "1px solid #ccc" }}>
+        <Typography variant="subtitle1" fontWeight="bold">{section.name}</Typography>
+        {section?.items && section.items.length > 0 ? (
+          section.items.map((fieldId) => {
+            const field = fields.find((f) => f.id === fieldId);
+            return field ? (
+              <Paper key={field.id} sx={{ p: 1, mt: 1, backgroundColor: "#f5f5f5" }}>{field.name}</Paper>
+            ) : null;
+          })
+        ) : (
+          <Typography variant="body2" sx={{ color: "#757575", mt: 1 }}>Arraste campos aqui</Typography>
+        )}
+      </Paper>
+    );
+  };
+
+  return (
+    <DndContext
+      onDragEnd={({ active, over }) => {
+        if (active && over) {
+          handleDrop(active.id as string, over.id as string);
+        }
+      }}
+    >
+      <Grid container spacing={2} sx={{ mt: 2 }}>
+        {/* Campos Disponíveis (30%) */}
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Typography variant="subtitle1" mb={1}>Campos Disponíveis</Typography>
+          {fields.length > 0 ? (
+            fields.map((field) => (
+              <DraggableField key={field.id} field={field} />
+            ))
+          ) : (
+            <Typography variant="body2" sx={{ color: "#757575", mt: 1 }}>Nenhum campo disponível</Typography>
+          )}
+        </Grid>
+
+        {/* Seções (70%) */}
+        <Grid size={{ xs: 12, md: 8 }}>
+          <Typography variant="subtitle1" mb={1}>Seções</Typography>
+          {sections.map((section) => (
+            <DroppableSection key={section.id} section={section} />
+          ))}
+          <Button variant="outlined" onClick={handleAddSection} startIcon={<AddIcon />}>
+            Nova Seção
+          </Button>
+        </Grid>
+      </Grid>
+    </DndContext>
+  );
+}

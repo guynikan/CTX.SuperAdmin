@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Paper, Button, TextField, Typography, Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, MenuItem, Select, FormControl, InputLabel, Box } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { Paper, Button, TextField, Typography, MenuItem, Select, FormControl, InputLabel, Box } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 import { useConfiguration } from "@/hooks/useConfiguration";
+import ConfigurationFields from "./ConfigurationFields";
 
 const schema = yup.object().shape({
   title: yup.string().required("O título é obrigatório"),
@@ -27,10 +26,10 @@ export default function ConfigurationPage() {
 
   const { dictionary } = useDictionary();
   
-  const [activeTab, setActiveTab] = useState(0);
   const searchParams = useSearchParams();
   const moduleId = searchParams.get("moduleId");
   const moduleName = searchParams.get("name");
+  const [fields, setFields] = useState<{ name: string; order: number; properties: string }[]>([]);
 
   const { control, handleSubmit, watch } = useForm({
     resolver: yupResolver(schema),
@@ -43,35 +42,22 @@ export default function ConfigurationPage() {
 
   const selectedType = watch("type");
 
-  const onSubmit = (data) => {
-    const payload = {
-      ...data,
-      moduleId,
-    };
-    console.log("Form Submitted", payload);
-  };
-
-  const fields = [
-    { id: 1, name: "Matrícula", type: "Texto" },
-    { id: 2, name: "Data de nascimento", type: "Data" },
-    { id: 3, name: "Gênero", type: "Select" },
-    { id: 4, name: "PPE", type: "Radio" },
-  ];
-
   const { mutate: createFullConfig } = useConfiguration();
 
-const handleCreateConfiguration = () => {
+const handleCreateConfiguration = (data) => {
+
   createFullConfig({
     configuration: {
-      title: "Configuração Teste",
-      description: "Configuração de exemplo",
-      configurationTypeId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-      moduleId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      title: data.title,
+      description:data.description,
+      configurationTypeId: "fb4069d2-7d91-40ad-ac35-01d1276a2bfc", // ID temp config Type from Swagger
+      moduleId,
     },
-    items: [
-      { name: "Campo A", order: 1, properties: "{}" },
-      { name: "Campo B", order: 2, properties: "{}" },
-    ],
+    items: fields.map(field => ({
+      name: field.name,
+      order: field.order,
+      properties: field.properties, 
+    })),
     sections: [
       { name: "Seção 1", order: 1, properties: "{}" },
       { name: "Seção 2", order: 2, properties: "{}" },
@@ -84,88 +70,52 @@ const handleCreateConfiguration = () => {
 
   return (
     <>
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Typography variant="subtitle2" sx={{ color: "#757575" }}>{moduleName} </Typography>
-        </Box>  
-        <Typography variant="h6" mt={1}>Nova configuração</Typography>
+   
+     <form onSubmit={handleSubmit(handleCreateConfiguration)}>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Controller
-            name="title"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextField {...field} label="Título" fullWidth margin="normal" error={!!fieldState.error} helperText={fieldState.error?.message} />
-            )}
-          />
-          <Controller
-            name="description"
-            control={control}
-            render={({ field }) => (
-              <TextField {...field} label="Descrição (opcional)" fullWidth margin="normal" />
-            )}
-          />
-          <Controller
-            name="type"
-            control={control}
-            render={({ field, fieldState }) => (
-              <FormControl fullWidth margin="normal" error={!!fieldState.error}>
-                <InputLabel>Tipo de Configuração</InputLabel>
-                <Select {...field} label="Tipo de Configuração">
-                  {configurationTypes.map((option) => (
-                    <MenuItem key={option.id} value={option.id}>
-                      {option.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
-          />
-        </form>
-      </Paper>
+        <Paper sx={{ p: 3, mb: 3 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Typography variant="subtitle2" sx={{ color: "#757575" }}>{moduleName} </Typography>
+          </Box>  
+          <Typography variant="h6" mt={1}>{dictionary?.newConfiguration}</Typography>
 
-      {/* 🔥 Só exibe as abas se o tipo selecionado for "Formulário" */}
-      {selectedType === "1" && (
-        <Paper sx={{ p: 2 }}>
-          <Typography variant="h6" mb={2}>Formulário</Typography>
-          <Tabs value={activeTab} onChange={(_, newValue) => setActiveTab(newValue)}>
-            <Tab label="CAMPOS" />
-            <Tab label="SEÇÕES" />
-            <Tab label="REGRAS" />
-          </Tabs>
-
-          {activeTab === 0 && (
-            <TableContainer component={Paper} sx={{ mt: 2 }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell><strong>Nome</strong></TableCell>
-                    <TableCell><strong>Tipo</strong></TableCell>
-                    <TableCell><strong>Ações</strong></TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {fields.map((field) => (
-                    <TableRow key={field.id}>
-                      <TableCell>{field.name}</TableCell>
-                      <TableCell>{field.type}</TableCell>
-                      <TableCell>
-                        <IconButton color="primary"><EditIcon /></IconButton>
-                        <IconButton color="error"><DeleteIcon /></IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-
-          <Button variant="outlined" sx={{ mt: 2, float: "right" }}>Novo Campo</Button>
+            <Controller
+              name="title"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField {...field} label="Título" fullWidth margin="normal" error={!!fieldState.error} helperText={fieldState.error?.message} />
+              )}
+            />
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <TextField {...field} label="Descrição (opcional)" fullWidth margin="normal" />
+              )}
+            />
+            <Controller
+              name="type"
+              control={control}
+              render={({ field, fieldState }) => (
+                <FormControl fullWidth margin="normal" error={!!fieldState.error}>
+                  <InputLabel>Tipo de Configuração</InputLabel>
+                  <Select {...field} label="Tipo de Configuração">
+                    {configurationTypes.map((option) => (
+                      <MenuItem key={option.id} value={option.id}>
+                        {option.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+            />
         </Paper>
-        
-      )}
-      <Button onClick={()=> handleCreateConfiguration()} variant="contained" color="primary" type="submit" sx={{ mt: 2 }}>Salvar</Button>
 
+        <ConfigurationFields fields={fields} onFieldsChange={setFields} selectedType={selectedType} />
+
+        <Button variant="contained" color="primary" type="submit" sx={{ maxWidth:'200px', mt: 2 }}>Salvar</Button>
+
+     </form>
     </>
   );
 }
