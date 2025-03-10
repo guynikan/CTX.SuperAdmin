@@ -36,7 +36,7 @@ export default function Header() {
           px: 5,
         }}
       >
-          <Link style={{color: 'white', textDecoration:'none'}} href='/dashboard' >Home</Link> 
+          <Link style={{color: 'white', textDecoration:'none'}} href='/configuration/modules' >Home</Link> 
           <Link style={{color: 'white', textDecoration:'none'}} href='/modules' >Modules</Link> 
           <Link style={{color: 'white', textDecoration:'none'}} href='/segments/types' >Segment Types</Link> 
           <Link style={{color: 'white', textDecoration:'none'}} href='/segments/values' >Segment Values</Link> 

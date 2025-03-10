@@ -8,8 +8,8 @@ import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 import { useState } from "react";
 import { useCreateModule } from "@/hooks/useModules";
 
-import Sidebar from "./components/Sidebar";
-import CreateModuleModal from "../modules/components/CreateModal";
+import Sidebar from "../components/Sidebar";
+import CreateModuleModal from "../../modules/components/CreateModal";
 
 
 export default function ModulesLayout({ children }: { children: React.ReactNode }) {

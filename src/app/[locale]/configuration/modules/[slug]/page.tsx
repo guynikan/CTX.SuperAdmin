@@ -13,7 +13,7 @@ import { useCreateModule, useModuleById } from "@/hooks/useModules";
 import { useParams } from "next/navigation";
 
 import Link from "next/link";
-import CreateModuleModal from "../../modules/components/CreateModal";
+import CreateModuleModal from "../../../modules/components/CreateModal";
 import { Fragment, useState } from "react";
 
 export default function ModulePageDetail() {
@@ -73,7 +73,7 @@ export default function ModulePageDetail() {
           
           {/* Actions */}
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-            <Link href={`new?moduleId=${module.id}&name=${module.name}`} passHref>
+            <Link href={`/configuration/new?moduleId=${module.id}&name=${module.name}`} passHref>
               <Button variant="outlined" startIcon={<SettingsIcon />}>
                 {dictionary?.newConfiguration}
               </Button>

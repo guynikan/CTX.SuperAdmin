@@ -22,7 +22,7 @@ describe("Modules Page", () => {
   
   it("render page correctly", async () => {
     await renderWithProvider();
-    expect(screen.getByText("HOME MODULES")).toBeInTheDocument();
+    expect(screen.getByText("Escolha ou crie um módulo para começar")).toBeInTheDocument();
   });
  
 });

@@ -11,7 +11,7 @@ type ModuleFormData = {
   parentId?: string; 
 };
 
-interface CreateModuleModalProps {
+type CreateModuleModalProps = {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: ModuleFormData) => void;
@@ -24,14 +24,13 @@ interface CreateModuleModalProps {
   loading: boolean;
 }
 
-// 📌 Validação Yup
 const schema = yup.object().shape({
   name: yup.string().trim().required("O nome do módulo é obrigatório"),
   description: yup.string().optional(),
   parentId: yup.string().optional(), 
 });
 
-export default function CreateModuleModal({ open, onClose, onSubmit, moduleData, setModuleData, parentId, loading }: CreateModuleModalProps) {
+export default function CreateModuleModal({ open, onClose, onSubmit, parentId, loading }: CreateModuleModalProps) {
   const {
     control,
     handleSubmit,
@@ -44,7 +43,7 @@ export default function CreateModuleModal({ open, onClose, onSubmit, moduleData,
   });
 
   const handleClose = () => {
-    reset(); // Resetar os campos ao fechar
+    reset();
     onClose();
   };
 

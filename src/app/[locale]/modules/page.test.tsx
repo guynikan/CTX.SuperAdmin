@@ -1,8 +1,8 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import ModulesPage from "../page";
 import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 import { useModules } from "@/hooks/useModules";
 import { Module } from "@/types/modules";
+import ModulesView from "./page";
 
 jest.mock("@/hooks/useModules", () => ({
   useModules: jest.fn(),
@@ -16,7 +16,7 @@ jest.mock("@/hooks/useModules", () => ({
   })),
 }));
  
-jest.mock("./Tree", () => () => <div data-testid="tree-flow">Tree Flow</div>);
+jest.mock("./components/Tree", () => () => <div data-testid="tree-flow">Tree Flow</div>);
 
 jest.mock("next/navigation", () => ({
   usePathname: jest.fn(() => "/pt_BR/modules"),
@@ -30,7 +30,7 @@ const mockModules: Module[] = [
 const renderWithProvider = async () => {
   render(
     <DictionaryProvider namespace="modules">
-      <ModulesPage />
+      <ModulesView />
     </DictionaryProvider>
   );
   await waitFor(() => {
@@ -54,7 +54,7 @@ describe("Modules Page", () => {
     });
     await renderWithProvider();
     expect(screen.getByText("Todos os Módulos")).toBeInTheDocument();
-    expect(screen.getByText("Ver como Tabela")).toBeInTheDocument();
+    expect(screen.getByText("Ver como Árvore")).toBeInTheDocument();
   
   });
 

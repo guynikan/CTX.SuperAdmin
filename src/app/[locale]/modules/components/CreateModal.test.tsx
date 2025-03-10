@@ -6,12 +6,22 @@ const mockOnClose = jest.fn();
 const mockOnSubmit = jest.fn();
 const mockSetValue = jest.fn();
 
+type ModuleFormData = {
+  name: string;
+  description?: string;
+  parentId?: string; 
+};
+
 type CreateModalProps = {
   open: boolean;
   onClose: () => void;
-  onSubmit: () => void;
-  value: string;
-  setValue: (value: string) => void;
+  onSubmit: (data: ModuleFormData) => void;
+  parentId?: string; 
+  moduleData: {
+    name: string;
+    description: string;
+  };
+  setModuleData: (data: { name: string; description: string }) => void;
   loading: boolean;
 }
 
@@ -21,8 +31,8 @@ const renderCreateModal = (props: Partial<CreateModalProps> = {}) => {
       open={true}
       onClose={mockOnClose}
       onSubmit={mockOnSubmit}
-      value=""
-      setValue={mockSetValue}
+      moduleData={{}}
+      setModuleData={mockSetValue}
       loading={false}
       {...props} 
     />
@@ -42,10 +52,11 @@ describe("CreateModal Component", () => {
   it("should call setValue when typing in input", async () => {
     render(
       <CreateModal 
-        open={true} 
+        open={true}
+        moduleData={{}} 
         onClose={mockOnClose} 
         onSubmit={mockOnSubmit} 
-        value="" setValue={mockSetValue} 
+        setModuleData={mockSetValue}
         loading={false} />
     );
 
@@ -53,10 +64,8 @@ describe("CreateModal Component", () => {
     expect(mockSetValue).toHaveBeenCalledWith("N");
   });
 
-  it("should call onSubmit when clicking the add button", async () => {
-    
+  it("should call onSubmit when clicking the add button", async () => {    
     renderCreateModal();
-
 
     await userEvent.click(screen.getByRole("button", { name: "Adicionar" }));
     expect(mockOnSubmit).toHaveBeenCalled();

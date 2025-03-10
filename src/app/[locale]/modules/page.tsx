@@ -1,10 +1,11 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 import { useCreateModule, useModules } from "@/hooks/useModules";
+
 import TreeFlow from "./components/Tree";
-import { useState, useMemo } from "react";
 import DataTable from "./components/DataTable";
 import CreateModuleModal from "./components/CreateModal";
 
