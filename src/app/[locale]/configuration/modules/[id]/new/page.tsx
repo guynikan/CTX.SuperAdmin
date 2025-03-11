@@ -8,7 +8,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 import { useConfiguration } from "@/hooks/useConfiguration";
-import ConfigurationForm from "./ConfigurationForm";
+import ConfigurationForm from "./components/ConfigurationForm";
 
 const schema = yup.object().shape({
   title: yup.string().required("O título é obrigatório"),
