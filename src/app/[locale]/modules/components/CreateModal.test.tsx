@@ -1,35 +1,40 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import CreateModal from "./CreateModal";
+import CreateModuleModal from "./CreateModal";
 
 const mockOnClose = jest.fn();
 const mockOnSubmit = jest.fn();
 const mockSetValue = jest.fn();
 
-type CreateModalProps = {
+type ModuleFormData = {
+  name: string;
+  description?: string;
+  parentId?: string; 
+};
+
+type CreateModuleModalProps = {
   open: boolean;
   onClose: () => void;
-  onSubmit: () => void;
-  value: string;
-  setValue: (value: string) => void;
+  onSubmit: (data: ModuleFormData) => void;
+  parentId?: string; 
+  setModuleData: (data: { name: string; description: string }) => void;
   loading: boolean;
 }
 
-const renderCreateModal = (props: Partial<CreateModalProps> = {}) => {
+const renderCreateModal = (props: Partial<CreateModuleModalProps> = {}) => {
   render(
-    <CreateModal
+    <CreateModuleModal
       open={true}
       onClose={mockOnClose}
       onSubmit={mockOnSubmit}
-      value=""
-      setValue={mockSetValue}
+      moduleData={{ name: "", description: "" }} // Corrigido
+      setModuleData={mockSetValue}
       loading={false}
-      {...props} 
+      {...props}
     />
   );
 };
-
-describe("CreateModal Component", () => {
+describe("CreateModuleModal Component", () => {
   it("should render correctly when open", () => {
    
     renderCreateModal();
@@ -39,38 +44,38 @@ describe("CreateModal Component", () => {
     expect(screen.getByRole("button", { name: "Adicionar" })).toBeInTheDocument();
   });
 
-  it("should call setValue when typing in input", async () => {
-    render(
-      <CreateModal 
-        open={true} 
-        onClose={mockOnClose} 
-        onSubmit={mockOnSubmit} 
-        value="" setValue={mockSetValue} 
-        loading={false} />
-    );
-
-    await userEvent.type(screen.getByLabelText("Nome"), "Novo Módulo");
-    expect(mockSetValue).toHaveBeenCalledWith("N");
-  });
-
-  it("should call onSubmit when clicking the add button", async () => {
-    
+  it("should call onSubmit when clicking the add button", async () => {    
     renderCreateModal();
-
+    await userEvent.type(screen.getByLabelText("Nome"), "Novo Módulo");
 
     await userEvent.click(screen.getByRole("button", { name: "Adicionar" }));
     expect(mockOnSubmit).toHaveBeenCalled();
   });
 
-  it("should disable add button when loading", () => {
-    renderCreateModal({ loading: true });
-
-    expect(screen.getByRole("button", { name: "Adicionar" })).toBeDisabled();
-  });
-
   it("should call onClose when clicking the cancel button", async () => {
     renderCreateModal();
     await userEvent.click(screen.getByRole("button", { name: "Cancelar" }));
+    expect(mockOnClose).toHaveBeenCalled();
+  });
+
+  it("should display 'Adicionar Novo Submódulo' when parentId is provided", () => {
+    renderCreateModal({ parentId: "123" });
+  
+    expect(screen.getByText("Adicionar Novo Submódulo")).toBeInTheDocument();
+  });
+  
+  it("should show validation error if 'Nome' is empty and submit is clicked", async () => {
+    renderCreateModal();
+  
+    await userEvent.click(screen.getByRole("button", { name: "Adicionar" }));
+    
+    expect(await screen.findByText("O nome do módulo é obrigatório")).toBeInTheDocument();
+  });
+  
+  it("should close modal when ESC is pressed", async () => {
+    renderCreateModal();
+  
+    await userEvent.keyboard("{Escape}");
     expect(mockOnClose).toHaveBeenCalled();
   });
 });

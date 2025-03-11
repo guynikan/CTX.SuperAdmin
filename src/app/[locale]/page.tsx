@@ -1,74 +1,9 @@
 "use client";
 
-import { Box, Button, Container, Typography } from "@mui/material";
-import Link from "next/link";
-
-import { ROUTES } from "@/routes";
-
-const links = [
-  { name: "Login ✅", href: ROUTES.AUTH.LOGIN },
-  { name: "Modules ✅ ", href: ROUTES.MODULES.ROOT},
-  { name: "Segment Types ✅", href: ROUTES.SEGMENTS.TYPES },
-  { name: "Segment Values ✅", href: ROUTES.SEGMENTS.VALUES },
-  { name: "Configuration Types ⌛", href: ROUTES.CONFIGURATION.RULES },
-  { name: "Configuration Rules ⌛", href: ROUTES.CONFIGURATION.VALUES },
-];
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <Box
-      sx={{   
-        display: "flex",
-        maxWidth: '700px',
-        margin: 'auto',
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        color: "black",
-        textAlign: "center",
-      }}
-    >
-      <Typography
-        variant="h4"
-        fontWeight="bold"
-        letterSpacing={1}
-        sx={{ mb: 4, mt: 5 }}
-      >
-        Super Admin NextGen
-      </Typography>
+  redirect("/configuration/modules");
 
-      <Container
-        sx={{
-          display: "flex",
-          flexWrap: 'wrap',
-          justifyContent:'center',
-          gap: 3,
-          alignItems: "center",
-        }}
-      >
-        {links.map((link) => (
-          <Link key={link.name} href={link.href} passHref>
-            <Button
-              variant="outlined"
-              sx={{
-                fontSize: "13px",
-                height:'130px',
-                width:'180px',
-                borderRadius: "8px",
-                color: "black",
-                borderColor: "black",
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  backgroundColor: "black",
-                  color: "white",
-                },
-              }}
-            >
-              {link.name}
-            </Button>
-          </Link>
-        ))}
-      </Container>
-    </Box>
-  );
 }
+

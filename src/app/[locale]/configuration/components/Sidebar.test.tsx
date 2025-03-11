@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import Sidebar from "./Sidebar";
 import { useModules } from "@/hooks/useModules";
 import { DictionaryProvider } from "@/i18n/DictionaryProvider";
+import userEvent from "@testing-library/user-event";
 
 jest.mock("@/hooks/useModules", () => ({
   useModules: jest.fn(),
@@ -30,13 +31,6 @@ const renderWithProvider = async () => {
 describe("Sidebar Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-  });
-
-  it("should render 'Adicionar módulo' button", async() => {
-    (useModules as jest.Mock).mockReturnValue({ data: mockModules, isLoading: false });
-    await renderWithProvider();
-
-    expect(screen.getByText("Novo Módulo")).toBeInTheDocument();
   });
 
   it("should display loading indicator when data is being fetched", async () => {
@@ -73,5 +67,36 @@ describe("Sidebar Component", () => {
     expect(screen.getByText("Nenhum módulo cadastrado")).toBeInTheDocument();
   });
 
+  it("should display loading indicator when data is being fetched", async () => {
+    (useModules as jest.Mock).mockReturnValue({ data: [], isLoading: true });
+    await renderWithProvider();
+
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+  });
+
+  it("should call handleAddModule when 'Adicionar módulo' button is clicked", async () => {
+    const handleAddModuleMock = jest.fn();
+    (useModules as jest.Mock).mockReturnValue({ data: mockModules, isLoading: false });
+  
+    render(
+      <DictionaryProvider namespace="modules">
+        <Sidebar handleAddModule={handleAddModuleMock} />
+      </DictionaryProvider>
+    );
+  
+    await waitFor(() => {
+      expect(screen.queryByText("Carregando traduções...")).not.toBeInTheDocument();
+    });
+  
+    const addButton = screen.getByRole("button", { name: 'Novo Módulo' });
+  
+    await userEvent.click(addButton);
+  
+    expect(handleAddModuleMock).toHaveBeenCalledTimes(1);
+  });
+  
 
 });
+
+
+

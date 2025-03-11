@@ -1,10 +1,19 @@
 "use client";
 
-import { useDictionary } from "@/i18n/DictionaryProvider";
-import { Module } from "@/types/modules";
+import { useState } from "react";
+import { ptBR, enUS } from "@mui/x-data-grid/locales";
 import { Box, Typography } from "@mui/material";
 import { DataGridPro, GridColDef } from "@mui/x-data-grid-pro";
-import { ptBR, enUS } from "@mui/x-data-grid/locales";
+
+import { useDictionary } from "@/i18n/DictionaryProvider";
+
+import { Module } from "@/types/modules";
+
+import { useDeleteModule } from "@/hooks/useModules";
+
+import DeleteButton from "../../segments/components/DeleteButton";
+import EditButton from "../../segments/components/EditButton";
+import DeleteModal from "./DeleteModal";
 
 const localeMap = {
   pt_BR: ptBR,
@@ -19,15 +28,14 @@ const transformModulesToTree = (modules: Module[]): any[] => {
     map.set(mod.id, { ...mod, children: [], path: [] });
   });
 
-  // Construindo a hierarquia
   modules.forEach((module) => {
     if (module.parentId && map.has(module.parentId)) {
       const parent = map.get(module.parentId);
       parent.children.push(map.get(module.id));
-      map.get(module.id).path = [...parent.path, module.name]; // Construindo path
+      map.get(module.id).path = [...parent.path, module.name]; 
     } else {
-      map.get(module.id).path = [module.name]; // Raízes começam do próprio nome
-      roots.push(map.get(mod.id));
+      map.get(module.id).path = [module.name]; 
+      roots.push(map.get(module.id));
     }
   });
 
@@ -36,6 +44,35 @@ const transformModulesToTree = (modules: Module[]): any[] => {
 
 export default function DataTable({ modules }: { modules: Module[] }) {
   const { locale, dictionary } = useDictionary();
+
+  const [hasChildren, setHasChildren] = useState(false);
+  const [selectedModule, setSelectedModule] = useState<Module| null>(null);
+  const [openConfirm, setOpenConfirmDelete] = useState(false);
+
+  const { mutateAsync: deleteModule } = useDeleteModule();
+
+
+  const handleEditClick = (module: Module) => {
+    setSelectedModule(module);
+  };
+  
+  const handleDeleteClick = (module: Module) => {
+    const moduleHasChildren = !!module?.children?.length;
+    setSelectedModule(module);
+    setHasChildren(moduleHasChildren);
+    setOpenConfirmDelete(true);
+  };
+
+  const handleDeleteModule = async () => { 
+    try {
+      await deleteModule(selectedModule?.id);
+      
+    } catch (error) {
+      console.error(error);
+    } finally{
+      setOpenConfirmDelete(false)
+    }
+  };
 
   const columns: GridColDef[] = [
     { field: "name", headerName: dictionary?.table.name, width: 320 },
@@ -52,8 +89,12 @@ export default function DataTable({ modules }: { modules: Module[] }) {
       field: "actions",
       headerName: dictionary?.table.actions,
       width: 120,
-      renderCell: () => (
-        <Box sx={{ display: "flex", gap: 1 }}>{/* Botões de ação */}</Box>
+      renderCell: (params) => (
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <EditButton id={params.row.id} onEdit={() => handleEditClick(params.row)} />
+          <DeleteButton onDelete={() => handleDeleteClick(params.row)} />
+
+        </Box>
       ),
     },
   ];
@@ -78,6 +119,16 @@ export default function DataTable({ modules }: { modules: Module[] }) {
           {dictionary?.empty}
         </Typography>
       )}
+      <DeleteModal
+        confirmDelete={handleDeleteModule}
+        open={openConfirm}
+        onClose={() => setOpenConfirmDelete(false)}
+        module={selectedModule}
+        hasChildren={hasChildren}
+      />
+
     </>
+
+    
   );
 }

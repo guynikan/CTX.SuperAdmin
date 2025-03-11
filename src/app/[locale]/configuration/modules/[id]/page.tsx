@@ -1,26 +1,30 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import { Box, Button, CircularProgress, Divider, IconButton, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, IconButton, Paper, Tab, Tabs, Typography } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import { Home } from "@mui/icons-material";
+
 import AddIcon from "@mui/icons-material/Add";
 import SettingsIcon from "@mui/icons-material/Settings";
 
 import { useDictionary } from "@/i18n/DictionaryProvider";
 
 import { useCreateModule, useModuleById } from "@/hooks/useModules";
-import { useState } from "react";
-import CreateModuleModal from "../components/CreateModal";
+
+import { useParams } from "next/navigation";
+
+import Link from "next/link";
+import CreateModuleModal from "../../../modules/components/CreateModal";
+import { Fragment, useState } from "react";
 
 export default function ModulePageDetail() {
-  const {  dictionary } = useDictionary();
-  
-  const { module: id } = useParams();
+  const { dictionary } = useDictionary();
+
+  const { id } = useParams();
   const { data: module, isLoading } = useModuleById(String(id));
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
 
   const createModuleMutation = useCreateModule();
   
@@ -53,40 +57,48 @@ export default function ModulePageDetail() {
           <CircularProgress size={24} />
         </Box>
       ) : module ? (
-        <>
+          <Fragment key={module.id}>
+
+       
          {/* Header */}
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Home fontSize="small" sx={{ color: "#757575" }} />
-              <Typography variant="subtitle2" sx={{ color: "#757575" }}>Home / {dictionary?.rootName} / {module.name}</Typography>
+            <Box sx={{ alignItems: "center", gap: 1 }}>
+              <Typography variant="h6" fontWeight={600} sx={{ textAlign:"left" }}>{module.name}</Typography>   
+              <Typography sx={{ mb: 2, textAlign:"left" }}>{module.description}</Typography>    
             </Box>
             <IconButton>
               <FilterListIcon />
             </IconButton>
           </Box>
-          <Typography variant="h6" fontWeight={600} sx={{ textAlign:"left" }}>{module.name}</Typography>   
-          <Typography sx={{ mb: 2, textAlign:"left" }}>{module.description}</Typography>    
- 
+          
           {/* Actions */}
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-            <Button onClick={()=> setIsModalOpen(true)} variant="outlined" startIcon={<AddIcon />}>{dictionary?.newSubModule}</Button>
-            <Button variant="outlined" startIcon={<SettingsIcon />}>{dictionary?.newConfiguration}</Button>
+            <Link href={`/configuration/modules/${module.id}/new?&name=${module.name}`} passHref>
+              <Button variant="outlined" startIcon={<SettingsIcon />}>
+                {dictionary?.newConfiguration}
+              </Button>
+            </Link>
+            <Button onClick={()=>setIsModalOpen(true)} variant="outlined" startIcon={<AddIcon />}>{dictionary?.newSubModule}</Button>
+            
           </Box>
 
+
+
           {/* Submodules */}
-          <Typography sx={{textAlign:"left" }} variant="subtitle1" fontWeight={600}>{dictionary?.subModules}</Typography>
-          <Divider sx={{ my: 1 }} />
+          {!!module.children?.length && 
+            <Paper sx={{ p: 3, mb: 3 }}>
+              <Tabs sx={{borderBottom:'1px solid #e5e5e5'}} value={activeTab} onChange={(_, newValue) => setActiveTab(newValue)}>  
+                {module.children?.map(submodule => (<Tab key={submodule.id}  label={submodule.name} />))}
+              </Tabs>
+            </Paper>
+          }
 
-        
-
-          {module.children?.map(submodule => (<><p key={submodule.id}>{submodule.name}</p></>))}
-       
-        </>
+          </Fragment>
       ) : (
         <Typography variant="h5">{dictionary?.emptySingle}</Typography>
       )}
 
-      <CreateModuleModal 
+      <CreateModuleModal
         open={isModalOpen} 
         onSubmit={addModule}
         moduleData={moduleData}
