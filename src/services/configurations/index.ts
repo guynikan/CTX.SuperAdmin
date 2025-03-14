@@ -1,7 +1,7 @@
 import { httpService } from "@/services/http";
-import { Configuration, Item, Section } from "@/types/configuration";
+import { Configuration, CreateConfiguration, Item, Section } from "@/types/configuration";
 
-export const createConfiguration = async (configuration: Configuration): Promise<Configuration | undefined> => {
+export const createConfiguration = async (configuration: CreateConfiguration): Promise<Configuration | undefined> => {
   return await httpService<Configuration>({
     path: "/api/Configuration",
     options: {

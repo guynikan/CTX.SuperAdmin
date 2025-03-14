@@ -1,122 +1,39 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { Paper, Button, TextField, Typography, MenuItem, Select, FormControl, InputLabel, Box } from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import { Box, Button, Typography} from "@mui/material";
 import { useDictionary } from "@/i18n/DictionaryProvider";
-import { useConfiguration } from "@/hooks/useConfiguration";
 import ConfigurationForm from "./components/ConfigurationForm";
 
-const schema = yup.object().shape({
-  title: yup.string().required("O título é obrigatório"),
-  description: yup.string().optional(),
-  type: yup.string().required("O tipo de configuração é obrigatório"),
-});
-
-const configurationTypes = [
-  { id: "1", name: "Formulário" },
-  { id: "2", name: "Temas" },
-  { id: "3", name: "Stepper" },
-];
 
 export default function ConfigurationPage() {
 
   const { dictionary } = useDictionary();
   
-  const searchParams = useSearchParams();
-  const moduleId = searchParams.get("moduleId");
   const [fields, setFields] = useState<{ name: string; order: number; properties: string }[]>([]);
   const [sections, setSections] = useState<Partial<Section>[]>([]);
 
-  const { control, handleSubmit, watch } = useForm({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      title: "",
-      description: "",
-      type: "",
-    },
-  });
+  const selectedType = "1";
 
-  const selectedType = watch("type");
 
-  const { mutate: createFullConfig } = useConfiguration();
-
-  const handleCreateConfiguration = (data) => {
-    createFullConfig({
-      configuration: {
-        title: data.title,
-        description: data.description,
-        configurationTypeId: "fb4069d2-7d91-40ad-ac35-01d1276a2bfc", // ID temp config Type from Swagger
-        moduleId,
-      },
-      items: fields.map(field => ({
-        name: field.name,
-        order: field.order,
-        properties: field.properties,
-      })),
-      sections: sections.map(section => ({
-        name: section.name,
-        order: section.order,
-        properties: section.properties,
-      })),
-      sectionItemAssociations: sections.map(section => ({
-        sectionId: section.id,
-        itemIds: section.items,
-      })),
-    });
-  };
+  // const handleCreateConfiguration = () => {
+  // };
 
   return (
     <>
-     <form onSubmit={handleSubmit(handleCreateConfiguration)}>
-        <Paper sx={{ p: 3, mb: 3 }}>
-         
-          <Typography variant="h6">{dictionary?.newConfiguration}</Typography>
-
-          <Controller
-            name="title"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextField {...field} label="Título" fullWidth margin="normal" error={!!fieldState.error} helperText={fieldState.error?.message} />
-            )}
-          />
-          <Controller
-            name="description"
-            control={control}
-            render={({ field }) => (
-              <TextField {...field} label="Descrição (opcional)" fullWidth margin="normal" />
-            )}
-          />
-          <Controller
-            name="type"
-            control={control}
-            render={({ field, fieldState }) => (
-              <FormControl fullWidth margin="normal" error={!!fieldState.error}>
-                <InputLabel>Tipo de Configuração</InputLabel>
-                <Select {...field} label="Tipo de Configuração">
-                  {configurationTypes.map((option) => (
-                    <MenuItem key={option.id} value={option.id}>
-                      {option.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
-          />
-        </Paper>
-
-        {selectedType === "1" && (
-          <>
-            <ConfigurationForm fields={fields} setFields={setFields} sections={sections} setSections={setSections}  />
-          </>
-        )}
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+        <Box sx={{ alignItems: "center", gap: 1 }}>
+          <Typography variant="h6" fontWeight={600} sx={{ textAlign:"left" }}>{dictionary?.newConfiguration}</Typography>   
+        </Box>
+      
+      </Box>
+      {selectedType === "1" && (
+        <>
+          <ConfigurationForm fields={fields} setFields={setFields} sections={sections} setSections={setSections}  />
+        </>
+      )}
 
         <Button variant="contained" color="primary" type="submit" sx={{ maxWidth: '200px', mt: 2 }}>Salvar</Button>
-      </form>
-      
     </>
   );
 }

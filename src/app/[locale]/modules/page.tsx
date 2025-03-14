@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 import { useCreateModule, useModules } from "@/hooks/useModules";
@@ -13,34 +13,11 @@ export default function ModulesView() {
   const { data: modules, isLoading, error } = useModules();
   const {  dictionary } = useDictionary();
 
-  const [viewMode, setViewMode] = useState<"table" | "tree">("table");
+  const [viewMode, setViewMode] = useState<"table" | "tree">("tree");
 
   const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [moduleData, setModuleData] = useState(Object);
-
-  const treeData = useMemo(() => {
-    const convertToTree = (items) => {
-      const map = new Map();
-      const tree = [];
-
-      items.forEach((item) => {
-        map.set(item.id, { ...item, children: [] });
-      });
-
-      items.forEach((item) => {
-        if (item.parentId) {
-          map.get(item.parentId)?.children.push(map.get(item.id));
-        } else {
-          tree.push(map.get(item.id));
-        }
-      });
-
-      return tree;
-    };
-
-    return convertToTree(modules || []);
-  }, [modules]);
 
   const createModuleMutation = useCreateModule();
   
@@ -106,7 +83,7 @@ export default function ModulesView() {
       <Box sx={{ height: "800px", width: "100%", overflowX: "auto" }}>
         {viewMode === "table" ? 
         ( <DataTable modules={modules} />) : (
-          <TreeFlow data={treeData} />
+          <TreeFlow data={modules} />
         )}
       </Box>
 

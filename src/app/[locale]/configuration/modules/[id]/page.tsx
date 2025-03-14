@@ -1,23 +1,28 @@
 "use client";
 
+import { Fragment, useState } from "react";
+
 import { Box, Button, CircularProgress, IconButton, Paper, Tab, Tabs, Typography } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
-
 import AddIcon from "@mui/icons-material/Add";
 import SettingsIcon from "@mui/icons-material/Settings";
 
 import { useDictionary } from "@/i18n/DictionaryProvider";
-
 import { useCreateModule, useModuleById } from "@/hooks/useModules";
 
 import { useParams } from "next/navigation";
 
-import Link from "next/link";
 import CreateModuleModal from "../../../modules/components/CreateModal";
-import { Fragment, useState } from "react";
+import CreateConfigurationModal from "./CreateConfigurationModal";
+import { useCreateConfiguration } from "@/hooks/useConfiguration";
+import { CreateConfiguration } from "@/types/configuration";
+
 
 export default function ModulePageDetail() {
   const { dictionary } = useDictionary();
+  const createModuleMutation = useCreateModule();
+  const createConfigurationMutation = useCreateConfiguration();
+
 
   const { id } = useParams();
   const { data: module, isLoading } = useModuleById(String(id));
@@ -26,14 +31,35 @@ export default function ModulePageDetail() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
 
-  const createModuleMutation = useCreateModule();
+  const [isConfigModalOpen, setConfigModalOpen] = useState(false);
+  const [configurationData, setConfigurationData] = useState({
+    title: "",
+    description: "",
+    configurationTypeId: "",
+  });
   
   const [moduleData, setModuleData] = useState({
     name: "",
     description: "",
   });
 
-  const addModule = async (moduleData: object) => {
+
+  const handleAddConfiguration = async (configurationData: CreateConfiguration) => {
+    setLoading(true);
+    try {
+      const { title, description, configurationTypeId, } = configurationData;
+      await createConfigurationMutation.mutateAsync({  title, description, configurationTypeId, moduleId: id as string });
+      setConfigModalOpen(false);
+      setConfigurationData({  title: "", description: "", configurationTypeId: "", }); 
+      window.location.href = `/configuration/modules/${id}/new?&name=${module?.name}`;
+    } catch (error) {
+      console.error("Erro ao adicionar Módulo:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addSubModule = async (moduleData: object) => {
     setLoading(true);
     try {
       await createModuleMutation.mutateAsync({
@@ -73,11 +99,9 @@ export default function ModulePageDetail() {
           
           {/* Actions */}
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-            <Link href={`/configuration/modules/${module.id}/new?&name=${module.name}`} passHref>
-              <Button variant="outlined" startIcon={<SettingsIcon />}>
-                {dictionary?.newConfiguration}
-              </Button>
-            </Link>
+            <Button onClick={() => setConfigModalOpen(true)} variant="outlined" startIcon={<SettingsIcon />}>
+              {dictionary?.newConfiguration}
+            </Button>
             <Button onClick={()=>setIsModalOpen(true)} variant="outlined" startIcon={<AddIcon />}>{dictionary?.newSubModule}</Button>
             
           </Box>
@@ -100,11 +124,19 @@ export default function ModulePageDetail() {
 
       <CreateModuleModal
         open={isModalOpen} 
-        onSubmit={addModule}
+        onSubmit={addSubModule}
         moduleData={moduleData}
         setModuleData={setModuleData}
         loading={loading}
         onClose={() => setIsModalOpen(false)} />
+
+
+      <CreateConfigurationModal
+        open={isConfigModalOpen}
+        onClose={() => setConfigModalOpen(false)}
+        onSubmit={handleAddConfiguration}
+        initialData={configurationData}
+      />
     </Box>
   );
 }
