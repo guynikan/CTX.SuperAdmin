@@ -1,10 +1,3 @@
-export type ConfigurationType = {
-  id: string;
-  name: string;
-  metadataSchema: string;
-  dataSchema: string;
-};
-
 export type Module = {
   id: string;
   parentId: string;
@@ -49,6 +42,18 @@ export type Configuration = {
   configurationData: ConfigurationData[];
   sections: Section[];
   items: Item[];
+};
+
+export type ConfigurationType = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  name: string;
+  description: string;
+  metadataSchema: string;
+  dataSchema: string;
+  isActive: boolean;
+  configurations: Configuration[];
 };
 
 export type CreateConfiguration = Pick<Configuration, "title" | "description" | "moduleId"|  "configurationTypeId">;

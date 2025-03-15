@@ -5,6 +5,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Modal, TextField, FormControl, InputLabel, Select, MenuItem, Typography, Button, Box } from "@mui/material";
 import { CreateConfiguration } from "@/types/configuration";
+import { useConfigurationTypes } from "@/hooks/useConfiguration";
+import { useDictionary } from "@/i18n/DictionaryProvider";
 
 const schema = yup.object().shape({
   title: yup.string().required("O título é obrigatório"),
@@ -12,20 +14,17 @@ const schema = yup.object().shape({
   configurationTypeId: yup.string().required("O tipo de configuração é obrigatório"),
 });
 
-const configurationTypes = [
-  { id: "fb4069d2-7d91-40ad-ac35-01d1276a2bfc", name: "Formulário" },
-  { id: "31cd02cd-d4fb-4d0f-9272-8fc18398e860", name: "Temas" },
-  { id: "8095efd0-9bf5-452c-8a6f-df5c78345a7b", name: "Stepper" },
-];
-
 type ConfigurationModalProps = {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: CreateConfiguration) => void;
   initialData?: Partial<CreateConfiguration>;
-}
+};
 
 export default function ConfigurationModal({ open, onClose, onSubmit, initialData }: ConfigurationModalProps) {
+  
+  const { dictionary } = useDictionary();
+
   const { control, handleSubmit, reset, formState: { errors } } = useForm<Partial<CreateConfiguration>>({
     resolver: yupResolver(schema),
     defaultValues: initialData || {
@@ -35,6 +34,8 @@ export default function ConfigurationModal({ open, onClose, onSubmit, initialDat
     },
   });
 
+  const { data: configurationTypes } = useConfigurationTypes();
+  
   const handleClose = () => {
     reset();
     onClose();
@@ -42,20 +43,8 @@ export default function ConfigurationModal({ open, onClose, onSubmit, initialDat
 
   return (
     <Modal open={open} onClose={handleClose}>
-      <Box sx={{
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        maxWidth: 950,
-        width:'90%',
-        bgcolor: "background.paper",
-        borderTop: "5px solid #333",
-        boxShadow: 20,
-        p: 5,
-        borderRadius: 1,
-      }}>
-        <Typography variant="h6">Nova Configuração</Typography>
+      <Box sx={styles.modalContainer}>
+        <Typography variant="h6">{dictionary?.newConfiguration}</Typography>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <Controller
@@ -76,10 +65,10 @@ export default function ConfigurationModal({ open, onClose, onSubmit, initialDat
             name="configurationTypeId"
             control={control}
             render={({ field }) => (
-              <FormControl fullWidth margin="normal" error={!!errors.type}>
+              <FormControl fullWidth sx={styles.formControl} error={!!errors.configurationTypeId}>
                 <InputLabel>Tipo de Configuração</InputLabel>
                 <Select {...field} label="Tipo de Configuração">
-                  {configurationTypes.map((option) => (
+                  {configurationTypes?.map((option) => (
                     <MenuItem key={option.id} value={option.id}>
                       {option.name}
                     </MenuItem>
@@ -89,12 +78,44 @@ export default function ConfigurationModal({ open, onClose, onSubmit, initialDat
             )}
           />
 
-          <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
-            <Button onClick={handleClose} color="error" sx={{ mr: 1 }}>Cancelar</Button>
-            <Button type="submit" variant="contained" color="primary">Salvar</Button>
+          <Box sx={styles.buttonContainer}>
+            <Button onClick={handleClose} color="error" sx={styles.cancelButton}>
+              Cancelar
+            </Button>
+            <Button type="submit" variant="contained" color="primary">
+              Salvar
+            </Button>
           </Box>
         </form>
       </Box>
     </Modal>
   );
 }
+
+const styles = {
+  modalContainer: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    maxWidth: 950,
+    width: "90%",
+    bgcolor: "background.paper",
+    borderTop: "5px solid #333",
+    boxShadow: 20,
+    p: 5,
+    borderRadius: 1,
+  },
+  formControl: {
+    fullWidth: true,
+    margin: "15px 0",
+  },
+  buttonContainer: {
+    mt: 2,
+    display: "flex",
+    justifyContent: "flex-end",
+  },
+  cancelButton: {
+    mr: 1,
+  },
+};

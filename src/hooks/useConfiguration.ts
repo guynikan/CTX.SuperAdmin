@@ -7,19 +7,18 @@ import {
   createConfigurationSection,
   associateSectionItems,
 } from "@/services/configurations";
-import { Configuration, CreateConfiguration, Item, Section } from "@/types/configuration";
+import { CreateConfiguration, Item, Section } from "@/types/configuration";
+import { getConfigurationTypes } from "@/services/configurations/types";
 
-export function useConfigurations() {
+
+
+export function useConfigurationTypes() {
   return useQuery({
-    queryKey: ["configurations"],
-    queryFn: async () => {
-      const response = await fetch("/api/Configuration");
-      if (!response.ok) throw new Error("Erro ao buscar configurações");
-      return response.json();
-    },
+    queryKey: ["configurationsTypes"],
+    queryFn: getConfigurationTypes,
     staleTime: 1000 * 60 * 5, 
     retry: 3, 
-    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000),
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000), // Backoff exponencial
   });
 }
 
