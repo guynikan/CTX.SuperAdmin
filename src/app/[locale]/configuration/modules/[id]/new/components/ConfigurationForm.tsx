@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Paper, Tab, Tabs, Button } from "@mui/material";
+import { Paper, Tab, Tabs, Button, Box } from "@mui/material";
 import ConfigurationFields from "./ConfigurationFields";
 import ConfigurationSections from "./ConfigurationSections";
 import { useConfigurationMutations } from "@/hooks/useConfiguration";
 import { Item, Section } from "@/types/configuration";
 import { toast } from "react-toastify";
+import ConfigurationRules from "./ConfigurationRules";
 
 type ConfigurationFormProps = {
   configurationId: string;
@@ -24,69 +25,89 @@ enum ConfigurationTabs {
 
 export default function ConfigurationForm({ configurationId, fields, sections, setFields, setSections }: ConfigurationFormProps) {
   const [activeTab, setActiveTab] = useState(0);
-  const { createItemsMutation, createSectionMutation, associateItemsToSectionProcess } = useConfigurationMutations(configurationId);
+  const [ruleset, setRuleset] = useState({
+    name: "Minha Regra",
+    enabled: true,
+    priority: 0,
+    ruleConditions: [],
+  });
 
+  const { createItemsMutation, createSectionMutation, associateItemsToSectionProcess, createRuleSetMutation } = useConfigurationMutations(configurationId);
+  
   const handleSave = async () => {
     try {
-      // Cria os novos itens (que ainda não foram persistidos)
-      const newItems = fields.filter((item) => !item.isPersisted);
-      let createdItems = [];
+      let createdItems: Item[] = [];
+      const hasFields = fields.length > 0;
+      const hasSections = sections.length > 0;
+      const hasRules = !!ruleset;
   
-      if (newItems.length > 0) {
-        const result = await createItemsMutation.mutateAsync(newItems);
-        createdItems = result || [];
+      // 1. Campos
+      if (hasFields) {
+        const newItems = fields.filter((item) => !item.isPersisted);
   
-        // Atualiza o ID e isPersisted dos campos
-        const updatedFields = fields.map((field) => {
-          const created = createdItems.find((c) => c.name === field.name);
-          return created ? { ...created, isPersisted: true } : field;
-        });
+        if (newItems.length > 0) {
+          const result = await createItemsMutation.mutateAsync(newItems);
+          createdItems = result || [];
   
-        setFields(updatedFields);
+          const updatedFields = fields.map((field) => {
+            const created = createdItems.find((c) => c.name === field.name);
+            return created ? { ...created, isPersisted: true } : field;
+          });
+  
+          setFields(updatedFields);
+        }
       }
   
-      // Atualiza os campos com ids atualizados
+      // IDs reais para associar
       const allFields = [
         ...fields.filter((f) => f.isPersisted),
         ...createdItems.map((f) => ({ ...f, isPersisted: true })),
       ];
   
-      // Cria novas seções
-      for (const section of sections) {
-        if (!section.isPersisted) {
-          const created = await createSectionMutation.mutateAsync(section);
-          section.id = created.id;
-          section.isPersisted = true;
+      // 2. Seções
+      let updatedSections = [...sections];
+      if (hasSections) {
+        for (const section of updatedSections) {
+          if (!section.isPersisted) {
+            const created = await createSectionMutation.mutateAsync(section);
+            section.id = created.id;
+            section.isPersisted = true;
+          }
         }
+  
+        // Atualiza os itens das seções
+        updatedSections = updatedSections.map((section) => ({
+          ...section,
+          items: section.items.map((oldId) => {
+            const original = fields.find((f) => f.id === oldId);
+            const real = allFields.find((f) => f.name === original?.name);
+            return real?.id || oldId;
+          }),
+        }));
+  
+        setSections(updatedSections);
+  
+        // 3. Associa itens às seções
+        await Promise.all(
+          updatedSections.map((section) => {
+            if (!section.id) return;
+            const itemIds = section.items;
+            if (itemIds.length > 0) {
+              return associateItemsToSectionProcess(section.id, itemIds);
+            }
+          })
+        );
       }
   
-      // Atualiza items dentro de seções com os novos IDs reais
-      const updatedSections = sections.map((section) => ({
-        ...section,
-        items: section.items.map((oldId) => {
-          const original = fields.find((f) => f.id === oldId);
-          const real = allFields.find((f) => f.name === original?.name);
-          return real?.id || oldId;
-        }),
-      }));
+      // 4. Ruleset
+      if (hasRules) {
+        await createRuleSetMutation.mutateAsync(ruleset);
+      }
   
-      setSections(updatedSections);
-  
-      // Associa os itens às seções
-      await Promise.all(
-        updatedSections.map((section) => {
-          if (!section.id) return;
-          const itemIds = section.items;
-          if (itemIds.length > 0) {
-            return associateItemsToSectionProcess(section.id, itemIds);
-          }
-        })
-      );
-
-      toast.success('Configuração atualizada!');
-  
+      toast.success("Configuração atualizada com sucesso!");
     } catch (error) {
       console.error("Erro ao salvar configuração:", error);
+      toast.error("Erro ao salvar configuração.");
     }
   };
   
@@ -99,17 +120,22 @@ export default function ConfigurationForm({ configurationId, fields, sections, s
         <Tab data-testid="rules-tab" label="REGRAS" />
       </Tabs>
 
-      {activeTab === ConfigurationTabs.FIELDS && (
+      <Box hidden={activeTab !== ConfigurationTabs.FIELDS}>
         <ConfigurationFields fields={fields} onFieldsChange={setFields} />
-      )}
-      {activeTab === ConfigurationTabs.SECTIONS && (
-        <ConfigurationSections 
-          fields={fields} 
-          sections={sections} 
-          onSectionChange={setSections}  
-          onFieldsChange={setFields} 
+      </Box>
+
+      <Box hidden={activeTab !== ConfigurationTabs.SECTIONS}>
+        <ConfigurationSections
+          fields={fields}
+          sections={sections}
+          onSectionChange={setSections}
+          onFieldsChange={setFields}
         />
-      )}
+      </Box>
+
+      <Box hidden={activeTab !== ConfigurationTabs.RULES}>
+        <ConfigurationRules ruleset={ruleset} onChange={setRuleset} />
+      </Box>
 
       <Button fullWidth variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleSave}>
         Salvar Configuração

@@ -7,6 +7,7 @@ import {
   createConfigurationSection,
   associateSectionItems,
   getConfigurationById,
+  createConfigurationRuleSet,
 } from "@/services/configurations";
 import { CreateConfiguration, Item, Section } from "@/types/configuration";
 import { getConfigurationTypes } from "@/services/configurations/types";
@@ -74,10 +75,18 @@ export function useConfigurationMutations(configurationId: string) {
       console.error("Erro ao associar itens à seção:", error);
     }
   };
+  const createRuleSetMutation = useMutation({
+
+    mutationFn: async (data: any) => {
+      createConfigurationRuleSet(configurationId, data)},
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["configuration", configurationId] }),
+  });
 
   return {
     createItemsMutation,
     createSectionMutation,
     associateItemsToSectionProcess,
+    createRuleSetMutation
   };
 }

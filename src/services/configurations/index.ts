@@ -51,3 +51,29 @@ export const associateSectionItems = async (
     },
   });
 };
+
+
+export const createConfigurationRuleSet = async (configurationId: string, ruleSet: RuleSet) => {
+  return await httpService<Partial<RuleSet>>({
+    path: `/api/ConfigurationRule/configuration/${configurationId}/ruleset`,
+    options: {
+      method: "POST",
+      body: JSON.stringify(ruleSet),
+    },
+  });
+};
+
+type RuleSet = {
+  name: string,
+  logicalOperator: number,
+  enabled: boolean,
+  priority: number,
+  ruleConditions: [
+    {
+      segmentType: string,
+      comparisonOperator: number,
+      values: string[]
+    }
+  ]
+}
+

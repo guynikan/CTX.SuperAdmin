@@ -58,4 +58,13 @@ export type ConfigurationType = {
   configurations: Configuration[];
 };
 
+
+export type Rule = {
+  id: number;
+  segmentType: string;
+  comparisonOperator: number;
+  values: string[];
+  logicalOperator: string;
+};
+
 export type CreateConfiguration = Pick<Configuration, "title" | "description" | "moduleId"|  "configurationTypeId">;
