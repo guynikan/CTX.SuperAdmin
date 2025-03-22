@@ -25,9 +25,6 @@ export default function ConfigurationForm({ configurationId, fields, sections, s
   const [activeTab, setActiveTab] = useState(0);
   const { createItemsMutation, createSectionMutation, associateItemsToSectionProcess } = useConfigurationMutations(configurationId);
 
-  const assignedFieldIds = sections.flatMap((section) => section.items);
-  const fieldsAvailable = fields.filter((field) => !assignedFieldIds.includes(field.id));
-
   const handleSave = async () => {
     try {
       // Criar os campos
@@ -65,7 +62,7 @@ export default function ConfigurationForm({ configurationId, fields, sections, s
       </Tabs>
 
       {activeTab === ConfigurationTabs.FIELDS && (
-        <ConfigurationFields fields={fieldsAvailable} onFieldsChange={setFields} />
+        <ConfigurationFields fields={fields} onFieldsChange={setFields} />
       )}
       {activeTab === ConfigurationTabs.SECTIONS && (
         <ConfigurationSections 

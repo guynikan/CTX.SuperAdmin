@@ -1,13 +1,14 @@
 "use client";
 
-import { Paper, Typography, Button, TextField, Box } from "@mui/material";
+import { Paper, Typography, Button, TextField, Box, IconButton } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
 import { DndContext, DragOverlay, useDraggable, useDroppable } from "@dnd-kit/core";
 import Grid from "@mui/material/Grid2";
 
 import { Item, Section } from "@/types/configuration";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
+import { Delete } from "@mui/icons-material";
 
 
 type ConfigurationSectionsProps =  {
@@ -51,6 +52,24 @@ export default function ConfigurationSections({ fields, sections, onFieldsChange
     setLocalSections(updated);
     onSectionChange(updated);
   };
+
+  const handleRemoveFieldFromSection = (sectionId: string, fieldId: string) => {
+    const updatedSections = localSections.map((section) => {
+      if (section.id !== sectionId) return section;
+  
+      return {
+        ...section,
+        items: (section.items || []).filter((id) => id !== fieldId),
+      };
+    });
+  
+    setLocalSections(updatedSections);
+    onSectionChange(updatedSections);
+  
+    // Atualiza também os campos "usados"
+    setAssignedFields(new Set(updatedSections.flatMap(s => s.items || [])));
+  };
+  
   
 
   const handleDrop = (fieldId: string, sectionId: string) => {
@@ -85,11 +104,13 @@ export default function ConfigurationSections({ fields, sections, onFieldsChange
         sx={{
           p: 1,
           mb: 1,
-          cursor: disabled ? "not-allowed" : "grab",
-          backgroundColor: disabled ? "#eee" : "#f5f5f5",
+          my: 1,
+          border: "1px solid #ccc",
           borderRadius: 1,
+          bgcolor: "#fafafa",
           boxShadow: 1,
           opacity: disabled ? 0.5 : 1,
+          cursor: disabled ? "not-allowed" : "grab",
           pointerEvents: disabled ? "none" : "auto",
         }}
       >
@@ -162,9 +183,19 @@ export default function ConfigurationSections({ fields, sections, onFieldsChange
                   border: "1px solid #ccc",
                   borderRadius: 1,
                   bgcolor: "#fafafa",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
                 }}
               >
-                {field.name}
+                <span>{field.name}</span>
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={() => handleRemoveFieldFromSection(section.id, field.id)}
+                >
+                  <Delete fontSize="small" />
+                </IconButton>
               </Box>
             ) : null;
           })
@@ -179,7 +210,7 @@ export default function ConfigurationSections({ fields, sections, onFieldsChange
   
 
   const usedFieldIds = new Set(localSections.flatMap(s => s.items.map(i => i.id)));
-
+  
   return (
     <DndContext
       onDragEnd={({ active, over }) => {
@@ -212,6 +243,7 @@ export default function ConfigurationSections({ fields, sections, onFieldsChange
               <DraggableField
                 key={field.id}
                 field={field}
+                
                 disabled={usedFieldIds.has(field.id)}
               />
             ))
