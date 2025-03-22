@@ -4,13 +4,23 @@ import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 import { Item, Section } from "@/types/configuration";
 import { toast } from "react-toastify";
 
+// Component stubs
 jest.mock("./ConfigurationFields", () => jest.fn(() => <div data-testid="fields-component">ConfigurationFields</div>));
 jest.mock("./ConfigurationSections", () => jest.fn(() => <div data-testid="sections-component">ConfigurationSections</div>));
+jest.mock("./ConfigurationRules", () => jest.fn(() => <div data-testid="rules-component">ConfigurationRules</div>));
+
+// Mocks
+const createItemsMutationMock = { mutateAsync: jest.fn().mockResolvedValue([{ id: "new-2", name: "Field 2", order: 1, properties: "{}", isPersisted: true }]) };
+const createSectionMutationMock = { mutateAsync: jest.fn().mockResolvedValue({ id: "new-section" }) };
+const associateItemsToSectionProcessMock = jest.fn().mockResolvedValue(undefined);
+const createRuleSetMutationMock = { mutateAsync: jest.fn().mockResolvedValue(undefined) };
+
 jest.mock("@/hooks/useConfiguration", () => ({
   useConfigurationMutations: () => ({
-    createItemsMutation: { mutateAsync: jest.fn().mockResolvedValue([]) },
-    createSectionMutation: { mutateAsync: jest.fn().mockResolvedValue({ id: "new-section" }) },
-    associateItemsToSectionProcess: jest.fn().mockResolvedValue(undefined),
+    createItemsMutation: createItemsMutationMock,
+    createSectionMutation: createSectionMutationMock,
+    associateItemsToSectionProcess: associateItemsToSectionProcessMock,
+    createRuleSetMutation: createRuleSetMutationMock,
   }),
 }));
 
@@ -18,7 +28,9 @@ jest.mock("next/navigation", () => ({
   usePathname: () => "/en_US/modules",
 }));
 
-jest.mock("react-toastify", () => ({ toast: { success: jest.fn() } }));
+jest.mock("react-toastify", () => ({
+  toast: { success: jest.fn(), error: jest.fn() },
+}));
 
 const mockFields: Item[] = [
   { id: "1", name: "Field 1", order: 0, properties: "{}", isPersisted: true },
@@ -26,7 +38,19 @@ const mockFields: Item[] = [
 ];
 
 const mockSections: Partial<Section>[] = [
-  { name: "Section 1", items: ["2"], isPersisted: false },
+  {
+    name: "Section 1",
+    isPersisted: false,
+    items: [
+      {
+        id: "2",
+        name: "Field 2",
+        order: 1,
+        properties: "{}",
+        isPersisted: true,
+      }
+    ],
+  },
 ];
 
 const mockSetFields = jest.fn();
@@ -76,9 +100,15 @@ describe("ConfigurationForm", () => {
     fireEvent.click(screen.getByText(/salvar configuração/i));
 
     await waitFor(() => {
+      expect(createItemsMutationMock.mutateAsync).toHaveBeenCalledWith([
+        expect.objectContaining({ name: "Field 2" }),
+      ]);
+      expect(createSectionMutationMock.mutateAsync).toHaveBeenCalled();
+      expect(associateItemsToSectionProcessMock).toHaveBeenCalled();
+      expect(createRuleSetMutationMock.mutateAsync).toHaveBeenCalled();
       expect(mockSetFields).toHaveBeenCalled();
       expect(mockSetSections).toHaveBeenCalled();
-      expect(toast.success).toHaveBeenCalledWith("Configuração atualizada!");
+      expect(toast.success).toHaveBeenCalledWith("Configuração atualizada com sucesso!");
     });
   });
 });

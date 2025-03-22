@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -17,25 +17,24 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { Rule, Ruleset } from "@/types/configuration";
 
-const options = ["Status"];
-const operators = [
+const SEGMENT_OPTIONS = ["Status"];
+const OPERATOR_OPTIONS = [
   { label: "Igual", value: 0 },
   { label: "Diferente", value: 1 },
 ];
-const values = ["Assistido", "Não Assistido"];
-const logicalOperators = [0, 1];
+const VALUE_OPTIONS = ["Assistido", "Não Assistido"];
+const LOGICAL_OPERATORS = [
+  { label: "OR", value: 0 },
+  { label: "AND", value: 1 },
+];
 
-type FormattedData = {
-  name: string;
-  enabled: boolean;
-  priority: number;
-  ruleConditions: {
-    segmentType: string;
-    comparisonOperator: number;
-    values: string[];
-    logicalOperator: number;
-  }[];
-};
+const initialRule = (): Rule => ({
+  id: Date.now(),
+  segmentType: "Status",
+  comparisonOperator: 0,
+  values: ["Assistido"],
+  logicalOperator: 1,
+});
 
 type Props = {
   ruleset: Ruleset;
@@ -43,91 +42,74 @@ type Props = {
 };
 
 export default function ConfigurationRules({ onChange }: Props) {
-  const [rules, setRules] = useState<Rule[]>([
-    {
-      id: 1,
-      segmentType: "Status",
-      comparisonOperator: 0,
-      values: ["Assistido"],
-      logicalOperator: 0,
-    },
-  ]);
+  const [rules, setRules] = useState<Rule[]>([initialRule()]);
   const [ruleName, setRuleName] = useState("Minha Regra");
 
-  const addRule = () => {
-    setRules((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        segmentType: "Status",
-        comparisonOperator: 0,
-        values: ["Assistido"],
-        logicalOperator: 1,
-      },
-    ]);
-  };
+  const addRule = () => setRules((prev) => [...prev, initialRule()]);
 
-  const removeRule = (id: number) => {
+  const removeRule = (id: number) =>
     setRules((prev) => prev.filter((rule) => rule.id !== id));
+
+  const updateRule = (id: number, field: keyof Rule, value: any) => {
+    setRules((prevRules) => {
+      return prevRules.map((rule) => {
+        if (rule.id !== id) return rule;
+  
+        let updatedValue: any;
+  
+        if (field === "values") {
+          updatedValue = Array.isArray(value) ? value : [value];
+        } else {
+          updatedValue = value;
+        }
+  
+        return {
+          ...rule,
+          [field]: updatedValue,
+        };
+      });
+    });
   };
 
-  const handleChange = (id: number, field: keyof Rule, value: string | number | string[]) => {
-    setRules((prev) =>
-      prev.map((rule) =>
-        rule.id === id
-          ? {
-              ...rule,
-              [field]:
-                field === "values" ? (Array.isArray(value) ? value : [value]) : value,
-            }
-          : rule
-      )
-    );
-  };
-
+  const formatRuleset = useCallback((): Ruleset => ({
+    name: ruleName,
+    enabled: true,
+    priority: 0,
+    ruleConditions: rules,
+  }), [rules, ruleName]);
+  
   useEffect(() => {
-    const formattedData: FormattedData = {
-      name: ruleName,
-      enabled: true,
-      priority: 0,
-      ruleConditions: rules.map(({ segmentType, comparisonOperator, values, logicalOperator }) => ({
-        segmentType,
-        comparisonOperator,
-        values,
-        logicalOperator,
-      })),
-    };
-
-    onChange(formattedData);
-  }, [rules, ruleName, onChange]);
-
+    onChange(formatRuleset());
+  }, [formatRuleset, onChange]);
+ 
   return (
     <Box sx={styles.container}>
       <TextField
         fullWidth
         label="Nome da Regra"
         size="small"
-        variant="outlined"
         value={ruleName}
         onChange={(e) => setRuleName(e.target.value)}
-        sx={{ marginBottom: "10px" }}
+        sx={{ mb: 2 }}
       />
 
       {rules.map((rule, index) => (
         <Stack key={rule.id} direction="row" spacing={2} sx={styles.row}>
           {index !== 0 && (
             <FormControl sx={{ ...styles.formControl, ...styles.smallAnd }} size="small">
-              <InputLabel>Operador</InputLabel>
+              <InputLabel id={`operator-label-${rule.id}`} >Operador</InputLabel>
+              
               <Select
+                labelId={`operator-label-${rule.id}`}
                 label="Operador"
                 value={rule.logicalOperator}
-                onChange={(e: SelectChangeEvent) =>
-                  handleChange(rule.id, "logicalOperator", e.target.value)
+                onChange={(e: SelectChangeEvent<number>) =>
+                  updateRule(rule.id, "logicalOperator", Number(e.target.value))
                 }
               >
-                {logicalOperators.map((op) => (
-                  <MenuItem key={op} value={op}>
-                    {op === 1 ? 'AND' : 'OR'}
+                {LOGICAL_OPERATORS.map(({ label, value }) => (
+                  <MenuItem key={value} value={value}>
+                    {label}
                   </MenuItem>
                 ))}
               </Select>
@@ -135,49 +117,49 @@ export default function ConfigurationRules({ onChange }: Props) {
           )}
 
           <FormControl sx={styles.formControl} size="small">
-            <InputLabel>Segmento</InputLabel>
+            <InputLabel id={`segment-label-${rule.id}`}>Segmento</InputLabel>
             <Select
+              labelId={`segment-label-${rule.id}`}
               label="Segmento"
               value={rule.segmentType}
-              onChange={(e: SelectChangeEvent) =>
-                handleChange(rule.id, "segmentType", e.target.value)
-              }
+              onChange={(e) => updateRule(rule.id, "segmentType", e.target.value)}
             >
-              {options.map((option) => (
-                <MenuItem key={option} value={option}>
-                  {option}
+              {SEGMENT_OPTIONS.map((opt) => (
+                <MenuItem key={opt} value={opt}>
+                  {opt}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
 
           <FormControl sx={styles.formControl} size="small">
-            <InputLabel>Operador</InputLabel>
+            <InputLabel id={`comparison-label-${rule.id}`}>Operador</InputLabel>
+
             <Select
+              labelId={`comparison-label-${rule.id}`}
               label="Operador"
               value={rule.comparisonOperator}
-              onChange={(e: SelectChangeEvent) =>
-                handleChange(rule.id, "comparisonOperator", Number(e.target.value))
+              onChange={(e: SelectChangeEvent<number>) =>
+                updateRule(rule.id, "comparisonOperator", Number(e.target.value))
               }
             >
-              {operators.map((op) => (
-                <MenuItem key={op.value} value={op.value}>
-                  {op.label}
+              {OPERATOR_OPTIONS.map(({ label, value }) => (
+                <MenuItem key={value} value={value}>
+                  {label}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
 
           <FormControl sx={styles.formControl} size="small">
-            <InputLabel>Valor</InputLabel>
+            <InputLabel id={`value-label-${rule.id}`}>Valor</InputLabel>
             <Select
+              labelId={`value-label-${rule.id}`}
               label="Valor"
               value={rule.values[0]}
-              onChange={(e: SelectChangeEvent) =>
-                handleChange(rule.id, "values", [ e.target.value ])
-              }
-            >
-              {values.map((val) => (
+              onChange={(e) => updateRule(rule.id, "values", [e.target.value])}
+              >
+              {VALUE_OPTIONS.map((val) => (
                 <MenuItem key={val} value={val}>
                   {val}
                 </MenuItem>
@@ -185,7 +167,7 @@ export default function ConfigurationRules({ onChange }: Props) {
             </Select>
           </FormControl>
 
-          <IconButton onClick={() => removeRule(rule.id)} color="error">
+          <IconButton data-testid="delete-icon" onClick={() => removeRule(rule.id)} color="error">
             <DeleteIcon />
           </IconButton>
         </Stack>
@@ -203,8 +185,6 @@ export default function ConfigurationRules({ onChange }: Props) {
   );
 }
 
-
-
 const styles = {
   container: {
     backgroundColor: "#FFF",
@@ -213,12 +193,6 @@ const styles = {
     padding: "20px",
     width: "100%",
     maxWidth: "900px",
-  },
-  sectionHeader: {
-    textAlign: "center",
-    marginBottom: "20px",
-    borderBottom: "2px solid #E0E0E0",
-    paddingBottom: "10px",
   },
   row: {
     display: "flex",

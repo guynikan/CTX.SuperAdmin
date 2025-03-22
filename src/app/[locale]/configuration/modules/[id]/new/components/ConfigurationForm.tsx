@@ -41,7 +41,7 @@ export default function ConfigurationForm({ configurationId, fields, sections, s
   
     const created = await createItemsMutation.mutateAsync(newItems);
     const updated = fields.map((field) => {
-      const match = created?.find((c) => c.name === field.name);
+      const match = created?.find((createdItem) => createdItem?.name === field.name);
       return match ? { ...match, isPersisted: true } : field;
     });
   
@@ -108,7 +108,6 @@ export default function ConfigurationForm({ configurationId, fields, sections, s
     }
   };
   
-
   return (
     <Paper sx={{ p: 2 }}>
       <Tabs value={activeTab} onChange={(_, newValue) => setActiveTab(newValue)}>

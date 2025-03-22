@@ -60,7 +60,7 @@ export type ConfigurationType = {
 
 
 export type Rule = {
-  id: number;
+  id?: string;
   segmentType: string;
   comparisonOperator: number;
   values: string[];

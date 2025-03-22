@@ -47,10 +47,8 @@ export function useCreateConfiguration() {
 export function useConfigurationMutations(configurationId: string) {
   const queryClient = useQueryClient();
   const createItemsMutation = useMutation({
-    mutationFn: (items: Partial<Item[]>) =>
-      createConfigurationItems(items, configurationId),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["configuration", configurationId] }),
+    mutationFn: (items: Partial<Item[]>) => createConfigurationItems(items, configurationId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["configuration", configurationId] }),
   });
 
   const createSectionMutation = useMutation({
