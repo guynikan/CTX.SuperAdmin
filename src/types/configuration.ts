@@ -18,6 +18,7 @@ export type Item = {
   name: string;
   order: number;
   properties: string;
+  isPersisted?: boolean; // ← novo campo
 };
 
 export type Section = {
@@ -26,6 +27,7 @@ export type Section = {
   order: number;
   properties: string;
   items: Item[];
+  isPersisted?: boolean; // ← novo campo
 };
 
 export type Configuration = {

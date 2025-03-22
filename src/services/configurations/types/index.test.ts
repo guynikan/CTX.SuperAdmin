@@ -1,4 +1,4 @@
-import { getConfigurationTypes } from "@/services/configurations/types";
+import { getConfigurationTypes } from "./index";
 import { httpService } from "@/services/http";
 
 jest.mock("@/services/http", () => ({
@@ -6,16 +6,18 @@ jest.mock("@/services/http", () => ({
 }));
 
 describe("getConfigurationTypes", () => {
-  it("deve retornar os tipos de configuração quando a requisição for bem-sucedida", async () => {
-
+  it("should return configuration types when the request is successful", async () => {
+    // Arrange
     const mockResponse = [
       { id: 1, name: "Config 1" },
       { id: 2, name: "Config 2" },
     ];
-    httpService.mockResolvedValue(mockResponse);
+    (httpService as jest.Mock).mockResolvedValue(mockResponse);
 
+    // Act
     const result = await getConfigurationTypes();
 
+    // Assert
     expect(httpService).toHaveBeenCalledWith({
       path: "/api/ConfigurationType",
       options: { method: "GET" },
@@ -23,17 +25,18 @@ describe("getConfigurationTypes", () => {
     expect(result).toEqual(mockResponse);
   });
 
-  it("deve retornar undefined quando a requisição falhar", async () => {
+  it("should throw an error when the request fails", async () => {
+    // Arrange
+    const mockError = new Error("Erro tratado pelo defaultErrorHandling");
+    (httpService as jest.Mock).mockRejectedValue(mockError);
 
-    httpService.mockRejectedValue(new Error("Erro na API"));
-
-    const result = await getConfigurationTypes();
-
+    // Act + Assert
+    await expect(getConfigurationTypes()).rejects.toThrow(
+      "Erro tratado pelo defaultErrorHandling"
+    );
     expect(httpService).toHaveBeenCalledWith({
       path: "/api/ConfigurationType",
       options: { method: "GET" },
     });
-    console.log({result})
-    expect(result).toBeUndefined();
   });
 });

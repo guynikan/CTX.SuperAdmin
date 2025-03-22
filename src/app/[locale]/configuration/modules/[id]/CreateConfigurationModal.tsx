@@ -21,7 +21,7 @@ type ConfigurationModalProps = {
   initialData?: Partial<CreateConfiguration>;
 };
 
-export default function ConfigurationModal({ open, onClose, onSubmit, initialData }: ConfigurationModalProps) {
+export default function CreateConfigurationModal({ open, onClose, onSubmit, initialData }: ConfigurationModalProps) {
   
   const { dictionary } = useDictionary();
 

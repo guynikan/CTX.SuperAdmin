@@ -37,6 +37,7 @@ export default function ConfigurationPage() {
       {configuration?.configurationType.name === "Formulário" && (
         <>
           <ConfigurationForm 
+            configurationId={config_id}
             fields={fields} 
             setFields={setFields} 
             sections={sections} 

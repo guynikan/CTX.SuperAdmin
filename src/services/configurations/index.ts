@@ -18,17 +18,17 @@ export const getConfigurationById = async (id: string): Promise<Configuration | 
   });
 };
 
-export const createConfigurationItems = async (items: Partial<Item[]>, configurationId: string): Promise<Partial<Item[]> | undefined> => {
+export const createConfigurationItems = async (items: Partial<Item[]>, configurationId: string) => {
   return await httpService<Partial<Item[]>>({
     path: `/api/Configuration/${configurationId}/items/batch`,
     options: {
       method: "POST",
-      body: JSON.stringify(items),
+      body: JSON.stringify({ items })
     },
   });
 };
 
-export const createConfigurationSection = async (configurationId:string, section: Partial<Section>): Promise<Partial<Section> | undefined> => {
+export const createConfigurationSection = async (configurationId: string, section: Partial<Section>) => {
   return await httpService<Partial<Section>>({
     path: `/api/Configuration/${configurationId}/sections`,
     options: {
@@ -38,12 +38,16 @@ export const createConfigurationSection = async (configurationId:string, section
   });
 };
 
-export const associateSectionItems = async (itemIds: string[], sectionId: string, configurationId: string): Promise<void> => {
+export const associateSectionItems = async (
+  configurationId: string,
+  sectionId: string,
+  itemIds: string[]
+): Promise<void> => {
   return await httpService<void>({
     path: `/api/Configuration/${configurationId}/sections/${sectionId}/items`,
     options: {
       method: "POST",
-      body: JSON.stringify(itemIds),
+      body: JSON.stringify({itemIds}),
     },
   });
 };
