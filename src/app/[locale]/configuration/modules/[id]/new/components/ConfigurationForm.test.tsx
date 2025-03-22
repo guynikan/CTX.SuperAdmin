@@ -5,14 +5,14 @@ import { Item, Section } from "@/types/configuration";
 jest.mock("./ConfigurationFields", () => jest.fn(() => <div data-testid="fields-component">ConfigurationFields</div>));
 jest.mock("./ConfigurationSections", () => jest.fn(() => <div data-testid="sections-component">ConfigurationSections</div>));
 
-const mockFields: Item[] = [
+const mockFields: Partial<Item>[] = [
   { id: "field1", name: "Campo 1", order: 0, properties: "{}" },
   { id: "field2", name: "Campo 2", order: 1, properties: "{}" },
 ];
 
 const mockSections: Partial<Section>[] = [
-  { id: "section1", name: "Seção 1", items: ["field1"] },
-  { id: "section2", name: "Seção 2", items: [] },
+  { id: "section1", name: "Seção 1", items: [{id: "123",name:"field1", order:1, properties:""}] },
+  { id: "section2", name: "Seção 2", items: [{id: "1223",name:"field2", order:0, properties:""}] },
 ];
 
 const mockSetFields = jest.fn();

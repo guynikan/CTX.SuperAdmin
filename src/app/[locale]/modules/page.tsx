@@ -13,7 +13,7 @@ export default function ModulesView() {
   const { data: modules, isLoading, error } = useModules();
   const {  dictionary } = useDictionary();
 
-  const [viewMode, setViewMode] = useState<"table" | "tree">("tree");
+  const [viewMode, setViewMode] = useState<"table" | "tree">("table");
 
   const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
   const [loading, setLoading] = useState(false);

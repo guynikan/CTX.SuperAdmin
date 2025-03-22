@@ -6,11 +6,11 @@ import {
   createConfigurationItems,
   createConfigurationSection,
   associateSectionItems,
+  getConfigurationById,
 } from "@/services/configurations";
+
 import { CreateConfiguration, Item, Section } from "@/types/configuration";
 import { getConfigurationTypes } from "@/services/configurations/types";
-
-
 
 export function useConfigurationTypes() {
   return useQuery({
@@ -20,6 +20,42 @@ export function useConfigurationTypes() {
     retry: 3, 
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000), // Backoff exponencial
   });
+}
+
+export function useConfigurationMutations(configurationId: string) {
+  const queryClient = useQueryClient();
+
+  const createItemsMutation = useMutation({
+    mutationFn: (items) => createConfigurationItems(items, configurationId),
+    onSuccess: () => queryClient.invalidateQueries(["configuration", configurationId]),
+  });
+
+  const createSectionMutation = useMutation({
+    mutationFn: (section) => createConfigurationSection(configurationId, section),
+    onSuccess: () => queryClient.invalidateQueries(["configuration", configurationId]),
+  });
+
+  const associateItemsMutation = useMutation({
+    mutationFn: ({ sectionId, itemIds }) => associateSectionItems(configurationId, sectionId, itemIds),
+    onSuccess: () => queryClient.invalidateQueries(["configuration", configurationId]),
+  });
+
+  const associateItemsToSectionProcess = async (sectionId: string, itemIds: string[]) => {
+    if (!sectionId || !itemIds.length) return;
+    try {
+      await associateItemsMutation.mutateAsync({ sectionId, itemIds });
+    } catch (error) {
+      console.error("Erro ao associar itens à seção:", error);
+      throw error;
+    }
+  };
+
+  return {
+    createItemsMutation,
+    createSectionMutation,
+    associateItemsMutation,
+    associateItemsToSectionProcess,
+  };
 }
 
 export function useCreateConfiguration() {
@@ -38,52 +74,10 @@ export function useCreateConfiguration() {
   });
 }
 
-export function useCreateConfigurationItems() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, items }: { id: string; items: Partial<Item[]> }) =>
-      createConfigurationItems(items, id),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ["configurations", id] });
-      toast.success("Itens adicionados com sucesso!");
-    },
-    onError: (error) => {
-      toast.error("Erro ao adicionar itens.");
-      console.error("Erro ao adicionar itens:", error);
-    },
-  });
-}
-
-export function useCreateConfigurationSection() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (section: Partial<Section>) => createConfigurationSection(section),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["configurations"] });
-      toast.success("Seção criada com sucesso!");
-    },
-    onError: (error) => {
-      toast.error("Erro ao criar seção.");
-      console.error("Erro ao criar seção:", error);
-    },
-  });
-}
-
-export function useAssociateSectionItems() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ itemIds, sectionId, configurationId }: { itemIds: string[], sectionId: string, configurationId: string }) =>
-      associateSectionItems(itemIds, sectionId, configurationId),
-    onSuccess: (_, { configurationId }) => {
-      queryClient.invalidateQueries({ queryKey: ["configurations", configurationId] });
-      toast.success("Itens associados à seção com sucesso!");
-    },
-    onError: (error) => {
-      toast.error("Erro ao associar itens à seção.");
-      console.error("Erro ao associar itens:", error);
-    },
+export function useConfigurationById(id: string) {
+  return useQuery({
+    queryKey: ["configuration", id],
+    queryFn: () => getConfigurationById(id),
+    enabled: !!id,
   });
 }

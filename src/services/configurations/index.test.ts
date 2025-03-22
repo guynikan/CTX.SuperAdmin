@@ -22,8 +22,8 @@ describe("Configuration Service", () => {
   };
 
   const mockItems: Partial<Item[]> = [
-    { name: "Item 1", order: 0, properties: "{}" },
-    { name: "Item 2", order: 1, properties: "{}" },
+    { id: "12312313", name: "Item 1", order: 0, properties: "{}" },
+    { id: "1231233", name: "Item 2", order: 1, properties: "{}" },
   ];
 
   const mockSection: Partial<Section> = {
@@ -75,10 +75,10 @@ describe("Configuration Service", () => {
   describe("createConfigurationSection", () => {
     it("should create a new section", async () => {
       (httpService as jest.Mock).mockResolvedValue(mockSection);
-      const result = await createConfigurationSection(mockSection);
+      const result = await createConfigurationSection(mockConfiguration?.id, mockSection);
 
       expect(httpService).toHaveBeenCalledWith({
-        path: "/api/Configuration/{id}/sections",
+        path: `/api/Configuration/${mockConfiguration?.id}/sections`,
         options: { method: "POST", body: JSON.stringify(mockSection) },
       });
       expect(result).toEqual(mockSection);

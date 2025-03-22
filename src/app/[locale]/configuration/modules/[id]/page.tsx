@@ -48,10 +48,14 @@ export default function ModulePageDetail() {
     setLoading(true);
     try {
       const { title, description, configurationTypeId, } = configurationData;
-      await createConfigurationMutation.mutateAsync({  title, description, configurationTypeId, moduleId: id as string });
-      setConfigModalOpen(false);
-      setConfigurationData({  title: "", description: "", configurationTypeId: "", }); 
-      window.location.href = `/configuration/modules/${id}/new?&name=${module?.name}`;
+      const configResponse = await createConfigurationMutation.mutateAsync({  title, description, configurationTypeId, moduleId: id as string });
+      
+      if(configResponse){
+        setConfigModalOpen(false);
+        setConfigurationData({  title: "", description: "", configurationTypeId: "", }); 
+        window.location.href = `/configuration/modules/${id}/new?&config_id=${configResponse?.id}`;
+      }
+        
     } catch (error) {
       console.error("Erro ao adicionar Módulo:", error);
     } finally {
@@ -89,7 +93,7 @@ export default function ModulePageDetail() {
          {/* Header */}
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
             <Box sx={{ alignItems: "center", gap: 1 }}>
-              <Typography variant="h6" fontWeight={600} sx={{ textAlign:"left" }}>{module.name}</Typography>   
+              <Typography variant="h6" fontWeight={600} sx={{ textAlign:"left" }}>Módulo - {module.name}</Typography>   
               <Typography sx={{ mb: 2, textAlign:"left" }}>{module.description}</Typography>    
             </Box>
             <IconButton>

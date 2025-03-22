@@ -29,7 +29,7 @@ import { Item } from "@/types/configuration";
 type ConfigurationFieldsProps = {
   fields: Item[];
   onFieldsChange: (updatedFields: Item[]) => void;
-}
+};
 
 const fieldTypes = ["Text", "Number", "Phone", "Textarea", "Select", "Date", "Radio", "Checkbox"];
 const fieldSizes = ["1/3", "50%", "100%"];
@@ -52,7 +52,7 @@ export default function ConfigurationFields({ fields, onFieldsChange }: Configur
 
     const updatedFields =
       editingIndex !== null
-        ? fields.map((field, index) => (index === editingIndex ? newField : field))
+        ? fields.map((field, index) => (index === editingIndex ? { ...newField, id: field.id } : field))
         : [...fields, newField];
 
     onFieldsChange(updatedFields);
@@ -63,7 +63,7 @@ export default function ConfigurationFields({ fields, onFieldsChange }: Configur
     const field = fields[index];
     const props = JSON.parse(field.properties || "{}");
     setEditingIndex(index);
-    reset({ name: field.name, type: props.type || "Text", size: props.size || "1/1" });
+    reset({ name: field.name, type: props.type || "Text", size: props.size || "100%" });
     setOpen(true);
   };
 
@@ -73,7 +73,7 @@ export default function ConfigurationFields({ fields, onFieldsChange }: Configur
 
   const handleClose = () => {
     setOpen(false);
-    reset({ name: "", type: "Text", size: "1/1" });
+    reset({ name: "", type: "Text", size: "100%" });
     setEditingIndex(null);
   };
 
@@ -91,7 +91,7 @@ export default function ConfigurationFields({ fields, onFieldsChange }: Configur
           </TableHead>
           <TableBody>
             {fields.length > 0 ? (
-              fields.map((field) => {
+              fields.map((field, index) => {
                 const props = JSON.parse(field.properties || "{}");
                 return (
                   <TableRow key={field.id}>
@@ -99,7 +99,7 @@ export default function ConfigurationFields({ fields, onFieldsChange }: Configur
                     <TableCell>{props.type || "N/A"}</TableCell>
                     <TableCell>{props.size || "N/A"}</TableCell>
                     <TableCell>
-                      <IconButton color="primary" onClick={() => handleEdit(fields.indexOf(field))}>
+                      <IconButton color="primary" onClick={() => handleEdit(index)}>
                         <EditIcon />
                       </IconButton>
                       <IconButton color="error" onClick={() => handleDelete(field.id)}>
@@ -157,7 +157,7 @@ export default function ConfigurationFields({ fields, onFieldsChange }: Configur
               render={({ field }) => (
                 <FormControl fullWidth margin="dense">
                   <InputLabel>Tipo</InputLabel>
-                  <Select {...field}>
+                  <Select {...field} label="Tipo">
                     {fieldTypes.map((option) => (
                       <MenuItem key={option} value={option}>{option}</MenuItem>
                     ))}
@@ -171,7 +171,7 @@ export default function ConfigurationFields({ fields, onFieldsChange }: Configur
               render={({ field }) => (
                 <FormControl fullWidth margin="dense">
                   <InputLabel>Tamanho</InputLabel>
-                  <Select {...field}>
+                  <Select {...field} label="Tamanho">
                     {fieldSizes.map((option) => (
                       <MenuItem key={option} value={option}>{option}</MenuItem>
                     ))}
