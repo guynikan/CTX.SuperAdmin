@@ -64,7 +64,14 @@ export type Rule = {
   segmentType: string;
   comparisonOperator: number;
   values: string[];
-  logicalOperator: string;
+  logicalOperator: number;
+};
+
+export type Ruleset = {
+  name: string;
+  enabled: boolean;
+  priority: number;
+  ruleConditions: Rule[];
 };
 
 export type CreateConfiguration = Pick<Configuration, "title" | "description" | "moduleId"|  "configurationTypeId">;

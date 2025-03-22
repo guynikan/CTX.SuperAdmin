@@ -34,73 +34,70 @@ export default function ConfigurationForm({ configurationId, fields, sections, s
 
   const { createItemsMutation, createSectionMutation, associateItemsToSectionProcess, createRuleSetMutation } = useConfigurationMutations(configurationId);
   
+
+  const persistNewFields = async () => {
+    const newItems = fields.filter((item) => !item.isPersisted);
+    if (newItems.length === 0) return;
+  
+    const created = await createItemsMutation.mutateAsync(newItems);
+    const updated = fields.map((field) => {
+      const match = created?.find((c) => c.name === field.name);
+      return match ? { ...match, isPersisted: true } : field;
+    });
+  
+    setFields(updated);
+  };
+  
+  const buildAllFields = (): Item[] => {
+    const persisted = fields.filter((f) => f.isPersisted);
+    const newOnes = fields.filter((f) => !f.isPersisted);
+    return [...persisted, ...newOnes];
+  };
+  
+  const persistSectionsWithRealItemIds = async (allFields: Item[]): Promise<Partial<Section>[]> => {
+    const updated = [...sections];
+  
+    for (const section of updated) {
+      if (!section.isPersisted) {
+        const created = await createSectionMutation.mutateAsync(section);
+        section.id = created?.id;
+        section.isPersisted = true;
+      }
+  
+      section.items = section.items?.map((oldId) => {
+        const original = fields.find((f) => f.id === oldId);
+        const real = allFields.find((f) => f.name === original?.name);
+        return real?.id || oldId;
+      });
+    }
+  
+    return updated;
+  };
+  
+  const associateItemsToSections = async (updatedSections: Partial<Section>[]) => {
+    await Promise.all(
+      updatedSections.map((section) => {
+        if (!section.id) return;
+        const itemIds = section.items || [];
+        if (itemIds.length > 0) {
+          return associateItemsToSectionProcess(section.id, itemIds);
+        }
+      })
+    );
+  };
+
   const handleSave = async () => {
     try {
-      let createdItems: Item[] = [];
-      const hasFields = fields.length > 0;
-      const hasSections = sections.length > 0;
-      const hasRules = !!ruleset;
+      if (fields.length > 0) await persistNewFields();
+      const allFields = buildAllFields();
   
-      // 1. Campos
-      if (hasFields) {
-        const newItems = fields.filter((item) => !item.isPersisted);
-  
-        if (newItems.length > 0) {
-          const result = await createItemsMutation.mutateAsync(newItems);
-          createdItems = result || [];
-  
-          const updatedFields = fields.map((field) => {
-            const created = createdItems.find((c) => c.name === field.name);
-            return created ? { ...created, isPersisted: true } : field;
-          });
-  
-          setFields(updatedFields);
-        }
+      if (sections.length > 0) {
+        const updated = await persistSectionsWithRealItemIds(allFields);
+        setSections(updated);
+        await associateItemsToSections(updated);
       }
   
-      // IDs reais para associar
-      const allFields = [
-        ...fields.filter((f) => f.isPersisted),
-        ...createdItems.map((f) => ({ ...f, isPersisted: true })),
-      ];
-  
-      // 2. Seções
-      let updatedSections = [...sections];
-      if (hasSections) {
-        for (const section of updatedSections) {
-          if (!section.isPersisted) {
-            const created = await createSectionMutation.mutateAsync(section);
-            section.id = created.id;
-            section.isPersisted = true;
-          }
-        }
-  
-        // Atualiza os itens das seções
-        updatedSections = updatedSections.map((section) => ({
-          ...section,
-          items: section.items.map((oldId) => {
-            const original = fields.find((f) => f.id === oldId);
-            const real = allFields.find((f) => f.name === original?.name);
-            return real?.id || oldId;
-          }),
-        }));
-  
-        setSections(updatedSections);
-  
-        // 3. Associa itens às seções
-        await Promise.all(
-          updatedSections.map((section) => {
-            if (!section.id) return;
-            const itemIds = section.items;
-            if (itemIds.length > 0) {
-              return associateItemsToSectionProcess(section.id, itemIds);
-            }
-          })
-        );
-      }
-  
-      // 4. Ruleset
-      if (hasRules) {
+      if (ruleset) {
         await createRuleSetMutation.mutateAsync(ruleset);
       }
   

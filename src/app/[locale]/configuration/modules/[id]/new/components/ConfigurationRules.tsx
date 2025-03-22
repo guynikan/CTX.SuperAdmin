@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import { Rule, Ruleset } from "@/types/configuration";
 
 const options = ["Status"];
 const operators = [
@@ -23,14 +24,6 @@ const operators = [
 ];
 const values = ["Assistido", "Não Assistido"];
 const logicalOperators = [0, 1];
-
-type Rule = {
-  id: number;
-  segmentType: string;
-  comparisonOperator: number;
-  values: string[];
-  logicalOperator: number;
-};
 
 type FormattedData = {
   name: string;
@@ -42,13 +35,6 @@ type FormattedData = {
     values: string[];
     logicalOperator: number;
   }[];
-};
-
-type Ruleset = {
-  name: string;
-  enabled: boolean;
-  priority: number;
-  ruleConditions: Rule[];
 };
 
 type Props = {
