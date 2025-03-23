@@ -10,7 +10,6 @@ import { Item, Section } from "@/types/configuration";
 import { useEffect, useState } from "react";
 import { Delete } from "@mui/icons-material";
 
-
 type ConfigurationSectionsProps =  {
   sections: Partial<Section>[];
   fields: Item[];
@@ -66,7 +65,6 @@ export default function ConfigurationSections({ fields, sections, onFieldsChange
     setLocalSections(updatedSections);
     onSectionChange(updatedSections);
   
-    // Atualiza também os campos "usados"
     setAssignedFields(new Set(updatedSections.flatMap(s => s.items || [])));
   };
   
@@ -119,7 +117,6 @@ export default function ConfigurationSections({ fields, sections, onFieldsChange
     );
   };
   
-
   const DroppableSection = ({
     section,
     onNameChange,
@@ -220,7 +217,6 @@ export default function ConfigurationSections({ fields, sections, onFieldsChange
         }
       }}
     >
-     
       <Grid container spacing={2} sx={{ mt: 2 }}>
         <DragOverlay>
           {activeDragField ? (

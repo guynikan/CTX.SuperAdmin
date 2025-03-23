@@ -20,10 +20,6 @@ export default function ConfigurationPage() {
   const [fields, setFields] = useState<{ name: string; order: number; properties: string }[]>([]);
   const [sections, setSections] = useState<Partial<Section>[]>([]);
 
-
-  // const handleCreateConfiguration = () => {
-  // };
-
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
@@ -33,7 +29,6 @@ export default function ConfigurationPage() {
         </Box>
       
       </Box>
-     
       {configuration?.configurationType.name === "Formulário" && (
         <>
           <ConfigurationForm 
@@ -44,8 +39,6 @@ export default function ConfigurationPage() {
             setSections={setSections}  />
         </>
       )}
-
-
     </>
   );
 }
