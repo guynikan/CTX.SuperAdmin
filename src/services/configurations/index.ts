@@ -1,7 +1,7 @@
 import { httpService } from "@/services/http";
-import { Configuration, Item, Section } from "@/types/configuration";
+import { Configuration, CreateConfiguration, Item, Section } from "@/types/configuration";
 
-export const createConfiguration = async (configuration: Configuration): Promise<Configuration | undefined> => {
+export const createConfiguration = async (configuration: CreateConfiguration): Promise<Configuration | undefined> => {
   return await httpService<Configuration>({
     path: "/api/Configuration",
     options: {
@@ -11,19 +11,26 @@ export const createConfiguration = async (configuration: Configuration): Promise
   });
 };
 
-export const createConfigurationItems = async (items: Partial<Item[]>, id: string): Promise<Partial<Item[]> | undefined> => {
+export const getConfigurationById = async (id: string): Promise<Configuration | undefined> => {
+  return await httpService<Configuration>({
+    path: `/api/Configuration/${id}`,
+    options: { method: "GET" },
+  });
+};
+
+export const createConfigurationItems = async (items: Partial<Item[]>, configurationId: string) => {
   return await httpService<Partial<Item[]>>({
-    path: `/api/Configuration/${id}/items/batch`,
+    path: `/api/Configuration/${configurationId}/items/batch`,
     options: {
       method: "POST",
-      body: JSON.stringify(items),
+      body: JSON.stringify({ items })
     },
   });
 };
 
-export const createConfigurationSection = async (section: Partial<Section>): Promise<Partial<Section> | undefined> => {
+export const createConfigurationSection = async (configurationId: string, section: Partial<Section>) => {
   return await httpService<Partial<Section>>({
-    path: "/api/Configuration/{id}/sections",
+    path: `/api/Configuration/${configurationId}/sections`,
     options: {
       method: "POST",
       body: JSON.stringify(section),
@@ -31,12 +38,42 @@ export const createConfigurationSection = async (section: Partial<Section>): Pro
   });
 };
 
-export const associateSectionItems = async (itemIds: string[], sectionId: string, configurationId: string): Promise<void> => {
+export const associateSectionItems = async (
+  configurationId: string,
+  sectionId: string,
+  itemIds: string[]
+): Promise<void> => {
   return await httpService<void>({
     path: `/api/Configuration/${configurationId}/sections/${sectionId}/items`,
     options: {
       method: "POST",
-      body: JSON.stringify(itemIds),
+      body: JSON.stringify({itemIds}),
     },
   });
 };
+
+
+export const createConfigurationRuleSet = async (configurationId: string, ruleSet: RuleSet) => {
+  return await httpService<Partial<RuleSet>>({
+    path: `/api/ConfigurationRule/configuration/${configurationId}/ruleset`,
+    options: {
+      method: "POST",
+      body: JSON.stringify(ruleSet),
+    },
+  });
+};
+
+type RuleSet = {
+  name: string,
+  logicalOperator: number,
+  enabled: boolean,
+  priority: number,
+  ruleConditions: [
+    {
+      segmentType: string,
+      comparisonOperator: number,
+      values: string[]
+    }
+  ]
+}
+

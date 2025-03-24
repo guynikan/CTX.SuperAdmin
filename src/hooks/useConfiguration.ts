@@ -1,61 +1,89 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createConfiguration, createConfigurationItems, createConfigurationSection, associateSectionItems } from "@/services/configurations";
-import { Configuration, CreateConfiguration } from "@/types/configuration";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import {
+  createConfiguration,
+  createConfigurationItems,
+  createConfigurationSection,
+  associateSectionItems,
+  getConfigurationById,
+  createConfigurationRuleSet,
+} from "@/services/configurations";
+import { CreateConfiguration, Item, Section } from "@/types/configuration";
+import { getConfigurationTypes } from "@/services/configurations/types";
 
-interface CreateFullConfigurationInput {
-  configuration: CreateConfiguration; 
-  items: { name: string; order: number; properties: string }[];
-  sections: { name: string; order: number; properties: string }[];
-  sectionItemAssociations: { sectionId: string; itemIds: string[] }[];
+export function useConfigurationTypes() {
+  return useQuery({
+    queryKey: ["configurationTypes"],
+    queryFn: getConfigurationTypes,
+    staleTime: 1000 * 60 * 5,
+    retry: 3,
+  });
 }
 
-export function useConfiguration() {
+export function useConfigurationById(id: string) {
+  return useQuery({
+    queryKey: ["configuration", id],
+    queryFn: () => getConfigurationById(id),
+    enabled: !!id,
+  });
+}
+
+export function useCreateConfiguration() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ configuration, items, sections, sectionItemAssociations }: CreateFullConfigurationInput) => {
-      try {
-       
-        const createdConfig = await createConfiguration({
-          ...configuration,
-          isActive: true,
-        });
-
-        if (!createdConfig?.id) throw new Error("Falha ao criar a configuração");
-
-        toast.success("Configuração criada com sucesso!");
-
-        
-        const createdItems = await createConfigurationItems({ items }, createdConfig.id);
-        if (!createdItems) throw new Error("Falha ao adicionar itens");
-
-        toast.success("Itens adicionados com sucesso!");
-
-        const createdSections = [];
-        for (const section of sections) {
-          const newSection = await createConfigurationSection({ ...section }, createdConfig.id);
-          if (!newSection) throw new Error("Falha ao criar seção");
-          createdSections.push(newSection);
-        }
-
-        toast.success("Seções criadas com sucesso!");
-
-
-        for (const { sectionId, itemIds } of sectionItemAssociations) {
-          await associateSectionItems({ itemIds }, sectionId, createdConfig.id);
-        }
-
-        toast.success("Itens associados às seções!");
-
-        queryClient.invalidateQueries({ queryKey: ["configurations"] });
-
-        return { createdConfig, createdItems, createdSections };
-      } catch (error) {
-        toast.error("Erro ao processar a configuração.");
-        console.error("Erro ao criar configuração:", error);
-        throw error;
-      }
+    mutationFn: (data: CreateConfiguration) => createConfiguration(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["configurations"] });
+      toast.success("Configuração criada com sucesso!");
+    },
+    onError: () => {
+      toast.error("Erro ao criar configuração.");
     },
   });
+}
+
+export function useConfigurationMutations(configurationId: string) {
+  const queryClient = useQueryClient();
+  const createItemsMutation = useMutation({
+    mutationFn: (items: Partial<Item[]>) => createConfigurationItems(items, configurationId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["configuration", configurationId] }),
+  });
+
+  const createSectionMutation = useMutation({
+    mutationFn: (section: Partial<Section>) =>
+      createConfigurationSection(configurationId, section),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["configuration", configurationId] }),
+  });
+
+  const associateItemsMutation = useMutation({
+    mutationFn: ({ sectionId, itemIds }: { sectionId: string; itemIds: string[] }) =>
+      associateSectionItems(configurationId, sectionId, itemIds),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["configuration", configurationId] }),
+  });
+
+  const associateItemsToSectionProcess = async (sectionId: string, itemIds: string[]) => {
+    if (!sectionId || !itemIds.length) return;
+    try {
+      await associateItemsMutation.mutateAsync({ sectionId, itemIds });
+    } catch (error) {
+      console.error("Erro ao associar itens à seção:", error);
+    }
+  };
+  const createRuleSetMutation = useMutation({
+
+    mutationFn: async (data: any) => {
+      createConfigurationRuleSet(configurationId, data)},
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["configuration", configurationId] }),
+  });
+
+  return {
+    createItemsMutation,
+    createSectionMutation,
+    associateItemsToSectionProcess,
+    createRuleSetMutation
+  };
 }

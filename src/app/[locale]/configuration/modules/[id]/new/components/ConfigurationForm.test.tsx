@@ -1,100 +1,114 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ConfigurationForm from "./ConfigurationForm";
+import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 import { Item, Section } from "@/types/configuration";
+import { toast } from "react-toastify";
 
+// Component stubs
 jest.mock("./ConfigurationFields", () => jest.fn(() => <div data-testid="fields-component">ConfigurationFields</div>));
 jest.mock("./ConfigurationSections", () => jest.fn(() => <div data-testid="sections-component">ConfigurationSections</div>));
+jest.mock("./ConfigurationRules", () => jest.fn(() => <div data-testid="rules-component">ConfigurationRules</div>));
+
+// Mocks
+const createItemsMutationMock = { mutateAsync: jest.fn().mockResolvedValue([{ id: "new-2", name: "Field 2", order: 1, properties: "{}", isPersisted: true }]) };
+const createSectionMutationMock = { mutateAsync: jest.fn().mockResolvedValue({ id: "new-section" }) };
+const associateItemsToSectionProcessMock = jest.fn().mockResolvedValue(undefined);
+const createRuleSetMutationMock = { mutateAsync: jest.fn().mockResolvedValue(undefined) };
+
+jest.mock("@/hooks/useConfiguration", () => ({
+  useConfigurationMutations: () => ({
+    createItemsMutation: createItemsMutationMock,
+    createSectionMutation: createSectionMutationMock,
+    associateItemsToSectionProcess: associateItemsToSectionProcessMock,
+    createRuleSetMutation: createRuleSetMutationMock,
+  }),
+}));
+
+jest.mock("next/navigation", () => ({
+  usePathname: () => "/en_US/modules",
+}));
+
+jest.mock("react-toastify", () => ({
+  toast: { success: jest.fn(), error: jest.fn() },
+}));
 
 const mockFields: Item[] = [
-  { id: "field1", name: "Campo 1", order: 0, properties: "{}" },
-  { id: "field2", name: "Campo 2", order: 1, properties: "{}" },
+  { id: "1", name: "Field 1", order: 0, properties: "{}", isPersisted: true },
+  { id: "2", name: "Field 2", order: 1, properties: "{}", isPersisted: false },
 ];
 
 const mockSections: Partial<Section>[] = [
-  { id: "section1", name: "Seção 1", items: ["field1"] },
-  { id: "section2", name: "Seção 2", items: [] },
+  {
+    name: "Section 1",
+    isPersisted: false,
+    items: [
+      {
+        id: "2",
+        name: "Field 2",
+        order: 1,
+        properties: "{}",
+        isPersisted: true,
+      }
+    ],
+  },
 ];
 
 const mockSetFields = jest.fn();
 const mockSetSections = jest.fn();
 
-describe("ConfigurationForm Component", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+const renderWithProvider = async () => {
+  render(
+    <DictionaryProvider namespace="modules">
+      <ConfigurationForm
+        configurationId="config-123"
+        fields={mockFields}
+        setFields={mockSetFields}
+        sections={mockSections}
+        setSections={mockSetSections}
+      />
+    </DictionaryProvider>
+  );
+
+  await waitFor(() => {
+    expect(screen.queryByText("Carregando traduções...")).not.toBeInTheDocument();
+  });
+};
+
+describe("ConfigurationForm", () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it("renders tabs correctly", async () => {
+    await renderWithProvider();
+    expect(screen.getByTestId("fields-tab")).toBeInTheDocument();
+    expect(screen.getByTestId("sections-tab")).toBeInTheDocument();
+    expect(screen.getByTestId("rules-tab")).toBeInTheDocument();
   });
 
-  it("should render the component with tabs", () => {
-    render(
-      <ConfigurationForm 
-        fields={mockFields} 
-        sections={mockSections} 
-        setFields={mockSetFields} 
-        setSections={mockSetSections} 
-      />
-    );
-
-    expect(screen.getByText("CAMPOS")).toBeInTheDocument();
-    expect(screen.getByText("SEÇÕES")).toBeInTheDocument();
-    expect(screen.getByText("REGRAS")).toBeInTheDocument();
-  });
-
-  it("should render ConfigurationFields when 'CAMPOS' tab is active", () => {
-    render(
-      <ConfigurationForm 
-        fields={mockFields} 
-        sections={mockSections} 
-        setFields={mockSetFields} 
-        setSections={mockSetSections} 
-      />
-    );
-
+  it("renders fields tab by default", async () => {
+    await renderWithProvider();
     expect(screen.getByTestId("fields-component")).toBeInTheDocument();
-    expect(screen.queryByTestId("sections-component")).not.toBeInTheDocument();
   });
 
-  it("should render ConfigurationSections when 'SEÇÕES' tab is clicked", () => {
-    render(
-      <ConfigurationForm 
-        fields={mockFields} 
-        sections={mockSections} 
-        setFields={mockSetFields} 
-        setSections={mockSetSections} 
-      />
-    );
-
-    fireEvent.click(screen.getByText("SEÇÕES"));
-
+  it("switches to sections tab on click", async () => {
+    await renderWithProvider();
+    fireEvent.click(screen.getByTestId("sections-tab"));
     expect(screen.getByTestId("sections-component")).toBeInTheDocument();
-    expect(screen.queryByTestId("fields-component")).not.toBeInTheDocument();
   });
 
-  it("should call setFields when updating fields", () => {
-    render(
-      <ConfigurationForm 
-        fields={mockFields} 
-        sections={mockSections} 
-        setFields={mockSetFields} 
-        setSections={mockSetSections} 
-      />
-    );
+  it("calls mutations and updates state on save", async () => {
+    await renderWithProvider();
+    fireEvent.click(screen.getByText(/salvar configuração/i));
 
-    fireEvent.click(screen.getByText("CAMPOS"));
-
-    expect(mockSetFields).not.toHaveBeenCalled();
-  });
-
-  it("should call setSections when updating sections", () => {
-    render(
-      <ConfigurationForm 
-        fields={mockFields} 
-        sections={mockSections} 
-        setFields={mockSetFields} 
-        setSections={mockSetSections} 
-      />
-    );
-
-    fireEvent.click(screen.getByText("SEÇÕES"));
-
-    expect(mockSetSections).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(createItemsMutationMock.mutateAsync).toHaveBeenCalledWith([
+        expect.objectContaining({ name: "Field 2" }),
+      ]);
+      expect(createSectionMutationMock.mutateAsync).toHaveBeenCalled();
+      expect(associateItemsToSectionProcessMock).toHaveBeenCalled();
+      expect(createRuleSetMutationMock.mutateAsync).toHaveBeenCalled();
+      expect(mockSetFields).toHaveBeenCalled();
+      expect(mockSetSections).toHaveBeenCalled();
+      expect(toast.success).toHaveBeenCalledWith("Configuração atualizada com sucesso!");
+    });
   });
 });

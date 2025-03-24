@@ -1,10 +1,3 @@
-export type ConfigurationType = {
-  id: string;
-  name: string;
-  metadataSchema: string;
-  dataSchema: string;
-};
-
 export type Module = {
   id: string;
   parentId: string;
@@ -25,6 +18,7 @@ export type Item = {
   name: string;
   order: number;
   properties: string;
+  isPersisted?: boolean;
 };
 
 export type Section = {
@@ -33,6 +27,7 @@ export type Section = {
   order: number;
   properties: string;
   items: Item[];
+  isPersisted?: boolean;
 };
 
 export type Configuration = {
@@ -49,6 +44,34 @@ export type Configuration = {
   configurationData: ConfigurationData[];
   sections: Section[];
   items: Item[];
+};
+
+export type ConfigurationType = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  name: string;
+  description: string;
+  metadataSchema: string;
+  dataSchema: string;
+  isActive: boolean;
+  configurations: Configuration[];
+};
+
+
+export type Rule = {
+  id?: string;
+  segmentType: string;
+  comparisonOperator: number;
+  values: string[];
+  logicalOperator: number;
+};
+
+export type Ruleset = {
+  name: string;
+  enabled: boolean;
+  priority: number;
+  ruleConditions: Rule[];
 };
 
 export type CreateConfiguration = Pick<Configuration, "title" | "description" | "moduleId"|  "configurationTypeId">;

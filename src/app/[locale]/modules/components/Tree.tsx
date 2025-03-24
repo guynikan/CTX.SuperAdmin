@@ -7,13 +7,13 @@ import { CircularProgress } from "@mui/material";
 import { toast } from "react-toastify";
 
 import CustomNode from "./CustomNode";
-import CreateModal from "./CreateModal";
 import DeleteModal from "./DeleteModal";
 
 
 import { useCreateModule, useDeleteModule } from "@/hooks/useModules";
 import { useNodeModal } from "../hooks/useNodeModal";
 import { useProcessTreeData } from "../hooks/useProcessTreeData";
+import CreateModuleModal from "./CreateModal";
 
 
 const TreeFlowComponent = ({ data }) => {
@@ -27,8 +27,30 @@ const TreeFlowComponent = ({ data }) => {
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
   const [hasChildren, setHasChildren] = useState(false);
 
-
   const processTreeData = useProcessTreeData(setNodes, setEdges);
+
+  const treeData = useMemo(() => {
+    const convertToTree = (items) => {
+      const map = new Map();
+      const tree = [];
+
+      items.forEach((item) => {
+        map.set(item.id, { ...item, children: [] });
+      });
+
+      items.forEach((item) => {
+        if (item.parentId) {
+          map.get(item.parentId)?.children.push(map.get(item.id));
+        } else {
+          tree.push(map.get(item.id));
+        }
+      });
+
+      return tree;
+    };
+
+    return convertToTree(data || []);
+  }, [data]);
 
   const createModuleMutation = useCreateModule();
 
@@ -40,16 +62,16 @@ const TreeFlowComponent = ({ data }) => {
     setOpenConfirm(true);
   },[edges]);
 
-  const addNode = async () => {
-    if (!newNodeData.name.trim()) {
+  const addNode = async (moduleData: object) => {
+    if (!moduleData.name.trim()) {
       toast.error("O nome do módulo é obrigatório.");
       return;
     }
     setLoading(true);
     try {
       await createModuleMutation.mutateAsync({
-        name: newNodeData.name,
-        description: "",
+        name: moduleData.name,
+        description: moduleData.description,
         parentId: newNodeData.parentId,
       });
       setOpenModal(false);
@@ -59,7 +81,6 @@ const TreeFlowComponent = ({ data }) => {
       setLoading(false);
     }
   };
-
 
   const { mutateAsync: deleteModule } = useDeleteModule();
 
@@ -97,8 +118,8 @@ const TreeFlowComponent = ({ data }) => {
   );
 
   useEffect(() => {
-    processTreeData(data);
-  }, [data, processTreeData]);
+    processTreeData(treeData);
+  }, [treeData, processTreeData]);
 
   return (
     <div style={{ width: "100%", height: "90vh", position: "relative" }}>
@@ -114,12 +135,12 @@ const TreeFlowComponent = ({ data }) => {
         <Controls />
       </ReactFlow>
 
-      <CreateModal
+      <CreateModuleModal
         open={openModal}
         onClose={handleCloseModal}
         onSubmit={addNode}
         moduleData={newNodeData}
-        setModuleData={(module) => setNewNodeData(module)}
+        setModuleData={(module: object) => setNewNodeData(module)}
         loading={loading}
       />
 

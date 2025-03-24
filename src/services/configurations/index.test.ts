@@ -22,8 +22,8 @@ describe("Configuration Service", () => {
   };
 
   const mockItems: Partial<Item[]> = [
-    { name: "Item 1", order: 0, properties: "{}" },
-    { name: "Item 2", order: 1, properties: "{}" },
+    { id: "12312313", name: "Item 1", order: 0, properties: "{}" },
+    { id: "1231233", name: "Item 2", order: 1, properties: "{}" },
   ];
 
   const mockSection: Partial<Section> = {
@@ -61,7 +61,7 @@ describe("Configuration Service", () => {
 
       expect(httpService).toHaveBeenCalledWith({
         path: "/api/Configuration/config123/items/batch",
-        options: { method: "POST", body: JSON.stringify(mockItems) },
+        options: { method: "POST", body: JSON.stringify({ items: mockItems }) },
       });
       expect(result).toEqual(mockItems);
     });
@@ -75,10 +75,10 @@ describe("Configuration Service", () => {
   describe("createConfigurationSection", () => {
     it("should create a new section", async () => {
       (httpService as jest.Mock).mockResolvedValue(mockSection);
-      const result = await createConfigurationSection(mockSection);
+      const result = await createConfigurationSection(mockConfiguration?.id, mockSection);
 
       expect(httpService).toHaveBeenCalledWith({
-        path: "/api/Configuration/{id}/sections",
+        path: `/api/Configuration/${mockConfiguration?.id}/sections`,
         options: { method: "POST", body: JSON.stringify(mockSection) },
       });
       expect(result).toEqual(mockSection);
@@ -93,17 +93,17 @@ describe("Configuration Service", () => {
   describe("associateSectionItems", () => {
     it("should associate items with a section", async () => {
       (httpService as jest.Mock).mockResolvedValue(undefined);
-      await associateSectionItems(["item1", "item2"], "section123", "config123");
+      await associateSectionItems("config123", "section123", ["item1", "item2"]);
 
       expect(httpService).toHaveBeenCalledWith({
         path: "/api/Configuration/config123/sections/section123/items",
-        options: { method: "POST", body: JSON.stringify(["item1", "item2"]) },
+        options: { method: "POST", body: JSON.stringify({ itemIds: ["item1", "item2"] }) },
       });
     });
 
     it("should handle errors", async () => {
       (httpService as jest.Mock).mockRejectedValue(new Error("Association Error"));
-      await expect(associateSectionItems(["item1", "item2"], "section123", "config123")).rejects.toThrow("Association Error");
+      await expect(associateSectionItems("config123", "section123", ["item1", "item2"])).rejects.toThrow("Association Error");
     });
   });
 });
