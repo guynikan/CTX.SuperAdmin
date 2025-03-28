@@ -19,7 +19,6 @@ export default function ConfigurationPage() {
   
   const [fields, setFields] = useState<{ name: string; order: number; properties: string }[]>([]);
   const [sections, setSections] = useState<Partial<Section>[]>([]);
-  console.log({configuration})
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>

@@ -18,7 +18,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { Rule, Ruleset } from "@/types/configuration";
 
 import { useSegmentTypes } from "@/hooks/segments/useSegmentTypes";
-import { useSegmentValuesByType } from "@/hooks/segments/useSegmentValues";
+import { useSegmentValuesByType, useSegmentValueById } from "@/hooks/segments/useSegmentValues";
 
 const OPERATOR_OPTIONS = [
   { label: "Igual", value: 0 },
@@ -53,25 +53,19 @@ export default function ConfigurationRules({ onChange }: Props) {
   const { data: segmentValues = [] } = useSegmentValuesByType(currentSegmentId);
 
   const updateRule = (id: number, field: keyof Rule, value: any) => {
-    setRules((prev) =>
-      prev.map((rule) =>
-        rule.id === id
-          ? {
-              ...rule,
-              [field]: field === "values" ? (Array.isArray(value) ? value : [value]) : value,
-            }
-          : rule
-      )
+    setRules((prevRules) =>
+      prevRules.map((rule) => {
+        if (rule.id !== id) return rule;
+        const updatedValue = field === "values" ? (Array.isArray(value) ? value : [value]) : value;
+        return { ...rule, [field]: updatedValue };
+      })
     );
   };
 
   const addRule = () => {
     setRules((prev) => {
       const last = prev[prev.length - 1];
-      const newRule: Rule = {
-        ...last,
-        id: Date.now(), // novo id único
-      };
+      const newRule: Rule = { ...last, id: Date.now() };
       return [...prev, newRule];
     });
   };
@@ -79,18 +73,17 @@ export default function ConfigurationRules({ onChange }: Props) {
   const removeRule = (id: number) => {
     setRules((prev) => prev.filter((rule) => rule.id !== id));
   };
+
   const handleSegmentTypeChange = async (ruleId: number, segmentId: string) => {
     updateRule(ruleId, "segmentType", segmentId);
-    updateRule(ruleId, "values", []); // limpa o valor atual ao mudar o tipo
-  
+    updateRule(ruleId, "values", []);
+    setCurrentSegmentId(segmentId);
+
     if (!segmentValuesCache[segmentId]) {
       try {
         const { data } = await useSegmentValueById(segmentId).refetch();
         if (data) {
-          setSegmentValuesCache((prev) => ({
-            ...prev,
-            [segmentId]: data,
-          }));
+          setSegmentValuesCache((prev) => ({ ...prev, [segmentId]: data }));
         }
       } catch (err) {
         console.error("Erro ao buscar valores do segmento:", err);
@@ -98,15 +91,12 @@ export default function ConfigurationRules({ onChange }: Props) {
     }
   };
 
-  const formatRuleset = useCallback((): Ruleset => {
-    return {
-      name: ruleName,
-      enabled: true,
-      priority: 0,
-      ruleConditions: rules,
-    };
-  }, [ruleName, rules]);
-  
+  const formatRuleset = useCallback((): Ruleset => ({
+    name: ruleName,
+    enabled: true,
+    priority: 0,
+    ruleConditions: rules,
+  }), [ruleName, rules]);
 
   return (
     <Box sx={styles.container}>
@@ -119,84 +109,79 @@ export default function ConfigurationRules({ onChange }: Props) {
         sx={{ mb: 2 }}
       />
 
-      {rules.map((rule, index) => (
-        <Stack key={rule.id} direction="row" spacing={2} sx={styles.row}>
-          {index !== 0 && (
-            <FormControl sx={{ ...styles.formControl, ...styles.smallAnd }} size="small">
-              <InputLabel id={`operator-label-${rule.id}`}>Operador</InputLabel>
+      {rules.map((rule, index) => {
+        const values = segmentValuesCache[rule.segmentType] || [];
+
+        return (
+          <Stack key={rule.id} direction="row" spacing={2} sx={styles.row}>
+            {index !== 0 && (
+              <FormControl sx={{ ...styles.formControl, ...styles.smallAnd }} size="small">
+                <InputLabel id={`operator-label-${rule.id}`}>Operador</InputLabel>
+                <Select
+                  labelId={`operator-label-${rule.id}`}
+                  label="Operador"
+                  value={rule.logicalOperator}
+                  onChange={(e: SelectChangeEvent<number>) =>
+                    updateRule(rule.id, "logicalOperator", Number(e.target.value))
+                  }
+                >
+                  {LOGICAL_OPERATORS.map(({ label, value }) => (
+                    <MenuItem key={value} value={value}>{label}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+
+            <FormControl sx={styles.formControl} size="small">
+              <InputLabel id={`segment-label-${rule.id}`}>Segmento</InputLabel>
               <Select
-                labelId={`operator-label-${rule.id}`}
-                label="Operador"
-                value={rule.logicalOperator}
-                onChange={(e: SelectChangeEvent<number>) =>
-                  updateRule(rule.id, "logicalOperator", Number(e.target.value))
-                }
+                labelId={`segment-label-${rule.id}`}
+                label="Segmento"
+                value={rule.segmentType}
+                onChange={(e) => handleSegmentTypeChange(rule.id, e.target.value)}
               >
-                {LOGICAL_OPERATORS.map(({ label, value }) => (
-                  <MenuItem key={value} value={value}>
-                    {label}
-                  </MenuItem>
+                {segmentTypes.map((segment) => (
+                  <MenuItem key={segment.id} value={segment.id}>{segment.name}</MenuItem>
                 ))}
               </Select>
             </FormControl>
-          )}
 
-          <FormControl sx={styles.formControl} size="small">
-            <InputLabel id={`segment-label-${rule.id}`}>Segmento</InputLabel>
-            <Select
-              labelId={`segment-label-${rule.id}`}
-              label="Segmento"
-              value={rule.segmentType}
-              onChange={(e) => handleSegmentTypeChange(rule.id, e.target.value)}
-            >
-              {segmentTypes.map((segment) => (
-                <MenuItem key={segment.id} value={segment.id}>
-                  {segment.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+            <FormControl sx={styles.formControl} size="small">
+              <InputLabel id={`comparison-label-${rule.id}`}>Operador</InputLabel>
+              <Select
+                labelId={`comparison-label-${rule.id}`}
+                label="Operador"
+                value={rule.comparisonOperator}
+                onChange={(e: SelectChangeEvent<number>) =>
+                  updateRule(rule.id, "comparisonOperator", Number(e.target.value))
+                }
+              >
+                {OPERATOR_OPTIONS.map(({ label, value }) => (
+                  <MenuItem key={value} value={value}>{label}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-          <FormControl sx={styles.formControl} size="small">
-            <InputLabel id={`comparison-label-${rule.id}`}>Operador</InputLabel>
-            <Select
-              labelId={`comparison-label-${rule.id}`}
-              label="Operador"
-              value={rule.comparisonOperator}
-              onChange={(e: SelectChangeEvent<number>) =>
-                updateRule(rule.id, "comparisonOperator", Number(e.target.value))
-              }
-            >
-              {OPERATOR_OPTIONS.map(({ label, value }) => (
-                <MenuItem key={value} value={value}>
-                  {label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+            <FormControl sx={styles.formControl} size="small">
+              <InputLabel id={`value-label-${rule.id}`}>Valor</InputLabel>
+              <Select
+                labelId={`value-label-${rule.id}`}
+                label="Valor"
+                value={rule.values[0] || ""}
+                onChange={(e) => updateRule(rule.id, "values", [e.target.value])}
+              >
+                {values.map((val) => (
+                  <MenuItem key={val.id} value={val.id}>{val.displayName}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-          <FormControl sx={styles.formControl} size="small">
-            <InputLabel id={`value-label-${rule.id}`}>Valor</InputLabel>
-
-          <Select
-            labelId={`value-label-${rule.id}`}
-            label="Valor"
-            value={rule.values[0] || ""}
-            onChange={(e) => updateRule(rule.id, "values", [e.target.value])}
-          >
-            {values.map((val) => (
-              <MenuItem key={val.id} value={val.id}>
-                {val.displayName}
-              </MenuItem>
-            ))}
-          </Select>
-          </FormControl>
-
-          <IconButton onClick={() => removeRule(rule.id)} color="error">
-            <DeleteIcon />
-          </IconButton>
-        </Stack>
-      ))}
+            <IconButton onClick={() => removeRule(rule.id)} color="error">
+              <DeleteIcon />
+            </IconButton>
+          </Stack>
+        );
+      })}
 
       <Button
         variant="outlined"
