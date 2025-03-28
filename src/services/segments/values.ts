@@ -9,7 +9,7 @@ export const getSegmentValues = async (): Promise<SegmentValue[] | undefined> =>
 };
 
 export const getSegmentValueById = async (id: string): Promise<SegmentValue | undefined> => {
-  return await httpService<SegmentValue>({
+  return await httpService<SegmentValue[]>({
     path: `/api/SegmentValue/${id}`,
     options: { method: "GET" },
   });

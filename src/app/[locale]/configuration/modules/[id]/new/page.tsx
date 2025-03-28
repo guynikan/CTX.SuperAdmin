@@ -19,17 +19,17 @@ export default function ConfigurationPage() {
   
   const [fields, setFields] = useState<{ name: string; order: number; properties: string }[]>([]);
   const [sections, setSections] = useState<Partial<Section>[]>([]);
-
+  console.log({configuration})
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
         <Box sx={{ alignItems: "center", gap: 1 }}>
           <Typography variant="h6" fontWeight={600} sx={{ textAlign:"left" }}>{dictionary?.newConfiguration}</Typography>   
-          {configuration?.title} - {configuration?.configurationType.name}
+          {configuration?.title} - {configuration?.description}
         </Box>
       
       </Box>
-      {configuration?.configurationType.name === "Formulário" && (
+      {configuration?.configurationTypeId === "49386185-8f48-42cd-acd4-78dcf7c8a56d" && (
         <>
           <ConfigurationForm 
             configurationId={config_id}
