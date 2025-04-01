@@ -75,3 +75,5 @@ export type Ruleset = {
 };
 
 export type CreateConfiguration = Pick<Configuration, "title" | "description" | "moduleId"|  "configurationTypeId">;
+
+export type CreateConfigurationType = Pick<ConfigurationType, "name" | "description" | "dataSchema"|  "metadataSchema">;
