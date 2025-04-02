@@ -15,7 +15,6 @@ import { SegmentType } from "@/types/segments";
 import CreateModal from "./components/CreateModal"; 
 import EditModal from "./components/EditModal";
 import EditButton from "../components/EditButton";
-import DeleteButton from "../components/DeleteButton";
 import DeleteModal from "../components/DeleteModal";
 
 const localeMap = {
@@ -26,7 +25,9 @@ const localeMap = {
 export default function SegmentTypesPage() {
   const { data: segmentTypes, isLoading, error } = useSegmentTypes();
 
-  const { locale, dictionary } = useDictionary();
+  const { locale, dictionary: translations } = useDictionary();
+
+  const dictionary = translations.segments;
 
   const [open, setOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);

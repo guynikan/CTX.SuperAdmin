@@ -7,15 +7,15 @@ import { Box, Button, Typography } from "@mui/material";
 import { ptBR, enUS } from "@mui/x-data-grid/locales";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 
-import { useConfigurationTypes } from "@/hooks/useConfigurationTypes";
+import { useConfigurationTypes, useDeleteConfigurationType } from "@/hooks/useConfigurationTypes";
 
-import { SegmentType } from "@/types/segments";
+import EditButton from "@/app/components/EditButton";
 
 import CreateModal from "./components/CreateModal"; 
-// import EditModal from "./components/EditModal";
-// import EditButton from "../components/EditButton";
-// import DeleteButton from "../components/DeleteButton";
-// import DeleteModal from "../components/DeleteModal";
+import EditModal from "./components/EditModal";
+import { ConfigurationType } from "@/types/configuration";
+import GenericDeleteModal from "@/app/components/DeleteModal";
+import DeleteButton from "@/app/components/DeleteButton";
 
 const localeMap = {
   pt_BR: ptBR,
@@ -31,15 +31,17 @@ export default function SegmentTypesPage() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  const [selectedSegment, setSelectedSegment] = useState<SegmentType | null>(null);
+  const [selectedConfiguration, setSelectedConfiguration] = useState<ConfigurationType | null>(null);
 
-  const handleEditClick = (segment: SegmentType) => {
-    setSelectedSegment(segment);
+  const deleteConfigurationType = useDeleteConfigurationType();
+
+  const handleEditClick = (configuration: ConfigurationType) => {
+    setSelectedConfiguration(configuration);
     setEditModalOpen(true);
   };
 
-  const handleDeleteClick = (segment: SegmentType) => {
-    setSelectedSegment(segment);
+  const handleDeleteClick = (configuration: ConfigurationType) => {
+    setSelectedConfiguration(configuration);
     setDeleteModalOpen(true);
   };
 
@@ -52,8 +54,9 @@ export default function SegmentTypesPage() {
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
-          {/* <DeleteButton onDelete={() => handleDeleteClick(params.row)} />
-          <EditButton id={params.row.id} onEdit={() => handleEditClick(params.row)} /> */}
+          <EditButton id={params.row.id} onEdit={() => handleEditClick(params.row)} /> 
+          <DeleteButton onDelete={() => handleDeleteClick(params.row)} />
+    
         </Box>
       ),
     },
@@ -101,10 +104,18 @@ export default function SegmentTypesPage() {
           </Box>
         )}
       </Box>
+
       <CreateModal open={open} onClose={() => setOpen(false)} />
-      {/* 
-      <EditModal open={editModalOpen} onClose={() => setEditModalOpen(false)} segment={selectedSegment} />
-      <DeleteModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} segment={selectedSegment} /> */}
+      <EditModal open={editModalOpen} onClose={() => setEditModalOpen(false)} configuration={selectedConfiguration!} />
+      <GenericDeleteModal
+        open={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)} 
+        entity={selectedConfiguration!}
+        entityName="Tipo de Configuração"
+        getEntityDisplayName={(s) => s?.name}
+        onDelete={(id) => deleteConfigurationType.mutateAsync(id)}
+      />
+
     </Box>
   );
 }

@@ -10,8 +10,8 @@ type Props = {
 
 export default function CreateModal({ open, onClose }: Props) {
 
-  const { dictionary  } = useDictionary();
-
+  const { dictionary: translations } = useDictionary();
+  const dictionary = translations.segments;
   return (
     <Modal open={open} onClose={onClose}>
       <Box

@@ -5,8 +5,8 @@ import { useDictionary } from "@/i18n/DictionaryProvider";
 
 
 export default function ForgotPasswordPage(){
-  const { dictionary } = useDictionary();
-
+  const {  dictionary: translations } = useDictionary();
+  const dictionary = translations.modules;
   return(
     <h1>{dictionary?.forgot_password}</h1>
   )

@@ -10,18 +10,19 @@ import { useSegmentValues } from "@/hooks/segments/useSegmentValues";
 
 import CreateModal from "./components/CreateModal";
 import { useState } from "react";
-import EditButton from "../components/EditButton";
 import DeleteModal from "../components/DeleteModal";
 
 import { SegmentValue } from "@/types/segments";
-import DeleteButton from "../components/DeleteButton";
 import EditModal from "./components/EditModal";
+import DeleteButton from "@/app/components/DeleteButton";
+import EditButton from "@/app/components/EditButton";
 
 export default function SegmentValuesPage() {
 
   const { data: segmentValues, isLoading, error } = useSegmentValues();
 
-  const { dictionary } = useDictionary();
+  const { dictionary: translations } = useDictionary();
+  const dictionary = translations.segments;
 
   const [open, setOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);

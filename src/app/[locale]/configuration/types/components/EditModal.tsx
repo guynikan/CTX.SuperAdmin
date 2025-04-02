@@ -1,16 +1,16 @@
 import { Modal, Box, Typography} from "@mui/material";
 
 import { useDictionary } from "@/i18n/DictionaryProvider";
-import SegmentTypeForm from "./ConfigurationTypeForm";
-import { SegmentType } from "@/types/segments";
+import ConfigurationTypeForm from "./ConfigurationTypeForm";
+import { ConfigurationType } from "@/types/configuration";
 
 type Props = {
-  segment: SegmentType
+  configuration: ConfigurationType
   open: boolean;
   onClose: () => void;
 };
 
-export default function EditModal({ open, onClose, segment }: Props) {
+export default function EditModal({ open, onClose, configuration }: Props) {
 
   const { dictionary  } = useDictionary();
 
@@ -34,7 +34,7 @@ export default function EditModal({ open, onClose, segment }: Props) {
           { dictionary?.configuration?.modal.titleEdit}
         </Typography>
 
-        <SegmentTypeForm initialValues={segment} onClose={onClose}   />
+        <ConfigurationTypeForm initialValues={configuration} onClose={onClose}   />
 
       </Box>
     </Modal>

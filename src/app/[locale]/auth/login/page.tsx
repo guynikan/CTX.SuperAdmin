@@ -23,8 +23,9 @@ import { ROUTES } from "@/routes";
 
 export default function LoginPage() {
 
-  const { dictionary } = useDictionary()!;
-
+  const {  dictionary: translations } = useDictionary();
+  const dictionary = translations.auth;
+  
   const [showPassword, setShowPassword] = useState(false);
 
   const schema = yup.object({

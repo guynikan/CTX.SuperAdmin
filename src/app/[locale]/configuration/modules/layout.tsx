@@ -31,7 +31,7 @@ export default function ModulesLayout({ children }: { children: React.ReactNode 
   }, [createModuleMutation]);
 
   return (
-    <DictionaryProvider namespace="modules">
+    <DictionaryProvider namespaces={["common", "modules"]}>
       <Box sx={styles.container}>
         <Grid container sx={styles.gridContainer}>
           

@@ -14,12 +14,13 @@ type Props = {
 };
 
 export default function SegmentTypeForm({ initialValues, onClose }: Props) {
-  const { dictionary } = useDictionary();
-
+  const { dictionary: translations  } = useDictionary();
+  const dictionary = translations.segments;
+  
   const schema = yup.object().shape({
-    name: yup.string().required(dictionary?.types.modal.validations.nameRequired),
+    name: yup.string().required(dictionary?.types?.modal.validations.nameRequired),
     description: yup.string().optional(),
-    priority: yup.number().required(dictionary?.types.modal.validations.priorityRequired).min(0),
+    priority: yup.number().required(dictionary?.types?.modal.validations.priorityRequired).min(0),
   });
   
   const { control, handleSubmit, reset } = useForm<CreateSegmentType>({

@@ -10,7 +10,9 @@ type Props = {
 
 export default function CreateModal({ open, onClose }: Props) {
 
-  const { dictionary  } = useDictionary();
+  const { dictionary: translations } = useDictionary();
+
+  const dictionary = translations.segments;
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -29,7 +31,7 @@ export default function CreateModal({ open, onClose }: Props) {
         }}
       >
         <Typography variant="h6" mb={2}>
-          { dictionary?.types.modal.titleCreate}
+          { dictionary?.types?.modal.titleCreate}
         </Typography>
 
         <SegmentTypeForm onClose={onClose}   />

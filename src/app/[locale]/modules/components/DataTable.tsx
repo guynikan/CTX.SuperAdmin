@@ -11,9 +11,9 @@ import { Module } from "@/types/modules";
 
 import { useDeleteModule } from "@/hooks/useModules";
 
-import DeleteButton from "../../segments/components/DeleteButton";
-import EditButton from "../../segments/components/EditButton";
 import DeleteModal from "./DeleteModal";
+import EditButton from "@/app/components/EditButton";
+import DeleteButton from "@/app/components/DeleteButton";
 
 const localeMap = {
   pt_BR: ptBR,
@@ -43,8 +43,9 @@ const transformModulesToTree = (modules: Module[]): any[] => {
 };
 
 export default function DataTable({ modules }: { modules: Module[] }) {
-  const { locale, dictionary } = useDictionary();
-
+  const { locale, dictionary: translations } = useDictionary();
+  const dictionary = translations.modules;
+  
   const [hasChildren, setHasChildren] = useState(false);
   const [selectedModule, setSelectedModule] = useState<Module| null>(null);
   const [openConfirm, setOpenConfirmDelete] = useState(false);

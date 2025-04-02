@@ -12,7 +12,8 @@ type Props = {
 
 export default function EditModal({ open, onClose, segment }: Props) {
 
-  const { dictionary  } = useDictionary();
+  const { dictionary: translations  } = useDictionary();
+  const dictionary = translations.segments;
 
   return (
     <Modal open={open} onClose={onClose}>
