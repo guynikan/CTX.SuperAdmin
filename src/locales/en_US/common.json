@@ -13,5 +13,12 @@
     "previous": "Anterior",
     "next": "Próxima",
     "last": "Última"
-  }
+  },
+  "empty":"No data",
+  "registerButton": "Create",
+  "loading": "🔄 Loading..",
+  "errorTitle": "⚠️ Loading error",
+  "errorMessage": "Try again.",
+  "emptySingle":"No data available",
+  "editButton":"Edit"
 }

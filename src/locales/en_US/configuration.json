@@ -1,0 +1,15 @@
+{
+  "title": "All Configuration Types",
+  "table": {
+    "name": "Name",
+    "description": "Description",
+    "actions": "Actions"
+  },
+  "modal":{
+    "titleCreate":"Create new Configuration Type",
+    "titleEdit": "Edit Configuration Type",
+    "validations":{
+      "nameRequired": "Name is required"
+    }
+  }
+}

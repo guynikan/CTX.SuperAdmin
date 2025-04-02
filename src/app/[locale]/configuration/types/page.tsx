@@ -5,14 +5,13 @@ import { useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Button, Typography } from "@mui/material";
 import { ptBR, enUS } from "@mui/x-data-grid/locales";
-import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 
 import { useConfigurationTypes } from "@/hooks/useConfigurationTypes";
 
 import { SegmentType } from "@/types/segments";
 
-// import CreateModal from "./components/CreateModal"; 
+import CreateModal from "./components/CreateModal"; 
 // import EditModal from "./components/EditModal";
 // import EditButton from "../components/EditButton";
 // import DeleteButton from "../components/DeleteButton";
@@ -45,12 +44,11 @@ export default function SegmentTypesPage() {
   };
 
   const columns: GridColDef[] = [
-    { field: "name", headerName: dictionary?.table?.name, width: 320 },
-    { field: "description", headerName: dictionary?.table?.description, width: 350 },
-    { field: "level", headerName: dictionary?.table?.level, width: 150 },
+    { field: "name", headerName: dictionary?.configuration?.table?.name, width: 320 },
+    { field: "description", headerName: dictionary?.configuration?.table?.description, width: 350 },
     {
       field: "actions",
-      headerName: dictionary?.table?.actions,
+      headerName: dictionary?.configuration?.table?.actions,
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -64,28 +62,27 @@ export default function SegmentTypesPage() {
   if (isLoading)
     return (
       <Typography sx={{ marginTop: 2, display: "flex", justifyContent: "center" }}>
-        {dictionary?.loading}
+        {dictionary?.common?.loading}
       </Typography>
     );
 
   if (error)
     return (
       <Box sx={{ padding: 2, textAlign: "center", color: "red" }}>
-        <Typography> {dictionary?.errorTitle} </Typography>
-        <Typography>{dictionary?.errorMessage}</Typography>
+        <Typography> {dictionary?.common?.errorTitle} </Typography>
+        <Typography>{dictionary?.common?.errorMessage}</Typography>
       </Box>
     );
 
   return (
-    <DictionaryProvider namespace="modules">
 
     <Box sx={{ width: "100%", maxWidth: "1000px", margin: "auto", padding: 2 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
         <Typography variant="h6" fontWeight="bold">
-          {dictionary?.title}
+          {dictionary?.configuration?.title}
         </Typography>
         <Button onClick={() => setOpen(true)} variant="outlined" color="primary" size="small">
-          {dictionary?.registerButton}
+          {dictionary?.common?.registerButton}
         </Button>
       </Box>
       <Box sx={{ height: "500px", width: "100%", overflowX: "auto" }}>
@@ -99,15 +96,15 @@ export default function SegmentTypesPage() {
         ) : (
           <Box>
             <Typography sx={{ fontSize: "16px", textAlign: "center" }} mb={2} mt={6}>
-            {dictionary?.empty}
+            {dictionary?.common?.empty}
             </Typography>
           </Box>
         )}
       </Box>
-      {/* <CreateModal open={open} onClose={() => setOpen(false)} />
+      <CreateModal open={open} onClose={() => setOpen(false)} />
+      {/* 
       <EditModal open={editModalOpen} onClose={() => setEditModalOpen(false)} segment={selectedSegment} />
       <DeleteModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} segment={selectedSegment} /> */}
     </Box>
-    </DictionaryProvider>
   );
 }

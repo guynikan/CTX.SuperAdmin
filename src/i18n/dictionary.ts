@@ -7,6 +7,7 @@ export const dictionaries = {
     auth: () => import("@/locales/pt_BR/auth.json").then((mod) => mod.default),
     segments: () => import("@/locales/pt_BR/segments.json").then((mod) => mod.default),
     modules: () => import("@/locales/pt_BR/modules.json").then((mod) => mod.default),
+    configuration: () => import("@/locales/pt_BR/configuration.json").then((mod) => mod.default),
 
   },
   en_US: {
@@ -14,6 +15,8 @@ export const dictionaries = {
     auth: () => import("@/locales/en_US/auth.json").then((mod) => mod.default),
     segments: () => import("@/locales/en_US/segments.json").then((mod) => mod.default),
     modules: () => import("@/locales/en_US/modules.json").then((mod) => mod.default),
+    configuration: () => import("@/locales/en_US/configuration.json").then((mod) => mod.default),
+
 
   },
 } as const;
