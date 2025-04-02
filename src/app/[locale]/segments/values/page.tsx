@@ -6,20 +6,21 @@ import { Box, Button, Typography } from "@mui/material";
 
 import { useDictionary } from "@/i18n/DictionaryProvider";
 
-import { useSegmentValues } from "@/hooks/segments/useSegmentValues";
+import { useDeleteSegmentValue, useSegmentValues } from "@/hooks/segments/useSegmentValues";
 
 import CreateModal from "./components/CreateModal";
 import { useState } from "react";
-import DeleteModal from "../components/DeleteModal";
 
 import { SegmentValue } from "@/types/segments";
 import EditModal from "./components/EditModal";
 import DeleteButton from "@/app/components/DeleteButton";
 import EditButton from "@/app/components/EditButton";
+import DeleteModal from "@/app/components/DeleteModal";
 
 export default function SegmentValuesPage() {
 
   const { data: segmentValues, isLoading, error } = useSegmentValues();
+  const deleteSegmentValue =  useDeleteSegmentValue();
 
   const { dictionary: translations } = useDictionary();
   const dictionary = translations.segments;
@@ -27,7 +28,7 @@ export default function SegmentValuesPage() {
   const [open, setOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-
+  
   const [selectedSegment, setSelectedSegment] = useState<SegmentValue>();
 
   const handleDeleteClick = (segment: SegmentValue) => {
@@ -56,8 +57,8 @@ export default function SegmentValuesPage() {
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
-          <DeleteButton onDelete={() => handleDeleteClick(params.row)} />
           <EditButton onEdit={() => handleEditClick(params.row)} />
+          <DeleteButton onDelete={() => handleDeleteClick(params.row)} />
         </Box>
       ),
     },
@@ -100,10 +101,15 @@ export default function SegmentValuesPage() {
       <CreateModal open={open} onClose={() => setOpen(false)} />
 
       <EditModal segment={selectedSegment} open={editModalOpen} onClose={() => setEditModalOpen(false)} />
-
-      <DeleteModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} segment={selectedSegment} />
         
-      
-    </Box>
+      <DeleteModal
+        open={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)} 
+        entity={selectedSegment!}
+        entityName="Valores de Segmentos"
+        getEntityDisplayName={(s) => s?.displayName}
+        onDelete={(id) => deleteSegmentValue.mutateAsync(id)}
+      />
+  </Box>
   );
 }

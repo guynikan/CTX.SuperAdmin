@@ -6,16 +6,16 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Button, Typography } from "@mui/material";
 import { ptBR, enUS } from "@mui/x-data-grid/locales";
 import { useDictionary } from "@/i18n/DictionaryProvider";
+import { ConfigurationType } from "@/types/configuration";
 
 import { useConfigurationTypes, useDeleteConfigurationType } from "@/hooks/useConfigurationTypes";
 
 import EditButton from "@/app/components/EditButton";
+import DeleteButton from "@/app/components/DeleteButton";
 
 import CreateModal from "./components/CreateModal"; 
 import EditModal from "./components/EditModal";
-import { ConfigurationType } from "@/types/configuration";
-import GenericDeleteModal from "@/app/components/DeleteModal";
-import DeleteButton from "@/app/components/DeleteButton";
+import DeleteModal from "@/app/components/DeleteModal";
 
 const localeMap = {
   pt_BR: ptBR,
@@ -107,7 +107,7 @@ export default function SegmentTypesPage() {
 
       <CreateModal open={open} onClose={() => setOpen(false)} />
       <EditModal open={editModalOpen} onClose={() => setEditModalOpen(false)} configuration={selectedConfiguration!} />
-      <GenericDeleteModal
+      <DeleteModal
         open={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)} 
         entity={selectedConfiguration!}

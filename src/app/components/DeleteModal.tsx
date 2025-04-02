@@ -3,23 +3,23 @@
 import { Modal, Box, Button, Typography } from "@mui/material";
 import { useState } from "react";
 
-type GenericDeleteModalProps<T> = {
+type DeleteModalProps<T> = {
   open: boolean;
   onClose: () => void;
   entity: T;
-  entityName: string; // Ex: "Tipo de Segmento", "Valor do Segmento"
+  entityName: string; 
   getEntityDisplayName: (entity: T) => string;
   onDelete: (id: string) => Promise<void>;
 };
 
-export default function GenericDeleteModal<T extends { id: string }>({
+export default function DeleteModal<T extends { id: string }>({
   open,
   onClose,
   entity,
   entityName,
   getEntityDisplayName,
   onDelete,
-}: GenericDeleteModalProps<T>) {
+}: DeleteModalProps<T>) {
   const [loading, setLoading] = useState(false);
 
   const confirmDelete = async () => {

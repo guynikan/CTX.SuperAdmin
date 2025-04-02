@@ -90,10 +90,10 @@ export default function ConfigurationTypeForm({ initialValues, onClose }: Props)
         />
 
       <Box sx={{display: 'flex', justifyContent:'flex-end', gap:2}}>
-        <Button type="submit" variant="outlined" color="error">
-          Cancelar
+        <Button sx={{minWidth:'110px'}}  type="submit" variant="outlined" color="error">
+          Cancel
         </Button>
-        <Button type="submit" variant="contained" color="primary"  disabled={loading}>
+        <Button sx={{minWidth:'110px'}}  type="submit" variant="contained" color="primary"  disabled={loading}>
           {loading ? dictionary?.common?.loading : (initialValues ? dictionary?.common?.editButton : dictionary?.common?.registerButton)}
         </Button>
       </Box>

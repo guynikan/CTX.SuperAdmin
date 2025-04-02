@@ -8,14 +8,16 @@ import { ptBR, enUS } from "@mui/x-data-grid/locales";
 
 import { useDictionary } from "@/i18n/DictionaryProvider";
 
-import { useSegmentTypes } from "@/hooks/segments/useSegmentTypes";
+import { useDeleteSegmentType, useSegmentTypes } from "@/hooks/segments/useSegmentTypes";
 
 import { SegmentType } from "@/types/segments";
 
 import CreateModal from "./components/CreateModal"; 
 import EditModal from "./components/EditModal";
-import EditButton from "../components/EditButton";
-import DeleteModal from "../components/DeleteModal";
+
+import DeleteButton from "@/app/components/DeleteButton";
+import EditButton from "@/app/components/EditButton";
+import DeleteModal from "@/app/components/DeleteModal";
 
 const localeMap = {
   pt_BR: ptBR,
@@ -34,6 +36,8 @@ export default function SegmentTypesPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const [selectedSegment, setSelectedSegment] = useState<SegmentType | null>(null);
+  
+  const deleteSegmentType = useDeleteSegmentType();
 
   const handleEditClick = (segment: SegmentType) => {
     setSelectedSegment(segment);
@@ -55,8 +59,8 @@ export default function SegmentTypesPage() {
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
-          <DeleteButton onDelete={() => handleDeleteClick(params.row)} />
           <EditButton id={params.row.id} onEdit={() => handleEditClick(params.row)} />
+          <DeleteButton onDelete={() => handleDeleteClick(params.row)} />
         </Box>
       ),
     },
@@ -105,7 +109,14 @@ export default function SegmentTypesPage() {
       </Box>
       <CreateModal open={open} onClose={() => setOpen(false)} />
       <EditModal open={editModalOpen} onClose={() => setEditModalOpen(false)} segment={selectedSegment} />
-      <DeleteModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} segment={selectedSegment} />
+      <DeleteModal
+        open={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)} 
+        entity={selectedSegment!}
+        entityName="Tipos de Segmentos"
+        getEntityDisplayName={(s) => s?.name}
+        onDelete={(id) => deleteSegmentType.mutateAsync(id)}
+      />
     </Box>
   );
 }
