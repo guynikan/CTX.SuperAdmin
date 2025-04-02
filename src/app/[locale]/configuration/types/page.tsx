@@ -5,7 +5,7 @@ import { useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Button, Typography } from "@mui/material";
 import { ptBR, enUS } from "@mui/x-data-grid/locales";
-
+import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 
 import { useConfigurationTypes } from "@/hooks/useConfigurationTypes";
@@ -45,12 +45,12 @@ export default function SegmentTypesPage() {
   };
 
   const columns: GridColDef[] = [
-    { field: "name", headerName: dictionary?.types.table.name, width: 320 },
-    { field: "description", headerName: dictionary?.types.table.description, width: 350 },
-    { field: "priority", headerName: dictionary?.types.table.priority, width: 150 },
+    { field: "name", headerName: dictionary?.table?.name, width: 320 },
+    { field: "description", headerName: dictionary?.table?.description, width: 350 },
+    { field: "level", headerName: dictionary?.table?.level, width: 150 },
     {
       field: "actions",
-      headerName: dictionary?.types.table.actions,
+      headerName: dictionary?.table?.actions,
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -64,26 +64,28 @@ export default function SegmentTypesPage() {
   if (isLoading)
     return (
       <Typography sx={{ marginTop: 2, display: "flex", justifyContent: "center" }}>
-        {dictionary?.types.loading}
+        {dictionary?.loading}
       </Typography>
     );
 
   if (error)
     return (
       <Box sx={{ padding: 2, textAlign: "center", color: "red" }}>
-        <Typography> {dictionary?.types.errorTitle} </Typography>
+        <Typography> {dictionary?.errorTitle} </Typography>
         <Typography>{dictionary?.errorMessage}</Typography>
       </Box>
     );
 
   return (
+    <DictionaryProvider namespace="modules">
+
     <Box sx={{ width: "100%", maxWidth: "1000px", margin: "auto", padding: 2 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
         <Typography variant="h6" fontWeight="bold">
-          {dictionary?.types.title}
+          {dictionary?.title}
         </Typography>
         <Button onClick={() => setOpen(true)} variant="outlined" color="primary" size="small">
-          {dictionary?.types.registerButton}
+          {dictionary?.registerButton}
         </Button>
       </Box>
       <Box sx={{ height: "500px", width: "100%", overflowX: "auto" }}>
@@ -97,7 +99,7 @@ export default function SegmentTypesPage() {
         ) : (
           <Box>
             <Typography sx={{ fontSize: "16px", textAlign: "center" }} mb={2} mt={6}>
-            {dictionary?.types.empty}
+            {dictionary?.empty}
             </Typography>
           </Box>
         )}
@@ -106,5 +108,6 @@ export default function SegmentTypesPage() {
       <EditModal open={editModalOpen} onClose={() => setEditModalOpen(false)} segment={selectedSegment} />
       <DeleteModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} segment={selectedSegment} /> */}
     </Box>
+    </DictionaryProvider>
   );
 }
