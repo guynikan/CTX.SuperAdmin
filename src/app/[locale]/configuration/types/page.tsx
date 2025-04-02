@@ -8,7 +8,7 @@ import { ptBR, enUS } from "@mui/x-data-grid/locales";
 
 import { useDictionary } from "@/i18n/DictionaryProvider";
 
-//import { useConfigurationTypes } from "@/hooks/segments/useSegmentTypes";
+import { useConfigurationTypes } from "@/hooks/useConfigurationTypes";
 
 import { SegmentType } from "@/types/segments";
 
@@ -24,7 +24,7 @@ const localeMap = {
 };
 
 export default function SegmentTypesPage() {
-  const { data: segmentTypes, isLoading, error } = useSegmentTypes();
+  const { data: configurationTypes, isLoading, error } = useConfigurationTypes();
 
   const { locale, dictionary } = useDictionary();
 
@@ -54,8 +54,8 @@ export default function SegmentTypesPage() {
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
-          <DeleteButton onDelete={() => handleDeleteClick(params.row)} />
-          <EditButton id={params.row.id} onEdit={() => handleEditClick(params.row)} />
+          {/* <DeleteButton onDelete={() => handleDeleteClick(params.row)} />
+          <EditButton id={params.row.id} onEdit={() => handleEditClick(params.row)} /> */}
         </Box>
       ),
     },
@@ -87,10 +87,10 @@ export default function SegmentTypesPage() {
         </Button>
       </Box>
       <Box sx={{ height: "500px", width: "100%", overflowX: "auto" }}>
-        {segmentTypes?.length ? (
+        {configurationTypes?.length ? (
           <DataGrid
             localeText={localeMap[locale].components.MuiDataGrid.defaultProps.localeText}
-            rows={segmentTypes}
+            rows={configurationTypes}
             columns={columns}
             pageSizeOptions={[5, 10, 100]}
           />
@@ -102,9 +102,9 @@ export default function SegmentTypesPage() {
           </Box>
         )}
       </Box>
-      <CreateModal open={open} onClose={() => setOpen(false)} />
+      {/* <CreateModal open={open} onClose={() => setOpen(false)} />
       <EditModal open={editModalOpen} onClose={() => setEditModalOpen(false)} segment={selectedSegment} />
-      <DeleteModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} segment={selectedSegment} />
+      <DeleteModal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} segment={selectedSegment} /> */}
     </Box>
   );
 }
