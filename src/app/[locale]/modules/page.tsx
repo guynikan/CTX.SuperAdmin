@@ -11,7 +11,8 @@ import CreateModuleModal from "./components/CreateModal";
 
 export default function ModulesView() {
   const { data: modules, isLoading, error } = useModules();
-  const {  dictionary } = useDictionary();
+  const {  dictionary: translations } = useDictionary();
+  const dictionary = translations.modules;
 
   const [viewMode, setViewMode] = useState<"table" | "tree">("table");
 

@@ -19,8 +19,8 @@ const mockModules = [
 
 const renderWithProvider = async () => {
   render(
-    <DictionaryProvider namespace="modules">
-      <Sidebar />
+    <DictionaryProvider namespaces={["modules","common"]}>
+      <Sidebar handleAddModule={()=>{}}/>
     </DictionaryProvider>
   );
   await waitFor(() => {
@@ -79,7 +79,7 @@ describe("Sidebar Component", () => {
     (useModules as jest.Mock).mockReturnValue({ data: mockModules, isLoading: false });
   
     render(
-      <DictionaryProvider namespace="modules">
+      <DictionaryProvider namespaces={["modules","common"]}>
         <Sidebar handleAddModule={handleAddModuleMock} />
       </DictionaryProvider>
     );
@@ -88,7 +88,7 @@ describe("Sidebar Component", () => {
       expect(screen.queryByText("Carregando traduções...")).not.toBeInTheDocument();
     });
   
-    const addButton = screen.getByRole("button", { name: 'Novo Módulo' });
+    const addButton = screen.getByRole("button", { name: 'Criar' });
   
     await userEvent.click(addButton);
   

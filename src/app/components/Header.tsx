@@ -40,7 +40,7 @@ export default function Header() {
           <Link style={{color: 'white', textDecoration:'none'}} href='/modules' >Modules</Link> 
           <Link style={{color: 'white', textDecoration:'none'}} href='/segments/types' >Segment Types</Link> 
           <Link style={{color: 'white', textDecoration:'none'}} href='/segments/values' >Segment Values</Link> 
-
+          <Link style={{color: 'white', textDecoration:'none'}} href='/configuration/types' >Configuration Types</Link> 
       </Box>
 
     </>

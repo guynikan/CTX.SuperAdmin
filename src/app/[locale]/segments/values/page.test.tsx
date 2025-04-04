@@ -71,7 +71,7 @@ const mockSegmentTypes: SegmentType[] = [
 
 const renderWithProvider = async () => {
   render(
-    <DictionaryProvider namespace="segments" mockDictionary={mockDictionary}>
+    <DictionaryProvider namespaces={["segments","common"]} mockDictionary={mockDictionary}>
       <SegmentValuesPage />
     </DictionaryProvider>
   );

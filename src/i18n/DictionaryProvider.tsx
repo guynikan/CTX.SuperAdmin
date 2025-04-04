@@ -1,12 +1,14 @@
-"use client";
+// DictionaryProvider.tsx
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { getDictionary, Dictionary, dictionaries } from "./dictionary";
-import { i18n, Locale } from "./config";
+import { i18n, Locale, Module } from "./config";
 import { usePathname } from "next/navigation";
 
+type DictionaryMap = Partial<Record<Module, Dictionary>>;
+
 interface DictionaryContextProps {
-  dictionary: Dictionary | null;
+  dictionary: DictionaryMap;
   locale: Locale;
 }
 
@@ -20,31 +22,37 @@ export function useDictionary() {
 
 export function DictionaryProvider({
   children,
-  namespace = "common", 
+  namespaces = ["common"],
 }: {
   children: React.ReactNode;
-  namespace?: keyof typeof dictionaries[Locale];
+  namespaces?: Module[];
 }) {
   const pathname = usePathname();
   const locale = (pathname.split("/")[1] as Locale) || i18n.defaultLocale;
 
-  const [dictionary, setDictionary] = useState<Dictionary>();
+  const [dictionary, setDictionary] = useState<DictionaryMap>({});
 
   useEffect(() => {
-    async function loadDictionary() {
+    async function loadDictionaries() {
       try {
-        const dict = await getDictionary(locale, namespace);
+        const entries = await Promise.all(
+          namespaces.map(async (ns) => [ns, await getDictionary(locale, ns)] as const)
+        );
+
+        const dict = Object.fromEntries(entries);
         setDictionary(dict);
       } catch (error) {
-        console.error(`Erro ao carregar o dicionário (${namespace}): ${error}`);
+        console.error(`Erro ao carregar dicionários:`, error);
         setDictionary({});
       }
     }
 
-    loadDictionary();
-  }, [locale, namespace]);
+    loadDictionaries();
+  }, [locale, namespaces.join(",")]);
 
-  if (!dictionary) return <p>Carregando traduções...</p>;
+  if (Object.keys(dictionary).length === 0) {
+    return <p>Carregando traduções...</p>;
+  }
 
   return (
     <DictionaryContext.Provider value={{ dictionary, locale }}>

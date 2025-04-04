@@ -1,9 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import CreateModal from "./CreateModal";
-import { useDictionary } from "@/i18n/DictionaryProvider";
+import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 
-jest.mock("@/i18n/DictionaryProvider", () => ({
-  useDictionary: jest.fn(),
+jest.mock("next/navigation", () => ({
+  usePathname: jest.fn(() => "/pt_BR/segments/types"),
 }));
 
 jest.mock("./SegmentValueForm", () => {
@@ -13,24 +13,23 @@ jest.mock("./SegmentValueForm", () => {
   return MockSegmentValueForm;
 });
 
-describe("Create Modal", () => {
-  const mockOnClose = jest.fn();
+const renderWithProvider = async () => {
+  const mockOnClose = jest.fn();  
 
-  beforeEach(() => {
-    (useDictionary as jest.Mock).mockReturnValue({
-      dictionary: {
-        values: {
-          modal: {
-            titleCreate: "Criar Novo Segmento",
-          },
-        },
-      },
-    });
+  render(
+    <DictionaryProvider namespaces={["segments","common"]}>
+      <CreateModal open={true} onClose={mockOnClose} />
+    </DictionaryProvider>
+  );
+  await waitFor(() => {
+    expect(screen.queryByText("Carregando traduções...")).not.toBeInTheDocument();
   });
+};
 
-  it("render component correctly", () => {
-    render(<CreateModal open={true} onClose={mockOnClose} />);
-    expect(screen.getByText("Criar Novo Segmento")).toBeInTheDocument();
+describe("Create Modal", () => {
+  it("render component correctly", async () => {
+    await renderWithProvider();
+    expect(screen.getByText("Criar Valor de Segmento")).toBeInTheDocument();
     expect(screen.getByTestId("segment-value-form")).toBeInTheDocument();
   });
 });

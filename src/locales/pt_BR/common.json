@@ -13,5 +13,11 @@
     "previous": "Previous",
     "next": "Next",
     "last": "Last"
-  }
+  },
+  "empty":"Nenhum dado cadastrado",
+  "registerButton": "Criar",
+  "loading": "🔄 Carregando..",
+  "errorTitle": "⚠️ Erro ao carregar",
+  "errorMessage": "Tente novamente.",
+  "emptySingle":"Dado não encontrado"
 }

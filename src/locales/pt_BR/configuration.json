@@ -1,0 +1,15 @@
+{
+  "title": "Todos os Tipos de Configuração",
+  "table": {
+    "name": "Nome",
+    "description": "Descrição",
+    "actions": "Ações"
+  },
+  "modal":{
+    "titleCreate":"Criar novo Tipo de Configuração",
+    "titleEdit": "Editar Tipo de Configuração",
+    "validations":{
+      "nameRequired": "Nome é obrigatório"
+    }
+  }
+}

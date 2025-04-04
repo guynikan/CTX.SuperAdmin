@@ -15,7 +15,8 @@ type Props = {
 };
 
 export default function SegmentValueForm({ initialValues, onClose }: Props) {
-  const { dictionary } = useDictionary();
+  const { dictionary: translations } = useDictionary();
+  const dictionary = translations.segments;
 
   const schema = yup.object().shape({
     segmentTypeId: yup.string().required(dictionary?.values.modal.validations.segmentTypeRequired),
