@@ -11,7 +11,9 @@ import { useDictionary } from "@/i18n/DictionaryProvider";
 
 export default function Sidebar({ handleAddModule }: { handleAddModule: () => void }) {
   const { data: modules, isLoading } = useModules();
-  const { dictionary, locale } = useDictionary();
+  const { dictionary: translations, locale } = useDictionary();
+  const dictionary = translations.modules;
+  
   const pathname = usePathname();
 
   const rootModules = useMemo(() => modules?.filter((module) => !module.parentId) || [], [modules]);

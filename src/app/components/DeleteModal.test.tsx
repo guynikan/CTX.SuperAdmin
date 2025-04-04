@@ -1,82 +1,100 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import DeleteModal from "./DeleteModal";
-import { useDeleteSegmentType } from "@/hooks/segments/useSegmentTypes";
-import { useDeleteSegmentValue } from "@/hooks/segments/useSegmentValues";
-import { SegmentType, SegmentValue } from "@/types/segments";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import DeleteModal from "./DeleteModal";
 
-jest.mock("@/hooks/segments/useSegmentTypes", () => ({
-  useDeleteSegmentType: jest.fn(() => ({
-    mutate: jest.fn(),
-    isPending: false, 
-  })),
-}));
+type MockEntity = { id: string; name: string };
 
-jest.mock("@/hooks/segments/useSegmentValues", () => ({
-  useDeleteSegmentValue: jest.fn(() => ({
-    mutate: jest.fn(),
-    isPending: false, 
-  })),
-}));
+const mockEntity: MockEntity = {
+  id: "abc123",
+  name: "Entidade de Teste",
+};
 
-const mockSegmentType: SegmentType = { id: "erF124o81h31239123", name: "Segmento Type A", isActive: false, priority: 1 };
-const mockSegmentValue: SegmentValue = { id: "af444jad98897asdh", segmentTypeId:"asda0987a8sd", displayName: "Segmento Value A", isActive: false, value: "1",  };
+describe("<DeleteModal />", () => {
+  const renderModal = (props?: Partial<React.ComponentProps<typeof DeleteModal<MockEntity>>>) => {
+    const onClose = props?.onClose ?? jest.fn();
+    const onDelete = props?.onDelete ?? jest.fn().mockResolvedValue(undefined);
+    const entity = props?.entity ?? mockEntity;
 
-const deleteSegmentTypeMock = jest.fn().mockResolvedValue({});
-const deleteSegmentValueMock = jest.fn().mockResolvedValue({});
+    render(
+      <DeleteModal
+        open={true}
+        entityName="Tipo"
+        entity={entity}
+        getEntityDisplayName={(e) => e.name}
+        onClose={onClose}
+        onDelete={onDelete}
+        {...props}
+      />
+    );
 
-describe("DeleteModa Component", () => {
-  const mockOnClose = jest.fn();
+    return { onClose, onDelete, entity };
+  };
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-    (useDeleteSegmentValue as jest.Mock).mockReturnValue({ mutateAsync: deleteSegmentValueMock });
-    (useDeleteSegmentType as jest.Mock).mockReturnValue({ mutateAsync: deleteSegmentTypeMock });
+  it("renders confirmation message with entity display name", () => {
+    renderModal();
+    expect(screen.getByTestId("remove-title")).toHaveTextContent(
+      "Deseja remover Tipo: Entidade de Teste"
+    );
   });
 
-  it("should render component correctly with Segment Type ", () => {
-    render(<DeleteModal open={true} onClose={mockOnClose} segment={mockSegmentType} />);
-    
-    expect(screen.getByTestId("remove-title")).toHaveTextContent("Deseja remover O Tipo de Segmento: Segmento Type A?");
-    expect(screen.getByRole("button", { name: "Remover" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cancelar" })).toBeInTheDocument(); 
-  });
-  
-  it("should render component correctly with Segment Value ", () => {
-    render(<DeleteModal open={true} onClose={mockOnClose} segment={mockSegmentValue} />);
-    
-    expect(screen.getByTestId("remove-title")).toHaveTextContent("Deseja remover O Valor do Segmento: Segmento Value A?");
-    expect(screen.getByRole("button", { name: "Remover" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cancelar" })).toBeInTheDocument(); 
+  it("calls onDelete and onClose when confirm is clicked", async () => {
+    const user = userEvent.setup();
+    const { onDelete, onClose } = renderModal();
+
+    await user.click(screen.getByRole("button", { name: /remover/i }));
+
+    expect(onDelete).toHaveBeenCalledWith(mockEntity.id);
+    expect(onClose).toHaveBeenCalled();
   });
 
-  it("should call deleteSegmentType when removing a SegmentType", async () => {
-    render(<DeleteModal open={true} onClose={mockOnClose} segment={mockSegmentType} />);
-  
-    await userEvent.click(screen.getByRole("button", { name: "Remover" }));
+  it("calls only onClose when cancel is clicked", async () => {
+    const user = userEvent.setup();
+    const { onClose, onDelete } = renderModal();
 
-    await waitFor(() => expect(deleteSegmentTypeMock).toHaveBeenCalledWith("erF124o81h31239123"));
-    expect(mockOnClose).toHaveBeenCalled();   
+    await user.click(screen.getByRole("button", { name: /cancelar/i }));
+
+    expect(onClose).toHaveBeenCalled();
+    expect(onDelete).not.toHaveBeenCalled();
   });
 
-  it("should call deleteSegmentValue when removing a SegmentValue", async () => {
-    render(<DeleteModal open={true} onClose={mockOnClose} segment={mockSegmentValue} />);
-  
-    await userEvent.click(screen.getByRole("button", { name: "Remover" }));
+  it("shows loading state during deletion", async () => {
+    const slowDelete = jest.fn(() => new Promise((resolve) => setTimeout(resolve, 300)));
+    const user = userEvent.setup();
 
-    await waitFor(() => expect(deleteSegmentValueMock).toHaveBeenCalledWith("af444jad98897asdh"));
-    expect(mockOnClose).toHaveBeenCalled();
+    renderModal({ onDelete: slowDelete });
+
+    const button = screen.getByRole("button", { name: /remover/i });
+    await user.click(button);
+
+    expect(screen.getByRole("button", { name: /removendo/i })).toBeDisabled();
   });
 
-  it("should close the modal when clicking the cancel button", () => {
-    render(<DeleteModal open={true} onClose={mockOnClose} segment={mockSegmentValue} />);
-    
-    fireEvent.click(screen.getByRole("button", { name: "Cancelar" }));
-    expect(mockOnClose).toHaveBeenCalled();
+  it("does not call onDelete if entity.id is missing", async () => {
+    const user = userEvent.setup();
+    const onDelete = jest.fn();
+
+    renderModal({
+      entity: { name: "Sem ID" } as any,
+      onDelete,
+    });
+
+    await user.click(screen.getByRole("button", { name: /remover/i }));
+
+    expect(onDelete).not.toHaveBeenCalled();
   });
 
+  it("does not render modal when open is false", () => {
+    render(
+      <DeleteModal
+        open={false}
+        onClose={jest.fn()}
+        entity={mockEntity}
+        entityName="Tipo"
+        getEntityDisplayName={(e) => e.name}
+        onDelete={jest.fn()}
+      />
+    );
+
+    expect(screen.queryByTestId("remove-title")).not.toBeInTheDocument();
+  });
 });
-
-
-
-

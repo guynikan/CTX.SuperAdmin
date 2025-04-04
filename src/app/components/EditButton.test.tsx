@@ -1,57 +1,50 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { SegmentType, SegmentValue } from "@/types/segments";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import EditButton from "./EditButton";
 
-const mockSegment: SegmentType = {
-  id:"8912410298139123",
-  name: "Segment Type test",
-  description: "desc test",
-  priority: 1,
-  isActive: false,
-}
+describe("<EditButton />", () => {
+  const setup = (props?: Partial<Parameters<typeof EditButton>[0]>) => {
+    const item = props?.item ?? { id: "1", name: "Test" };
+    const onEdit = props?.onEdit ?? jest.fn();
 
-const mockSegmentValue: SegmentValue = {
-  id:"8912410298139123",
-  displayName: "Segment Type test",
-  description: "desc test",
-  segmentTypeId: "123123",
-  value: "false",
-  isActive: false
-}
+    render(<EditButton item={item} onEdit={onEdit} />);
+    const button = screen.getByTestId("edit-button");
 
-describe("EditButton Segment Type List", () => {
+    return {
+      button,
+      item,
+      onEdit,
+    };
+  };
 
-  it("should render correctly for both SegmentType and SegmentValue", () => {
-    const { rerender } = render(<EditButton segment={mockSegment} onEdit={() => {}} />);
-    
-    expect(screen.getByTestId("edit-button")).toBeInTheDocument();
-  
-    rerender(<EditButton segment={mockSegmentValue} onEdit={() => {}} />);
-    
-    expect(screen.getByTestId("edit-button")).toBeInTheDocument();
+  it("renders the edit icon button with correct attributes", () => {
+    const { button } = setup();
+
+    expect(button).toBeInTheDocument();
+    expect(button).toHaveAttribute("aria-label", "edit");
+    expect(button).toHaveClass("MuiIconButton-sizeSmall");
   });
-  
 
-  it("should call onEdit with SegmentValue when clicked", () => {
+  it("calls onEdit with the provided item when clicked", async () => {
+    const user = userEvent.setup();
+    const { button, item, onEdit } = setup();
+
+    await user.click(button);
+
+    expect(onEdit).toHaveBeenCalledTimes(1);
+    expect(onEdit).toHaveBeenCalledWith(item);
+  });
+
+  it("calls onEdit with undefined if no item is provided", async () => {
+    const user = userEvent.setup();
     const onEditMock = jest.fn();
-    
-    render(<EditButton segment={mockSegmentValue} onEdit={onEditMock} />);
-    
-    fireEvent.click(screen.getByTestId("edit-button"));
-    
-    expect(onEditMock).toHaveBeenCalledTimes(1);
-    expect(onEditMock).toHaveBeenCalledWith(mockSegmentValue);
-  });
 
-  it("should call onEdit with SegmentType when clicked", () => {
-    const onEditMock = jest.fn();
-    
-    render(<EditButton segment={mockSegment} onEdit={onEditMock} />);
-    
-    fireEvent.click(screen.getByTestId("edit-button"));
-    
-    expect(onEditMock).toHaveBeenCalledTimes(1);
-    expect(onEditMock).toHaveBeenCalledWith(mockSegment);
-  });
+    render(<EditButton onEdit={onEditMock} />);
+    const button = screen.getByTestId("edit-button");
 
+    await user.click(button);
+
+    expect(onEditMock).toHaveBeenCalledTimes(1);
+    expect(onEditMock).toHaveBeenCalledWith(undefined);
+  });
 });
