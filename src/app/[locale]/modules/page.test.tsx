@@ -29,7 +29,7 @@ const mockModules: Module[] = [
 
 const renderWithProvider = async () => {
   render(
-    <DictionaryProvider namespace="modules">
+    <DictionaryProvider namespaces={["modules","common"]}>
       <ModulesView />
     </DictionaryProvider>
   );

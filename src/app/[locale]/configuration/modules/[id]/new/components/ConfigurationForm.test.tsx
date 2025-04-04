@@ -58,7 +58,7 @@ const mockSetSections = jest.fn();
 
 const renderWithProvider = async () => {
   render(
-    <DictionaryProvider namespace="modules">
+    <DictionaryProvider namespaces={["modules","common"]}>
       <ConfigurationForm
         configurationId="config-123"
         fields={mockFields}

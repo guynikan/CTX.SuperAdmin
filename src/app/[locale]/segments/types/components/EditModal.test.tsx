@@ -1,10 +1,10 @@
-import { render, screen } from "@testing-library/react";
-import { useDictionary } from "@/i18n/DictionaryProvider";
+import { render, screen, waitFor } from "@testing-library/react";
+import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 import EditModal from "./EditModal";
 import { SegmentType } from "@/types/segments";
 
-jest.mock("@/i18n/DictionaryProvider", () => ({
-  useDictionary: jest.fn(),
+jest.mock("next/navigation", () => ({
+  usePathname: jest.fn(() => "/pt_BR/segments/types"),
 }));
 
 jest.mock("./SegmentTypeForm", () => {
@@ -16,23 +16,23 @@ jest.mock("./SegmentTypeForm", () => {
 
 const mockSegmentTypes: SegmentType = { id: "1", name: "Segmento 1", description: "Desc Segmento 1", priority: 0, isActive: true };
 
-describe("Create Modal", () => {
-  const mockOnClose = jest.fn();
 
-  beforeEach(() => {
-    (useDictionary as jest.Mock).mockReturnValue({
-      dictionary: {
-        types: {
-          modal: {
-            titleEdit: "Editar Tipo de Segmento",
-          },
-        },
-      },
-    });
+const renderWithProvider = async () => {
+  const mockOnClose = jest.fn();  
+
+  render(
+    <DictionaryProvider namespaces={["segments","common"]}>
+      <EditModal segment={mockSegmentTypes} open={true} onClose={mockOnClose} />
+    </DictionaryProvider>
+  );
+  await waitFor(() => {
+    expect(screen.queryByText("Carregando traduções...")).not.toBeInTheDocument();
   });
+};
 
-  it("render component correctly", () => {
-    render(<EditModal segment={mockSegmentTypes} open={true} onClose={mockOnClose} />);
+describe("Edit Modal", () => {
+  it("render component correctly", async () => {
+    await renderWithProvider();
     expect(screen.getByText("Editar Tipo de Segmento")).toBeInTheDocument();
     expect(screen.getByTestId("segment-type-form")).toBeInTheDocument();
   });

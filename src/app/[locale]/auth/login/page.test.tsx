@@ -16,7 +16,7 @@ const mockDictionary = {
 
 const renderWithProvider = async () => {
   render(
-    <DictionaryProvider namespace="auth">
+    <DictionaryProvider namespaces={["auth","common"]}>
       <LoginPage />
     </DictionaryProvider>
   );

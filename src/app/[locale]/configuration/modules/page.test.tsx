@@ -9,7 +9,7 @@ jest.mock("next/navigation", () => ({
 
 const renderWithProvider = async () => {
   render(
-    <DictionaryProvider namespace="modules">
+    <DictionaryProvider namespaces={["modules","common"]}>
       <ModulesPage />
     </DictionaryProvider>
   );

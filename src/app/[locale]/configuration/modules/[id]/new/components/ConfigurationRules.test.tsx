@@ -18,7 +18,7 @@ const mockOnChange = jest.fn();
 
 const renderWithProvider = async () => {
   render(
-    <DictionaryProvider namespace="modules">
+    <DictionaryProvider namespaces={["modules","common"]}>
       <ConfigurationRules ruleset={initialRuleset} onChange={mockOnChange} />
     </DictionaryProvider>
   );

@@ -47,7 +47,7 @@ const Providers = ({ children, lang }: ProvidersProps) => {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <ToastContainer position="top-right" autoClose={3000} />
-        <DictionaryProvider namespace="common" lang={lang}>
+        <DictionaryProvider namespaces={["common"]} lang={lang}>
           {children}
         </DictionaryProvider>
       </ThemeProvider>

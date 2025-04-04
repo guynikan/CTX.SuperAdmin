@@ -1,6 +1,6 @@
 {
   "title": "Todos os Módulos",
-  "registerButton": "Novo Módulo",
+  "registerButton": "Criar",
   "loading": "🔄 Carregando módulos..",
   "errorTitle": "⚠️ Erro ao carregar módulos",
   "errorMessage": "Tente novamente.",
