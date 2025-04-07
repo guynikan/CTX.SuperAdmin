@@ -25,7 +25,9 @@ import { useCreateConfiguration } from "@/hooks/useConfiguration";
 import { CreateConfiguration } from "@/types/configuration";
 
 export default function ModulePageDetail() {
-  const { dictionary } = useDictionary();
+  const { dictionary: translations } = useDictionary();
+  const dictionary = translations.modules;
+
   const createModuleMutation = useCreateModule();
   const createConfigurationMutation = useCreateConfiguration();
 
@@ -139,6 +141,28 @@ export default function ModulePageDetail() {
                   <Tab key={submodule.id} label={submodule.name} />
                 ))}
               </Tabs>
+            </Paper>
+          )}
+
+          {/* Configurações do Módulo */}
+          {!!module.configurations?.length && (
+            <Paper sx={{ p: 3, mb: 3 }}>
+              <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, textAlign: "left" }}>
+                {dictionary?.configurationListTitle}
+              </Typography>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                {module.configurations.map((config) => (
+                  <Button
+                    key={config.id}
+                    href={`/configuration/modules/${module.id}/new?config_id=${config.id}`}
+                    variant="outlined"
+                    size="small"
+                    sx={{ justifyContent: "flex-start" }}
+                  >
+                    {config.title}
+                  </Button>
+                ))}
+              </Box>
             </Paper>
           )}
         </Fragment>

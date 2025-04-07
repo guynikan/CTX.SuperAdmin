@@ -11,6 +11,7 @@
   "newSubModule":"Novo Submódulo",
   "newConfiguration":"Nova Configuração",
   "subModules":"Submódulos",
+  "configurationListTitle": "Configurações",
   "table": {
     "name": "Nome",
     "description": "Descrição",

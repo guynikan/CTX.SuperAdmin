@@ -10,6 +10,7 @@
   "newSubModule":"New Submodule",
   "newConfiguration":"New Configuration",
   "subModules":"Submodules",
+  "configurationListTitle": "Configurations",
   "table": {
     "name": "Name",
     "description": "Description",

@@ -19,12 +19,14 @@ export default function ConfigurationTypeForm({ initialValues, onClose }: Props)
   const schema = yup.object().shape({
     name: yup.string().required(dictionary?.configuration?.modal.validations.nameRequired),
     description: yup.string().optional(),
+    metadataSchema: yup.string().required(dictionary?.configuration?.modal.validations.metadataSchemaRequired),
+    dataSchema: yup.string().required(dictionary?.configuration?.modal.validations.dataSchemaRequired),
   });
   
   const { control, handleSubmit, reset } = useForm<CreateConfigurationType>({
     resolver: yupResolver(schema), 
     mode: "onTouched",
-    defaultValues: initialValues || { name: "", description: ""  }
+    defaultValues: initialValues || { name: "", description: "", dataSchema:"", metadataSchema:"" }
 
   });
 
@@ -54,6 +56,11 @@ export default function ConfigurationTypeForm({ initialValues, onClose }: Props)
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleClose = () => {
+    reset();
+    onClose();
   };
   
   return (
@@ -89,8 +96,41 @@ export default function ConfigurationTypeForm({ initialValues, onClose }: Props)
           )}     
         />
 
+        <Controller
+          name="dataSchema"
+          control={control}
+          render={({ field, fieldState }) => (
+            <TextField
+            {...field}
+            sx={{ mb: 2 }} 
+            fullWidth 
+            multiline
+            rows={3}
+            error={!!fieldState.error}
+            label={dictionary?.configuration?.table?.dataSchema}
+            helperText={fieldState.error?.message} 
+          />
+          )}     
+                />
+        <Controller
+          name="metadataSchema"
+          control={control}
+          render={({ field, fieldState }) => (
+            <TextField
+            {...field}
+            sx={{ mb: 2 }} 
+            fullWidth 
+            multiline
+            rows={3}
+            error={!!fieldState.error}
+            label={dictionary?.configuration?.table?.metadataSchema}
+            helperText={fieldState.error?.message} 
+          />
+          )}     
+        />
+
       <Box sx={{display: 'flex', justifyContent:'flex-end', gap:2}}>
-        <Button sx={{minWidth:'110px'}}  type="submit" variant="outlined" color="error">
+        <Button onClick={handleClose} sx={{minWidth:'110px'}} variant="outlined" color="error">
           Cancel
         </Button>
         <Button sx={{minWidth:'110px'}}  type="submit" variant="contained" color="primary"  disabled={loading}>
