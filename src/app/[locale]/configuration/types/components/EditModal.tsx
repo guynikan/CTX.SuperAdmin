@@ -12,7 +12,8 @@ type Props = {
 
 export default function EditModal({ open, onClose, configuration }: Props) {
 
-  const { dictionary  } = useDictionary();
+  const { dictionary:translations  } = useDictionary();
+  const  dictionary = translations.configuration;
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -31,7 +32,7 @@ export default function EditModal({ open, onClose, configuration }: Props) {
         }}
       >
         <Typography variant="h6" mb={2}>
-          { dictionary?.configuration?.modal.titleEdit}
+          { dictionary?.modal.titleEdit}
         </Typography>
 
         <ConfigurationTypeForm initialValues={configuration} onClose={onClose}   />

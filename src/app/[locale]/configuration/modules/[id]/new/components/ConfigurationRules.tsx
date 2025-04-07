@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Box,
   Button,
@@ -18,7 +18,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { Rule, Ruleset } from "@/types/configuration";
 
 import { useSegmentTypes } from "@/hooks/segments/useSegmentTypes";
-import { useSegmentValuesByType, useSegmentValueById } from "@/hooks/segments/useSegmentValues";
+import { useSegmentValuesByType } from "@/hooks/segments/useSegmentValues";
 
 const OPERATOR_OPTIONS = [
   { label: "Igual", value: 0 },
@@ -74,29 +74,34 @@ export default function ConfigurationRules({ onChange }: Props) {
     setRules((prev) => prev.filter((rule) => rule.id !== id));
   };
 
-  const handleSegmentTypeChange = async (ruleId: number, segmentId: string) => {
+  const handleSegmentTypeChange = (ruleId: number, segmentId: string) => {
     updateRule(ruleId, "segmentType", segmentId);
     updateRule(ruleId, "values", []);
     setCurrentSegmentId(segmentId);
-
-    if (!segmentValuesCache[segmentId]) {
-      try {
-        const { data } = await useSegmentValueById(segmentId).refetch();
-        if (data) {
-          setSegmentValuesCache((prev) => ({ ...prev, [segmentId]: data }));
-        }
-      } catch (err) {
-        console.error("Erro ao buscar valores do segmento:", err);
-      }
-    }
   };
 
   const formatRuleset = useCallback((): Ruleset => ({
     name: ruleName,
+    logicalOperator: 0,
     enabled: true,
     priority: 0,
     ruleConditions: rules,
   }), [ruleName, rules]);
+  
+
+  useEffect(() => {
+    onChange(formatRuleset());
+    if (currentSegmentId && segmentValues.length > 0) {
+      setSegmentValuesCache((prev) => ({
+        ...prev,
+        [currentSegmentId]: segmentValues,
+      }));
+    }
+  }, [currentSegmentId, segmentValues, formatRuleset, onChange]);
+
+  useEffect(() => {
+    onChange(formatRuleset());
+  }, [formatRuleset, onChange]);
 
   return (
     <Box sx={styles.container}>

@@ -1,17 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Box, Typography} from "@mui/material";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 import ConfigurationForm from "./components/ConfigurationForm";
-import { Section } from "@/types/configuration";
+import { Item, Section } from "@/types/configuration";
 import { useConfigurationById } from "@/hooks/useConfiguration";
 import { useSearchParams } from "next/navigation";
 
 export default function ConfigurationPage() {
 
   const searchParams = useSearchParams() 
-  const config_id = searchParams.get('config_id')
+  const config_id = useMemo(() => searchParams.get("config_id") || "", [searchParams]);
 
   const { data: configuration } = useConfigurationById(String(config_id));
 
@@ -19,6 +19,26 @@ export default function ConfigurationPage() {
   
   const [fields, setFields] = useState<{ name: string; order: number; properties: string }[]>([]);
   const [sections, setSections] = useState<Partial<Section>[]>([]);
+
+  console.log({configuration})
+
+  useEffect(() => {
+    if (configuration) {
+      const transformedFields: Item[] = (configuration.items || []).map((item) => ({
+        ...item,
+        isPersisted: true, 
+      }));
+
+      const transformedSections: Partial<Section>[] = (configuration.sections || []).map((section) => ({
+        ...section,
+        isPersisted: true,
+        items: section.items || [],
+      }));
+
+      setFields(transformedFields);
+      setSections(transformedSections);
+    }
+  }, [configuration]);
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>

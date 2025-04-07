@@ -149,13 +149,13 @@ export default function ConfigurationFields({ fields, onFieldsChange }: Configur
             <Controller
               name="name"
               control={control}
-              render={({ field }) => <TextField {...field} label="Nome" fullWidth required />}
+              render={({ field }) => <TextField sx={{marginBottom:2}} {...field} label="Nome" fullWidth required />}
             />
             <Controller
               name="type"
               control={control}
               render={({ field }) => (
-                <FormControl fullWidth margin="dense">
+                <FormControl sx={{marginBottom:2}} fullWidth margin="dense">
                   <InputLabel>Tipo</InputLabel>
                   <Select {...field} label="Tipo">
                     {fieldTypes.map((option) => (
@@ -169,7 +169,7 @@ export default function ConfigurationFields({ fields, onFieldsChange }: Configur
               name="size"
               control={control}
               render={({ field }) => (
-                <FormControl fullWidth margin="dense">
+                <FormControl sx={{marginBottom:2}} fullWidth margin="dense">
                   <InputLabel>Tamanho</InputLabel>
                   <Select {...field} label="Tamanho">
                     {fieldSizes.map((option) => (
@@ -180,7 +180,7 @@ export default function ConfigurationFields({ fields, onFieldsChange }: Configur
               )}
             />
             <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
-              <Button onClick={handleClose} color="secondary" sx={{ mr: 1 }}>
+              <Button onClick={handleClose} color="error" sx={{ mr: 1 }}>
                 Cancelar
               </Button>
               <Button type="submit" variant="contained" color="primary">

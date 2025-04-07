@@ -3,10 +3,12 @@
   "table": {
     "name": "Nome",
     "description": "Descrição",
-    "actions": "Ações"
+    "metadataSchema": "Metadata Schema",
+    "dataSchema": "Data Schema",
+    "actions": "Actions"
   },
   "modal":{
-    "titleCreate":"Criar novo Tipo de Configuração",
+    "titleCreate":"Criar Tipo de Configuração",
     "titleEdit": "Editar Tipo de Configuração",
     "validations":{
       "nameRequired": "Nome é obrigatório",
