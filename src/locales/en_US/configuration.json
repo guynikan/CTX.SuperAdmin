@@ -3,13 +3,17 @@
   "table": {
     "name": "Name",
     "description": "Description",
+    "metadataSchema": "Metadata Schema",
+    "dataSchema": "Data Schema",
     "actions": "Actions"
   },
   "modal":{
     "titleCreate":"Create new Configuration Type",
     "titleEdit": "Edit Configuration Type",
     "validations":{
-      "nameRequired": "Name is required"
+      "nameRequired": "Name is required",
+      "metadataSchemaRequired": "MetaData is required",
+      "dataSchemaRequired": "Data Schema is required"
     }
   }
 }

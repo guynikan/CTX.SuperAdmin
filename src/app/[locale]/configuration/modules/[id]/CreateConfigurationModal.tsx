@@ -23,7 +23,8 @@ type ConfigurationModalProps = {
 
 export default function CreateConfigurationModal({ open, onClose, onSubmit, initialData }: ConfigurationModalProps) {
   
-  const { dictionary } = useDictionary();
+  const { dictionary: translations } = useDictionary();
+  const dictionary = translations.modules;
 
   const { control, handleSubmit, reset, formState: { errors } } = useForm<Partial<CreateConfiguration>>({
     resolver: yupResolver(schema),

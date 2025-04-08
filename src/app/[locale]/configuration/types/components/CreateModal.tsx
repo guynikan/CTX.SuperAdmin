@@ -1,7 +1,7 @@
 import { Modal, Box, Typography} from "@mui/material";
 
 import { useDictionary } from "@/i18n/DictionaryProvider";
-import SegmentTypeForm from "./ConfigurationTypeForm";
+import ConfigurationTypeForm from "./ConfigurationTypeForm";
 
 type Props = {
   open: boolean;
@@ -10,8 +10,8 @@ type Props = {
 
 export default function CreateModal({ open, onClose }: Props) {
 
-  const { dictionary  } = useDictionary();
-
+  const { dictionary: translations  } = useDictionary();
+  const dictionary = translations.configuration;
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -29,10 +29,10 @@ export default function CreateModal({ open, onClose }: Props) {
         }}
       >
         <Typography variant="h6" mb={2}>
-          { dictionary?.configuration?.modal?.titleCreate}
+          { dictionary?.modal?.titleCreate}
         </Typography>
 
-        <SegmentTypeForm onClose={onClose}   />
+        <ConfigurationTypeForm onClose={onClose}   />
 
       </Box>
     </Modal>

@@ -70,6 +70,7 @@ export type Rule = {
 export type Ruleset = {
   name: string;
   enabled: boolean;
+  logicalOperator: number;
   priority: number;
   ruleConditions: Rule[];
 };

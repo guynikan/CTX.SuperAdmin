@@ -20,5 +20,6 @@
   "errorTitle": "⚠️ Loading error",
   "errorMessage": "Try again.",
   "emptySingle":"No data available",
+  "cancel": "Cancel",
   "editButton":"Edit"
 }

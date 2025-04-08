@@ -98,7 +98,16 @@ export default function ConfigurationForm({ configurationId, fields, sections, s
       }
   
       if (ruleset) {
-        await createRuleSetMutation.mutateAsync(ruleset);
+        const normalizedRuleset = {
+          ...ruleset,
+          ruleConditions: ruleset.ruleConditions.map((rule) => ({
+            segmentTypeId: rule.segmentType, // ← backend espera isso!
+            comparisonOperator: rule.comparisonOperator,
+            values: rule.values,
+          })),
+        };
+  
+        await createRuleSetMutation.mutateAsync(normalizedRuleset);
       }
   
       toast.success("Configuração atualizada com sucesso!");
