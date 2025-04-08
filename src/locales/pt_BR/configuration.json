@@ -12,8 +12,8 @@
     "titleEdit": "Editar Tipo de Configuração",
     "validations":{
       "nameRequired": "Nome é obrigatório",
-      "metadataSchemaRequired": "MetaData é obrigatório",
-      "dataSchema": "Data Schema é obrigatório"
+      "metadataSchemaRequired": "Metadata é obrigatório",
+      "dataSchemaRequired": "Data Schema é obrigatório"
     }
   }
 }

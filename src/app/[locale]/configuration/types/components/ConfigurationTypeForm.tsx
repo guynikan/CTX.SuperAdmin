@@ -14,13 +14,14 @@ type Props = {
 };
 
 export default function ConfigurationTypeForm({ initialValues, onClose }: Props) {
-  const { dictionary } = useDictionary();
-
+  const { dictionary: translations } = useDictionary();
+  const dictionary = translations.configuration;
+  
   const schema = yup.object().shape({
-    name: yup.string().required(dictionary?.configuration?.modal.validations.nameRequired),
+    name: yup.string().required(dictionary?.modal.validations.nameRequired),
     description: yup.string().optional(),
-    metadataSchema: yup.string().required(dictionary?.configuration?.modal.validations.metadataSchemaRequired),
-    dataSchema: yup.string().required(dictionary?.configuration?.modal.validations.dataSchemaRequired),
+    metadataSchema: yup.string().required(dictionary?.modal.validations.metadataSchemaRequired),
+    dataSchema: yup.string().required(dictionary?.modal.validations.dataSchemaRequired),
   });
   
   const { control, handleSubmit, reset } = useForm<CreateConfigurationType>({
@@ -71,7 +72,7 @@ export default function ConfigurationTypeForm({ initialValues, onClose }: Props)
           render={({ field, fieldState }) => (
             <TextField 
               {...field} 
-              label={dictionary?.configuration?.table.name} 
+              label={dictionary?.table.name} 
               fullWidth 
               error={!!fieldState.error} 
               helperText={fieldState.error?.message} 
@@ -90,7 +91,7 @@ export default function ConfigurationTypeForm({ initialValues, onClose }: Props)
             multiline
             rows={3}
             error={!!fieldState.error}
-            label={dictionary?.configuration?.table?.description}
+            label={dictionary?.table?.description}
             helperText={fieldState.error?.message} 
           />
           )}     
@@ -107,7 +108,7 @@ export default function ConfigurationTypeForm({ initialValues, onClose }: Props)
             multiline
             rows={3}
             error={!!fieldState.error}
-            label={dictionary?.configuration?.table?.dataSchema}
+            label={dictionary?.table?.dataSchema}
             helperText={fieldState.error?.message} 
           />
           )}     
@@ -123,7 +124,7 @@ export default function ConfigurationTypeForm({ initialValues, onClose }: Props)
             multiline
             rows={3}
             error={!!fieldState.error}
-            label={dictionary?.configuration?.table?.metadataSchema}
+            label={dictionary?.table?.metadataSchema}
             helperText={fieldState.error?.message} 
           />
           )}     
@@ -131,10 +132,11 @@ export default function ConfigurationTypeForm({ initialValues, onClose }: Props)
 
       <Box sx={{display: 'flex', justifyContent:'flex-end', gap:2}}>
         <Button onClick={handleClose} sx={{minWidth:'110px'}} variant="outlined" color="error">
-          Cancel
+          {translations?.common?.cancel}
         </Button>
-        <Button sx={{minWidth:'110px'}}  type="submit" variant="contained" color="primary"  disabled={loading}>
-          {loading ? dictionary?.common?.loading : (initialValues ? dictionary?.common?.editButton : dictionary?.common?.registerButton)}
+        <Button  data-testid="submit-button"
+           sx={{minWidth:'110px'}}  type="submit" variant="contained" color="primary"  disabled={loading}>
+          {loading ? translations?.common?.loading : (initialValues ? translations?.common?.editButton : translations?.common?.registerButton)}
         </Button>
       </Box>
      

@@ -19,5 +19,7 @@
   "loading": "🔄 Carregando..",
   "errorTitle": "⚠️ Erro ao carregar",
   "errorMessage": "Tente novamente.",
-  "emptySingle":"Dado não encontrado"
+  "emptySingle":"Dado não encontrado",
+  "cancel": "Cancelar",
+  "editButton": "Editar"
 }
