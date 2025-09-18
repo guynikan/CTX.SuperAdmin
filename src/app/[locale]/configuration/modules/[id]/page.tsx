@@ -154,7 +154,7 @@ export default function ModulePageDetail() {
                 {module.configurations.map((config) => (
                   <Button
                     key={config.id}
-                    href={`/configuration/modules/${module.id}/new?config_id=${config.id}`}
+                    href={`/configuration/modules/${module.id}/view/${config.id}`}
                     variant="outlined"
                     size="small"
                     sx={{ justifyContent: "flex-start" }}

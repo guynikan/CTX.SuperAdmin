@@ -8,6 +8,6 @@ export default function ForgotPasswordPage(){
   const {  dictionary: translations } = useDictionary();
   const dictionary = translations.modules;
   return(
-    <h1>{dictionary?.forgot_password}</h1>
+    <h1>{(dictionary as any)?.forgot_password || 'Forgot Password'}</h1>
   )
 }

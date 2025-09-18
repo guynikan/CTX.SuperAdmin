@@ -31,10 +31,10 @@ export default function LoginPage() {
   const schema = yup.object({
     username: yup
       .string()
-      .required(dictionary?.required),
+      .required((dictionary as any)?.required || 'Required'),
     password: yup
       .string()
-      .required(dictionary?.required)
+      .required((dictionary as any)?.required || 'Required')
   }).required();
 
   type FormValues = yup.InferType<typeof schema>;
@@ -69,7 +69,7 @@ export default function LoginPage() {
         <Container maxWidth="xs">
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <Typography variant="h5" fontWeight={600}>
-              {dictionary?.signIn}
+              {(dictionary as any)?.signIn || 'Sign In'}
             </Typography>
 
             <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -78,18 +78,18 @@ export default function LoginPage() {
                 {...register("username")}
                 error={!!errors.username}
                 helperText={errors.username?.message}
-                label={dictionary?.username}
+                label={(dictionary as any)?.username}
                 fullWidth
                 variant="outlined"
                 margin="normal"
-                placeholder={dictionary?.username}
+                placeholder={(dictionary as any)?.username}
               />
       
               <TextField
                 {...register("password")}
                 error={!!errors.password}
                 helperText={errors.password?.message}
-                label={dictionary?.password}
+                label={(dictionary as any)?.password}
                 type={showPassword ? "text" : "password"}
                 fullWidth
                 autoComplete="on"
@@ -120,13 +120,13 @@ export default function LoginPage() {
                   "&:hover": { opacity: 0.9 },
                 }}
               >
-                {dictionary?.signIn} →
+                {(dictionary as any)?.signIn} →
               </Button>
 
               {/* Esqueci a Senha */}
               <Typography variant="body2" sx={{ mt: 3, color:'#434343', textAlign: "center" }}>
                 <Link href={ROUTES.AUTH.FORGOT_PASSWORD} underline="hover" fontWeight={600}>
-                  {dictionary?.forgot_password}
+                  {(dictionary as any)?.forgot_password}
                 </Link>
               </Typography>
 

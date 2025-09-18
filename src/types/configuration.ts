@@ -1,61 +1,49 @@
 export type Module = {
   id: string;
-  parentId: string;
+  parentId: string | null;
+  parent: Module | null;
   name: string;
+  description: string;
   level: number;
-};
-
-export type ConfigurationData = {
-  id: string;
-  version: string;
-  metadata: string;
-  data: string;
-};
-
-export type Item = {
-  id: string;
-  sectionId?: string;
-  name: string;
-  order: number;
-  properties: string;
-  isPersisted?: boolean;
-};
-
-export type Section = {
-  id: string;
-  name: string;
-  order: number;
-  properties: string;
-  items: Item[];
-  isPersisted?: boolean;
+  isActive: boolean;
+  children: Module[];
+  configurations: Configuration[];
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type Configuration = {
   id: string;
   configurationTypeId: string;
   moduleId: string;
+  baseConfigurationId: string | null;
   title: string;
+  slug?: string;
   description?: string;
+  version: string;
+  data: Record<string, any>; // JSON object with configuration data
+  metadata: Record<string, any>; // JSON object with metadata
   isActive: boolean;
+  hasRule: boolean;
+  rule: Rule | null;
   createdAt: string;
   updatedAt: string;
   configurationType: ConfigurationType;
   module: Module;
-  configurationData: ConfigurationData[];
-  sections: Section[];
-  items: Item[];
+  baseConfiguration?: Configuration | null;
 };
 
 export type ConfigurationType = {
   id: string;
-  createdAt: string;
-  updatedAt: string;
   name: string;
+  slug: string;
   description: string;
-  metadataSchema: string;
-  dataSchema: string;
+  metadataSchema: string; // JSON schema as string
+  dataSchema: string; // JSON schema as string
   isActive: boolean;
   configurations: Configuration[];
+  createdAt: string;
+  updatedAt: string;
 };
 
 
@@ -75,6 +63,10 @@ export type Ruleset = {
   ruleConditions: Rule[];
 };
 
-export type CreateConfiguration = Pick<Configuration, "title" | "description" | "moduleId"|  "configurationTypeId">;
+export type CreateConfiguration = Pick<Configuration, "title" | "description" | "moduleId" | "configurationTypeId" | "baseConfigurationId"> & {
+  slug?: string;
+  data?: Record<string, any>;
+  metadata?: Record<string, any>;
+};
 
-export type CreateConfigurationType = Pick<ConfigurationType, "name" | "description" | "dataSchema"|  "metadataSchema">;
+export type CreateConfigurationType = Pick<ConfigurationType, "name" | "slug" | "description" | "dataSchema" | "metadataSchema">;

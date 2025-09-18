@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { Locale } from "@/i18n/config";
 import { DictionaryProvider } from "@/i18n/DictionaryProvider";
+import { MonacoProvider } from "@/components/monaco/MonacoProvider";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -47,9 +48,11 @@ const Providers = ({ children, lang }: ProvidersProps) => {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <ToastContainer position="top-right" autoClose={3000} />
-        <DictionaryProvider namespaces={["common"]} lang={lang}>
-          {children}
-        </DictionaryProvider>
+        <MonacoProvider>
+          <DictionaryProvider namespaces={["common"]} lang={lang}>
+            {children}
+          </DictionaryProvider>
+        </MonacoProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
