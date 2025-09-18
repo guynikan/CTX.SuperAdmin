@@ -19,6 +19,9 @@ export default function ConfigurationTypeForm({ initialValues, onClose }: Props)
   
   const schema = yup.object().shape({
     name: yup.string().required(dictionary?.modal.validations.nameRequired),
+    slug: yup.string()
+      .required(dictionary?.modal.validations.slugRequired)
+      .matches(/^[a-z0-9_]+$/, dictionary?.modal.validations.slugInvalid),
     description: yup.string().optional(),
     metadataSchema: yup.string().required(dictionary?.modal.validations.metadataSchemaRequired),
     dataSchema: yup.string().required(dictionary?.modal.validations.dataSchemaRequired),
@@ -27,7 +30,7 @@ export default function ConfigurationTypeForm({ initialValues, onClose }: Props)
   const { control, handleSubmit, reset } = useForm<CreateConfigurationType>({
     resolver: yupResolver(schema), 
     mode: "onTouched",
-    defaultValues: initialValues || { name: "", description: "", dataSchema:"", metadataSchema:"" }
+    defaultValues: initialValues || { name: "", slug: "", description: "", dataSchema:"", metadataSchema:"" }
 
   });
 
@@ -36,7 +39,7 @@ export default function ConfigurationTypeForm({ initialValues, onClose }: Props)
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    reset(initialValues || { name: "", description: "" });
+    reset(initialValues || { name: "", slug: "", description: "" });
   }, [initialValues, reset]);
 
   const onSubmit = async (data: CreateConfigurationType) => {
@@ -77,6 +80,22 @@ export default function ConfigurationTypeForm({ initialValues, onClose }: Props)
               error={!!fieldState.error} 
               helperText={fieldState.error?.message} 
               sx={{ mb: 2 }} />
+          )}
+        />
+
+        <Controller
+          name="slug"
+          control={control}
+          render={({ field, fieldState }) => (
+            <TextField
+              {...field}
+              label={dictionary?.table.slug}
+              fullWidth
+              error={!!fieldState.error}
+              helperText={fieldState.error?.message || "Use apenas letras minúsculas, números e underscore"}
+              sx={{ mb: 2 }}
+              placeholder="exemplo_tipo_configuracao"
+            />
           )}
         />
 
