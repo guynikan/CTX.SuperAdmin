@@ -3,163 +3,114 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { Editor, OnChange, OnMount } from '@monaco-editor/react'
 import { editor } from 'monaco-editor'
-import { Box, CircularProgress, Alert } from '@mui/material'
+import { Box, CircularProgress } from '@mui/material'
 import { useMonaco } from './MonacoProvider'
-import { registerTemplateExpressionProvider } from './providers/templateExpressionProvider'
-
-interface TemplateError {
-  line: number
-  message: string
-  context: string
-}
+import { useMonacoEditor } from './MonacoEditorProvider'
+import { createTemplateExpressionProvider } from './providers/templateExpressionProviderFactory'
+import { configureEditorOptions, configureSchemaForContext, setupValidationListeners } from './utils/editorUtils'
+import { ValidationErrorsDisplay } from './ValidationErrorsDisplay'
 
 interface MonacoJsonEditorProps {
   value: string
   onChange: (value: string | undefined) => void
-  schema?: object
   height?: string | number
-  readOnly?: boolean
   placeholder?: string
-  configId?: string
   onValidationChange?: (isValid: boolean, errors: editor.IMarker[]) => void
 }
 
 export const MonacoJsonEditor: React.FC<MonacoJsonEditorProps> = ({
   value,
   onChange,
-  schema,
   height = 400,
-  readOnly = false,
   placeholder,
-  configId,
   onValidationChange
 }) => {
   const { isMonacoReady, monaco } = useMonaco()
+  const context = useMonacoEditor()
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
-  const [validationErrors, setValidationErrors] = useState<editor.IMarker[]>([])
-  const [templateErrors, setTemplateErrors] = useState<TemplateError[]>([])
+  const [templateErrors, setTemplateErrors] = useState<{ line: number; message: string; context: string }[]>([])
+  const [validationListenerCleanup, setValidationListenerCleanup] = useState<(() => void) | null>(null)
 
-  // Register basic autocomplete provider when Monaco is ready
+  // Register template expression provider when context is ready
   useEffect(() => {
-    if (!monaco || !isMonacoReady) return
+    if (!context.state.isReady || !context.config.autocomplete?.enabled) {
+      return
+    }
 
-    const disposable = registerTemplateExpressionProvider(monaco, configId, setTemplateErrors)
+    console.log('🔌 [MonacoJsonEditor] Registering template expression provider')
+    const provider = createTemplateExpressionProvider(
+      context.state.autocompleteTypes,
+      context.actions.getAutocompleteSuggestions,
+      setTemplateErrors
+    )
+    
+    const disposable = context.actions.registerCustomProvider(provider)
     
     return () => {
+      console.log('🧹 [MonacoJsonEditor] Disposing template expression provider')
       disposable.dispose()
     }
-  }, [monaco, isMonacoReady, configId])
+  }, [context.state.isReady, context.state.autocompleteTypes, context.config.autocomplete?.enabled])
 
-  // Configure JSON schema when available
+  // Configure JSON schema when available from context
   useEffect(() => {
-    if (monaco && schema && editorRef.current) {
+    if (monaco && context.config.schema && editorRef.current) {
       const model = editorRef.current.getModel()
       if (model) {
-        // Configure schema for JSON validation and autocomplete using Monaco's built-in JSON language service
-        const jsonDefaults = monaco.languages.json.jsonDefaults
-        
-        // Configure schema for validation and completion
-        jsonDefaults.setDiagnosticsOptions({
-          validate: true,
-          allowComments: false,
-          schemas: [{
-            uri: 'http://json-schema.org/draft-07/schema#',
-            fileMatch: [model.uri.toString()],
-            schema: schema
-          }]
-        })
-        
-        // Enable all JSON language features including autocomplete
-        jsonDefaults.setModeConfiguration({
-          documentFormattingEdits: true,
-          documentRangeFormattingEdits: true,
-          completionItems: true,
-          hovers: true,
-          documentSymbols: true,
-          tokens: true,
-          colors: true,
-          foldingRanges: true,
-          diagnostics: true
-        })
+        console.log('📄 [MonacoJsonEditor] Configuring schema from context')
+        configureSchemaForContext(monaco, context.config.schema, model.uri.toString())
+        context.actions.updateSchema(context.config.schema)
       }
     }
-  }, [monaco, schema])
+  }, [monaco, context.config.schema])
 
   // Handle editor mount
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor
 
-    // Configure editor options for JSON editing
-    editor.updateOptions({
-      minimap: { enabled: false },
-      lineNumbers: 'on',
-      roundedSelection: false,
-      scrollBeyondLastLine: false,
-      automaticLayout: true,
-      tabSize: 2,
-      insertSpaces: true,
-      wordWrap: 'on',
-      formatOnPaste: true,
-      formatOnType: true,
-      suggestOnTriggerCharacters: true,
-      // Disable word-based suggestions to avoid conflicts with custom providers
-      wordBasedSuggestions: 'off',
-      quickSuggestions: {
-        other: 'off',
-        comments: 'off', 
-        strings: 'on'
-      },
-      suggest: {
-        filterGraceful: false,
-        showWords: false,
-        showSnippets: false,
-        showKeywords: false,
-        insertMode: 'replace'
-      },
-      suggestSelection: 'first',
-      parameterHints: {
-        enabled: true,
-        cycle: false
-      },
-    })
+    console.log('🎯 [MonacoJsonEditor] Editor mounted, configuring...')
 
-    // Listen for validation changes
-    const validationModel = editor.getModel()
-    if (validationModel) {
-      const updateValidation = () => {
-        const markers = monaco.editor.getModelMarkers({ resource: validationModel.uri })
-        setValidationErrors(markers)
-        const isValid = markers.length === 0 && templateErrors.length === 0
-        onValidationChange?.(isValid, markers)
-      }
+    // Configure editor options using context config
+    configureEditorOptions(editor, context.config)
 
-      // Initial validation
-      updateValidation()
+    // Setup validation listeners
+    const cleanup = setupValidationListeners(
+      editor, 
+      monaco, 
+      onValidationChange,
+      context.actions.updateValidationErrors
+    )
+    
+    setValidationListenerCleanup(() => cleanup)
 
-      // Listen for marker changes
-      const disposable = monaco.editor.onDidChangeMarkers((uris) => {
-        if (uris.some(uri => uri.toString() === validationModel.uri.toString())) {
-          updateValidation()
-        }
-      })
-
-      return () => {
-        disposable.dispose()
+    // Configure schema if available
+    if (context.config.schema) {
+      const model = editor.getModel()
+      if (model) {
+        configureSchemaForContext(monaco, context.config.schema, model.uri.toString())
+        context.actions.updateSchema(context.config.schema)
       }
     }
+
+    console.log('✅ [MonacoJsonEditor] Editor configuration complete')
   }
 
   // Update validation when template errors change
   useEffect(() => {
-    if (editorRef.current && monaco) {
-      const model = editorRef.current.getModel()
-      if (model) {
-        const markers = monaco.editor.getModelMarkers({ resource: model.uri })
-        const isValid = markers.length === 0 && templateErrors.length === 0
-        onValidationChange?.(isValid, markers)
+    if (onValidationChange) {
+      const isValid = context.state.validationErrors.length === 0 && templateErrors.length === 0
+      onValidationChange(isValid, context.state.validationErrors)
+    }
+  }, [templateErrors, context.state.validationErrors, onValidationChange])
+
+  // Cleanup validation listeners on unmount
+  useEffect(() => {
+    return () => {
+      if (validationListenerCleanup) {
+        validationListenerCleanup()
       }
     }
-  }, [templateErrors, monaco, onValidationChange])
+  }, [validationListenerCleanup])
 
   // Handle value changes
   const handleEditorChange: OnChange = (value) => {
@@ -167,7 +118,7 @@ export const MonacoJsonEditor: React.FC<MonacoJsonEditorProps> = ({
   }
 
   // Loading state
-  if (!isMonacoReady) {
+  if (!context.state.isReady) {
     return (
       <Box
         display="flex"
@@ -189,7 +140,7 @@ export const MonacoJsonEditor: React.FC<MonacoJsonEditorProps> = ({
       <Box
         sx={{
           border: '1px solid',
-          borderColor: validationErrors.length > 0 ? 'error.main' : 'divider',
+          borderColor: context.state.validationErrors.length > 0 ? 'error.main' : 'divider',
           borderRadius: 1,
           overflow: 'hidden'
         }}
@@ -198,12 +149,12 @@ export const MonacoJsonEditor: React.FC<MonacoJsonEditorProps> = ({
           height={height}
           defaultLanguage="json"
           language="json"
-          theme="vs-dark"
+          theme={context.config.theme || 'ctx-json-theme'}
           value={value}
           onChange={handleEditorChange}
           onMount={handleEditorDidMount}
           options={{
-            readOnly,
+            readOnly: context.config.readOnly,
             placeholder: placeholder || 'Enter JSON...',
             scrollbar: {
               vertical: 'visible',
@@ -216,40 +167,13 @@ export const MonacoJsonEditor: React.FC<MonacoJsonEditorProps> = ({
       </Box>
 
       {/* Validation and template errors display */}
-      {(validationErrors.length > 0 || templateErrors.length > 0) && (
-        <Box mt={1}>
-          {/* Schema validation errors */}
-          {validationErrors.slice(0, 3).map((error, index) => (
-            <Alert
-              key={`schema-${index}`}
-              severity="error"
-              variant="outlined"
-              sx={{ mt: index > 0 ? 1 : 0, fontSize: '0.875rem' }}
-            >
-              Line {error.startLineNumber}: {error.message}
-            </Alert>
-          ))}
-          
-          {/* Template expression errors */}
-          {templateErrors.slice(0, 3).map((error, index) => (
-            <Alert
-              key={`template-${index}`}
-              severity="warning"
-              variant="outlined"
-              sx={{ mt: (validationErrors.length > 0 || index > 0) ? 1 : 0, fontSize: '0.875rem' }}
-            >
-              Line {error.line}: {error.message} ({error.context})
-            </Alert>
-          ))}
-          
-          {/* Show count if there are more errors */}
-          {(validationErrors.length + templateErrors.length) > 3 && (
-            <Alert severity="info" variant="outlined" sx={{ mt: 1, fontSize: '0.875rem' }}>
-              +{(validationErrors.length + templateErrors.length) - 3} more errors...
-            </Alert>
-          )}
-        </Box>
-      )}
+      <ValidationErrorsDisplay
+        validationErrors={context.state.validationErrors}
+        templateErrors={templateErrors}
+        autocompleteError={context.state.autocompleteError}
+        maxVisibleErrors={3}
+        collapsible={false}
+      />
     </Box>
   )
 }

@@ -14,12 +14,15 @@ import {
   Button,
 } from "@mui/material";
 import { MonacoJsonEditor } from '@/components/monaco/MonacoJsonEditor';
+import { MonacoEditorProvider } from '@/components/monaco/MonacoEditorProvider';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import InfoIcon from '@mui/icons-material/Info';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 import { Configuration } from "@/types/configuration";
+import AssociatedConfigurationsModal from './AssociatedConfigurationsModal';
 
 interface ConfigurationViewerProps {
   configuration: Configuration;
@@ -45,6 +48,8 @@ export default function ConfigurationViewer({
   const [activeTab, setActiveTab] = useState(ViewerTabs.DATA);
   const [editedData, setEditedData] = useState(configuration.data);
   const [editedMetadata, setEditedMetadata] = useState(configuration.metadata);
+  const [associationsModalOpen, setAssociationsModalOpen] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Ensure editedData is properly initialized when isEditMode changes
   useEffect(() => {
@@ -56,11 +61,13 @@ export default function ConfigurationViewer({
 
   const handleSave = () => {
     onSave?.({ data: editedData, metadata: editedMetadata });
+    setHasUnsavedChanges(false);
   };
 
   const handleCancel = () => {
     setEditedData(configuration.data);
     setEditedMetadata(configuration.metadata);
+    setHasUnsavedChanges(false);
     onCancel?.();
   };
 
@@ -150,15 +157,25 @@ export default function ConfigurationViewer({
             </Typography>
           </Box>
 
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<FileDownloadIcon />}
-            onClick={handleExportJson}
-            sx={{ ml: 2 }}
-          >
-            Exportar JSON
-          </Button>
+          <Box sx={{ display: "flex", gap: 1, ml: 2 }}>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<SettingsIcon />}
+              onClick={() => setAssociationsModalOpen(true)}
+            >
+              Configurações Associadas
+            </Button>
+            
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<FileDownloadIcon />}
+              onClick={handleExportJson}
+            >
+              Exportar JSON
+            </Button>
+          </Box>
         </Box>
       </Paper>
 
@@ -217,26 +234,39 @@ export default function ConfigurationViewer({
                 )}
               </Box>
               
-              <MonacoJsonEditor
-                value={JSON.stringify(isEditMode ? (editedData || {}) : (configuration.data || {}), null, 2)}
-                onChange={(value) => {
-                  if (isEditMode && value) {
-                    try {
-                      const parsedData = JSON.parse(value);
-                      setEditedData(parsedData);
-                    } catch (error) {
-                      // Handle JSON parsing errors gracefully
-                      console.warn('Invalid JSON entered:', error);
-                    }
-                  }
+              <MonacoEditorProvider
+                config={{
+                  schema: configuration.configurationType?.dataSchema ? 
+                    safeSchemaParser(configuration.configurationType.dataSchema) : undefined,
+                  autocomplete: {
+                    configId: configuration.id,
+                    enabled: true,
+                    cacheTypes: true
+                  },
+                  theme: 'vs-dark',
+                  readOnly: !isEditMode,
+                  wordWrap: true,
+                  minimap: false
                 }}
-                schema={configuration.configurationType?.dataSchema ? 
-                  safeSchemaParser(configuration.configurationType.dataSchema) : undefined}
-                height={400}
-                readOnly={!isEditMode}
-                placeholder="Enter configuration data in JSON format..."
-                configId={configuration.id}
-              />
+              >
+                <MonacoJsonEditor
+                  value={JSON.stringify(isEditMode ? (editedData || {}) : (configuration.data || {}), null, 2)}
+                  onChange={(value) => {
+                    if (isEditMode && value) {
+                      try {
+                        const parsedData = JSON.parse(value);
+                        setEditedData(parsedData);
+                        setHasUnsavedChanges(true);
+                      } catch (error) {
+                        // Handle JSON parsing errors gracefully
+                        console.warn('Invalid JSON entered:', error);
+                      }
+                    }
+                  }}
+                  height={400}
+                  placeholder="Enter configuration data in JSON format..."
+                />
+              </MonacoEditorProvider>
             </Box>
           )}
 
@@ -280,26 +310,39 @@ export default function ConfigurationViewer({
                 )}
               </Box>
               
-              <MonacoJsonEditor
-                value={JSON.stringify(isEditMode ? (editedMetadata || {}) : (configuration.metadata || {}), null, 2)}
-                onChange={(value) => {
-                  if (isEditMode && value) {
-                    try {
-                      const parsedData = JSON.parse(value);
-                      setEditedMetadata(parsedData);
-                    } catch (error) {
-                      // Handle JSON parsing errors gracefully
-                      console.warn('Invalid JSON entered:', error);
-                    }
-                  }
+              <MonacoEditorProvider
+                config={{
+                  schema: configuration.configurationType?.metadataSchema ? 
+                    safeSchemaParser(configuration.configurationType.metadataSchema) : undefined,
+                  autocomplete: {
+                    configId: configuration.id,
+                    enabled: true,
+                    cacheTypes: true
+                  },
+                  theme: 'vs-dark',
+                  readOnly: !isEditMode,
+                  wordWrap: true,
+                  minimap: false
                 }}
-                schema={configuration.configurationType?.metadataSchema ? 
-                  safeSchemaParser(configuration.configurationType.metadataSchema) : undefined}
-                height={400}
-                readOnly={!isEditMode}
-                placeholder="Enter metadata in JSON format..."
-                configId={configuration.id}
-              />
+              >
+                <MonacoJsonEditor
+                  value={JSON.stringify(isEditMode ? (editedMetadata || {}) : (configuration.metadata || {}), null, 2)}
+                  onChange={(value) => {
+                    if (isEditMode && value) {
+                      try {
+                        const parsedData = JSON.parse(value);
+                        setEditedMetadata(parsedData);
+                        setHasUnsavedChanges(true);
+                      } catch (error) {
+                        // Handle JSON parsing errors gracefully
+                        console.warn('Invalid JSON entered:', error);
+                      }
+                    }
+                  }}
+                  height={400}
+                  placeholder="Enter metadata in JSON format..."
+                />
+              </MonacoEditorProvider>
             </Box>
           )}
 
@@ -323,14 +366,25 @@ export default function ConfigurationViewer({
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                         Schema para validação dos dados principais
                       </Typography>
-                      <MonacoJsonEditor
-                        value={JSON.stringify(safeSchemaParser(configuration.configurationType.dataSchema), null, 2)}
-                        onChange={() => {}} // Schema is read-only
-                        height={300}
-                        readOnly={true}
-                        placeholder="Data schema definition..."
-                        configId={configuration.id}
-                      />
+                      <MonacoEditorProvider
+                        config={{
+                          autocomplete: {
+                            configId: configuration.id,
+                            enabled: false // Read-only schemas don't need autocomplete
+                          },
+                          theme: 'vs-dark',
+                          readOnly: true,
+                          wordWrap: true,
+                          minimap: false
+                        }}
+                      >
+                        <MonacoJsonEditor
+                          value={JSON.stringify(safeSchemaParser(configuration.configurationType.dataSchema), null, 2)}
+                          onChange={() => {}} // Schema is read-only
+                          height={300}
+                          placeholder="Data schema definition..."
+                        />
+                      </MonacoEditorProvider>
                     </CardContent>
                   </Card>
                 </Grid>
@@ -344,14 +398,25 @@ export default function ConfigurationViewer({
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                         Schema para validação dos metadados
                       </Typography>
-                      <MonacoJsonEditor
-                        value={JSON.stringify(safeSchemaParser(configuration.configurationType.metadataSchema), null, 2)}
-                        onChange={() => {}} // Schema is read-only
-                        height={300}
-                        readOnly={true}
-                        placeholder="Metadata schema definition..."
-                        configId={configuration.id}
-                      />
+                      <MonacoEditorProvider
+                        config={{
+                          autocomplete: {
+                            configId: configuration.id,
+                            enabled: false // Read-only schemas don't need autocomplete
+                          },
+                          theme: 'vs-dark',
+                          readOnly: true,
+                          wordWrap: true,
+                          minimap: false
+                        }}
+                      >
+                        <MonacoJsonEditor
+                          value={JSON.stringify(safeSchemaParser(configuration.configurationType.metadataSchema), null, 2)}
+                          onChange={() => {}} // Schema is read-only
+                          height={300}
+                          placeholder="Metadata schema definition..."
+                        />
+                      </MonacoEditorProvider>
                     </CardContent>
                   </Card>
                 </Grid>
@@ -484,6 +549,17 @@ export default function ConfigurationViewer({
           )}
         </Box>
       </Paper>
+
+      {/* Modal de Configurações Associadas */}
+      <AssociatedConfigurationsModal
+        configId={configuration.id}
+        isOpen={associationsModalOpen}
+        onClose={() => setAssociationsModalOpen(false)}
+        onConfigurationChange={(configId) => {
+          // TODO: Optionally refresh the current configuration if needed
+          console.log("Associated configuration changed:", configId);
+        }}
+      />
     </Box>
   );
 }
