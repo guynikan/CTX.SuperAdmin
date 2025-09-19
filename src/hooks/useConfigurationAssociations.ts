@@ -5,11 +5,11 @@ import {
   getAssociatedConfigurationById,
   updateAssociatedConfiguration,
   createConfiguration,
-  deleteAssociatedConfiguration,
   createAssociation,
   updateAssociation,
   deleteAssociation,
 } from "@/services/configurations/associations";
+import { deleteConfiguration } from "@/services/configurations";
 import {
   ConfigurationAssociation,
   AssociatedConfiguration,
@@ -83,12 +83,12 @@ export function useCreateAssociatedConfiguration() {
   });
 }
 
-// Delete configuration mutation
-export function useDeleteAssociatedConfiguration() {
+// Delete configuration mutation (uses generic configuration service)
+export function useDeleteConfiguration() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (configId: string) => deleteAssociatedConfiguration(configId),
+    mutationFn: (configId: string) => deleteConfiguration(configId),
     onSuccess: (_, configId) => {
       // Remove from cache
       queryClient.removeQueries({ queryKey: ["associatedConfiguration", configId] });
@@ -145,11 +145,11 @@ export function useDeleteAssociation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ sourceConfigId, associationId }: { sourceConfigId: string; associationId: string }) =>
-      deleteAssociation(sourceConfigId, associationId),
-    onSuccess: (_, { sourceConfigId }) => {
+    mutationFn: (associationId: string) => deleteAssociation(associationId),
+    onSuccess: () => {
+      // Invalidate all association queries since we don't know which config was affected
       queryClient.invalidateQueries({ 
-        queryKey: ["configurationAssociations", sourceConfigId] 
+        queryKey: ["configurationAssociations"] 
       });
       toast.success("Associação removida com sucesso!");
     },
@@ -165,7 +165,7 @@ export function useAssociatedConfigurationsManager(configId: string) {
   const associations = useConfigurationAssociations(configId);
   const updateMutation = useUpdateAssociatedConfiguration();
   const createMutation = useCreateAssociatedConfiguration();
-  const deleteMutation = useDeleteAssociatedConfiguration();
+  const deleteMutation = useDeleteConfiguration();
   const createAssociationMutation = useCreateAssociation();
   const updateAssociationMutation = useUpdateAssociation();
   const deleteAssociationMutation = useDeleteAssociation();

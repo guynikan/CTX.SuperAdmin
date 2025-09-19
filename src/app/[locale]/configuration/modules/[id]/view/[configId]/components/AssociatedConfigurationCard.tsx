@@ -74,10 +74,7 @@ export default function AssociatedConfigurationCard({
 
   const handleDelete = async () => {
     try {
-      await deleteAssociationMutation.mutateAsync({
-        sourceConfigId: association.sourceConfigurationId,
-        associationId: association.id,
-      });
+      await deleteAssociationMutation.mutateAsync(association.id);
       setDeleteDialogOpen(false);
     } catch (error) {
       console.error("Error deleting association:", error);

@@ -18,6 +18,13 @@ export const getConfigurationById = async (id: string): Promise<Configuration | 
   });
 };
 
+export const deleteConfiguration = async (id: string): Promise<void> => {
+  return await httpService<void>({
+    path: `/api/Configuration/${id}`,
+    options: { method: "DELETE" },
+  });
+};
+
 export const createConfigurationRuleSet = async (configurationId: string, ruleSet: RuleSet) => {
   return await httpService<Partial<RuleSet>>({
     path: `/api/ConfigurationRule/configuration/${configurationId}/ruleset`,

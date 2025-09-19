@@ -54,20 +54,12 @@ export const createConfiguration = async (
   });
 };
 
-// Delete a configuration
-export const deleteAssociatedConfiguration = async (configId: string): Promise<void> => {
-  await httpService<void>({
-    path: `${BASE_PATH}/${configId}`,
-    options: { method: "DELETE" },
-  });
-};
-
 // Create an association between configurations
 export const createAssociation = async (
   data: CreateAssociation
 ): Promise<ConfigurationAssociation | undefined> => {
   return await httpService<ConfigurationAssociation>({
-    path: "/api/configurations/associations",
+    path: "/api/configuration/associations",
     options: {
       method: "POST",
       body: JSON.stringify({
@@ -85,7 +77,7 @@ export const updateAssociation = async (
   isActive: boolean
 ): Promise<ConfigurationAssociation | undefined> => {
   return await httpService<ConfigurationAssociation>({
-    path: `/api/configurations/associations/${associationId}`,
+    path: `/api/configuration/associations/${associationId}`,
     options: {
       method: "PUT",
       body: JSON.stringify({
@@ -99,11 +91,11 @@ export const updateAssociation = async (
 
 // Delete an association
 export const deleteAssociation = async (
-  sourceConfigId: string,
   associationId: string
 ): Promise<void> => {
+  debugger
   await httpService<void>({
-    path: `${BASE_PATH}/${sourceConfigId}/associations/${associationId}`,
+    path: `/api/configuration/associations/${associationId}`,
     options: { method: "DELETE" },
   });
 };
