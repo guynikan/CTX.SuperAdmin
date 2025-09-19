@@ -10,6 +10,7 @@ import { useDictionary } from "@/i18n/DictionaryProvider";
 
 const schema = yup.object().shape({
   title: yup.string().required("O título é obrigatório"),
+  slug: yup.string().required("O slug é obrigatório"),
   description: yup.string().optional(),
   configurationTypeId: yup.string().required("O tipo de configuração é obrigatório"),
 });
@@ -30,6 +31,7 @@ export default function CreateConfigurationModal({ open, onClose, onSubmit, init
     resolver: yupResolver(schema),
     defaultValues: initialData || {
       title: "",
+      slug: "",
       description: "",
       configurationTypeId: "",
     },
@@ -53,6 +55,13 @@ export default function CreateConfigurationModal({ open, onClose, onSubmit, init
             control={control}
             render={({ field }) => (
               <TextField {...field} label="Título" fullWidth margin="normal" error={!!errors.title} helperText={errors.title?.message} />
+            )}
+          />
+          <Controller
+            name="slug"
+            control={control}
+            render={({ field }) => (
+              <TextField {...field} label="Slug" fullWidth margin="normal" error={!!errors.slug} helperText={errors.slug?.message} />
             )}
           />
           <Controller
