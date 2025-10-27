@@ -1,5 +1,5 @@
 import { httpService } from "@/services/http";
-import { Configuration, CreateConfiguration } from "@/types/configuration";
+import { Configuration, CreateConfiguration, UpdateConfiguration } from "@/types/configuration";
 
 export const createConfiguration = async (configuration: CreateConfiguration): Promise<Configuration | undefined> => {
   return await httpService<Configuration>({
@@ -15,6 +15,16 @@ export const getConfigurationById = async (id: string): Promise<Configuration | 
   return await httpService<Configuration>({
     path: `/api/Configuration/${id}`,
     options: { method: "GET" },
+  });
+};
+
+export const updateConfiguration = async (id: string, configuration: UpdateConfiguration): Promise<Configuration | undefined> => {
+  return await httpService<Configuration>({
+    path: `/api/Configuration/${id}`,
+    options: {
+      method: "PUT",
+      body: JSON.stringify(configuration),
+    },
   });
 };
 

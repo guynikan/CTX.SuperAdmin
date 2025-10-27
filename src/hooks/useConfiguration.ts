@@ -3,8 +3,9 @@ import { toast } from "react-toastify";
 import {
   createConfiguration,
   getConfigurationById,
+  updateConfiguration,
 } from "@/services/configurations";
-import { CreateConfiguration } from "@/types/configuration";
+import { CreateConfiguration, UpdateConfiguration } from "@/types/configuration";
 import { getConfigurationTypes } from "@/services/configurations/types";
 
 export function useConfigurationTypes() {
@@ -35,6 +36,31 @@ export function useCreateConfiguration() {
     },
     onError: () => {
       toast.error("Erro ao criar configuração.");
+    },
+  });
+}
+
+export function useUpdateConfiguration() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ configId, data }: { configId: string; data: UpdateConfiguration }) =>
+      updateConfiguration(configId, data),
+    onSuccess: (updatedConfig, { configId }) => {
+      // Update the specific configuration cache
+      queryClient.setQueryData(["configuration", configId], updatedConfig);
+      
+      // Invalidate configurations list to refresh any summaries
+      queryClient.invalidateQueries({ 
+        queryKey: ["configurations"],
+        refetchType: "active" 
+      });
+      
+      toast.success("Configuração atualizada com sucesso!");
+    },
+    onError: (error) => {
+      console.error("Error updating configuration:", error);
+      toast.error("Erro ao atualizar configuração.");
     },
   });
 }

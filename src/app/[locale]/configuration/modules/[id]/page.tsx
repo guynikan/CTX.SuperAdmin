@@ -21,6 +21,7 @@ import { useParams } from "next/navigation";
 
 import CreateModuleModal from "../../../modules/components/CreateModal";
 import CreateConfigurationModal from "./CreateConfigurationModal";
+import ConfigurationListItem from "./components/ConfigurationListItem";
 import { useCreateConfiguration } from "@/hooks/useConfiguration";
 import { CreateConfiguration } from "@/types/configuration";
 
@@ -90,6 +91,7 @@ export default function ModulePageDetail() {
     }
   };
 
+
   return (
     <Box sx={styles.container}>
       {isLoading ? (
@@ -150,17 +152,13 @@ export default function ModulePageDetail() {
               <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2, textAlign: "left" }}>
                 {dictionary?.configurationListTitle}
               </Typography>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 {module.configurations.map((config) => (
-                  <Button
+                  <ConfigurationListItem
                     key={config.id}
-                    href={`/configuration/modules/${module.id}/view/${config.id}`}
-                    variant="outlined"
-                    size="small"
-                    sx={{ justifyContent: "flex-start" }}
-                  >
-                    {config.title}
-                  </Button>
+                    config={config}
+                    moduleId={module.id}
+                  />
                 ))}
               </Box>
             </Paper>

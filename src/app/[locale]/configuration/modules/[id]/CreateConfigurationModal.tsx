@@ -8,17 +8,31 @@ import { CreateConfiguration } from "@/types/configuration";
 import { useConfigurationTypes } from "@/hooks/useConfiguration";
 import { useDictionary } from "@/i18n/DictionaryProvider";
 
+type FormData = {
+  title: string;
+  slug: string;
+  description?: string;
+  configurationTypeId: string;
+  moduleId?: string;
+  baseConfigurationId?: string | null;
+};
+
 const schema = yup.object().shape({
   title: yup.string().required("O título é obrigatório"),
+  slug: yup.string()
+    .required("O slug é obrigatório")
+    .matches(/^[a-z0-9_]+$/, "Slug deve conter apenas letras minúsculas, números e underscores"),
   description: yup.string().optional(),
   configurationTypeId: yup.string().required("O tipo de configuração é obrigatório"),
+  moduleId: yup.string().optional(),
+  baseConfigurationId: yup.string().nullable().optional(),
 });
 
 type ConfigurationModalProps = {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: CreateConfiguration) => void;
-  initialData?: Partial<CreateConfiguration>;
+  onSubmit: (data: FormData) => void;
+  initialData?: Partial<FormData>;
 };
 
 export default function CreateConfigurationModal({ open, onClose, onSubmit, initialData }: ConfigurationModalProps) {
@@ -26,10 +40,11 @@ export default function CreateConfigurationModal({ open, onClose, onSubmit, init
   const { dictionary: translations } = useDictionary();
   const dictionary = translations.modules;
 
-  const { control, handleSubmit, reset, formState: { errors } } = useForm<Partial<CreateConfiguration>>({
+  const { control, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: initialData || {
       title: "",
+      slug: "",
       description: "",
       configurationTypeId: "",
     },
@@ -45,7 +60,7 @@ export default function CreateConfigurationModal({ open, onClose, onSubmit, init
   return (
     <Modal open={open} onClose={handleClose}>
       <Box sx={styles.modalContainer}>
-        <Typography variant="h6">{dictionary?.newConfiguration}</Typography>
+        <Typography variant="h6">Nova Configuração</Typography>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <Controller
@@ -53,6 +68,20 @@ export default function CreateConfigurationModal({ open, onClose, onSubmit, init
             control={control}
             render={({ field }) => (
               <TextField {...field} label="Título" fullWidth margin="normal" error={!!errors.title} helperText={errors.title?.message} />
+            )}
+          />
+          <Controller
+            name="slug"
+            control={control}
+            render={({ field }) => (
+              <TextField 
+                {...field} 
+                label="Slug" 
+                fullWidth 
+                margin="normal" 
+                error={!!errors.slug} 
+                helperText={errors.slug?.message || "Apenas letras minúsculas, números e underscores"}
+              />
             )}
           />
           <Controller
