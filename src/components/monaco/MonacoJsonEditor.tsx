@@ -6,6 +6,7 @@ import { editor } from 'monaco-editor'
 import { Box, CircularProgress, Alert } from '@mui/material'
 import { useMonaco } from './MonacoProvider'
 import { registerTemplateExpressionProvider } from './providers/templateExpressionProvider'
+import { useSchemaService } from '@/hooks/useSchemaService'
 
 interface TemplateError {
   line: number
@@ -35,9 +36,36 @@ export const MonacoJsonEditor: React.FC<MonacoJsonEditorProps> = ({
   onValidationChange
 }) => {
   const { isMonacoReady, monaco } = useMonaco()
+  const schemaService = useSchemaService()
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
   const [validationErrors, setValidationErrors] = useState<editor.IMarker[]>([])
   const [templateErrors, setTemplateErrors] = useState<TemplateError[]>([])
+  const [resolvedSchema, setResolvedSchema] = useState<object | null>(null)
+  const [schemaError, setSchemaError] = useState<string | null>(null)
+
+  // Resolver schemas ctx:// quando o schema mudar
+  useEffect(() => {
+    if (!schema) {
+      setResolvedSchema(null)
+      setSchemaError(null)
+      return
+    }
+
+    const resolveSchema = async () => {
+      try {
+        setSchemaError(null)
+        const resolved = await schemaService.resolveAllReferences(schema)
+        setResolvedSchema(resolved)
+      } catch (error) {
+        console.error('Failed to resolve schema references:', error)
+        setSchemaError(error instanceof Error ? error.message : 'Unknown error')
+        // Fallback: usar schema original sem resolver referências
+        setResolvedSchema(schema)
+      }
+    }
+
+    resolveSchema()
+  }, [schema, schemaService])
 
   // Register basic autocomplete provider when Monaco is ready
   useEffect(() => {
@@ -52,7 +80,7 @@ export const MonacoJsonEditor: React.FC<MonacoJsonEditorProps> = ({
 
   // Configure JSON schema when available
   useEffect(() => {
-    if (monaco && schema && editorRef.current) {
+    if (monaco && resolvedSchema && editorRef.current) {
       const model = editorRef.current.getModel()
       if (model) {
         // Configure schema for JSON validation and autocomplete using Monaco's built-in JSON language service
@@ -65,7 +93,7 @@ export const MonacoJsonEditor: React.FC<MonacoJsonEditorProps> = ({
           schemas: [{
             uri: 'http://json-schema.org/draft-07/schema#',
             fileMatch: [model.uri.toString()],
-            schema: schema
+            schema: resolvedSchema
           }]
         })
         
@@ -83,7 +111,7 @@ export const MonacoJsonEditor: React.FC<MonacoJsonEditorProps> = ({
         })
       }
     }
-  }, [monaco, schema])
+  }, [monaco, resolvedSchema])
 
   // Handle editor mount
   const handleEditorDidMount: OnMount = (editor, monaco) => {
@@ -216,15 +244,26 @@ export const MonacoJsonEditor: React.FC<MonacoJsonEditorProps> = ({
       </Box>
 
       {/* Validation and template errors display */}
-      {(validationErrors.length > 0 || templateErrors.length > 0) && (
+      {(validationErrors.length > 0 || templateErrors.length > 0 || schemaError) && (
         <Box mt={1}>
+          {/* Schema resolution errors */}
+          {schemaError && (
+            <Alert
+              severity="warning"
+              variant="outlined"
+              sx={{ mb: 1, fontSize: '0.875rem' }}
+            >
+              Schema resolution warning: {schemaError}
+            </Alert>
+          )}
+          
           {/* Schema validation errors */}
           {validationErrors.slice(0, 3).map((error, index) => (
             <Alert
               key={`schema-${index}`}
               severity="error"
               variant="outlined"
-              sx={{ mt: index > 0 ? 1 : 0, fontSize: '0.875rem' }}
+              sx={{ mt: (schemaError || index > 0) ? 1 : 0, fontSize: '0.875rem' }}
             >
               Line {error.startLineNumber}: {error.message}
             </Alert>
@@ -236,7 +275,7 @@ export const MonacoJsonEditor: React.FC<MonacoJsonEditorProps> = ({
               key={`template-${index}`}
               severity="warning"
               variant="outlined"
-              sx={{ mt: (validationErrors.length > 0 || index > 0) ? 1 : 0, fontSize: '0.875rem' }}
+              sx={{ mt: (schemaError || validationErrors.length > 0 || index > 0) ? 1 : 0, fontSize: '0.875rem' }}
             >
               Line {error.line}: {error.message} ({error.context})
             </Alert>
