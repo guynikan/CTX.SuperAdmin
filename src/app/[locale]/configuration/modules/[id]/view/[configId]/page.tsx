@@ -1,19 +1,56 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import EditIcon from '@mui/icons-material/Edit';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import SaveIcon from '@mui/icons-material/Save';
 
-import { useConfigurationById } from "@/hooks/useConfiguration";
-import ConfigurationViewer from "./components/ConfigurationViewer";
+import { useConfigurationById, useUpdateConfiguration } from "@/hooks/useConfiguration";
+import ConfigurationViewer, { ConfigurationViewerRef } from "./components/ConfigurationViewer";
+import { toast } from "react-toastify";
 
 export default function ConfigurationViewPage() {
   const { id: moduleId, configId } = useParams();
   const { data: configuration, isLoading, error } = useConfigurationById(String(configId));
-  const [isEditMode, setIsEditMode] = useState(false);
+  const updateConfigurationMutation = useUpdateConfiguration();
+  const [isSaving, setIsSaving] = useState(false);
+  const configurationViewerRef = useRef<ConfigurationViewerRef>(null);
+
+  const handleSave = async (updatedData: {
+    data: any;
+    metadata: any;
+    title?: string;
+    description?: string;
+    slug?: string;
+    expression?: string;
+  }) => {
+    if (!configuration) return;
+    
+    setIsSaving(true);
+    try {
+      await updateConfigurationMutation.mutateAsync({
+        configId: configuration.id,
+        data: {
+          configurationTypeId: configuration.configurationTypeId,
+          moduleId: configuration.moduleId,
+          title: updatedData.title || configuration.title,
+          description: updatedData.description || configuration.description,
+          slug: updatedData.slug || configuration.slug,
+          expression: updatedData.expression || configuration.expression,
+          data: updatedData.data,
+          metadata: updatedData.metadata,
+          isActive: configuration.isActive,
+        }
+      });
+      toast.success("Configuração salva com sucesso!");
+    } catch (error) {
+      console.error("Error saving configuration:", error);
+      toast.error("Erro ao salvar configuração");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -50,7 +87,7 @@ export default function ConfigurationViewPage() {
   }
 
   return (
-    <Box sx={{ maxWidth: "1200px", margin: "0 auto", padding: 2 }}>
+    <Box sx={{ padding: 2 }}>
       {/* Header com navegação */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -74,25 +111,23 @@ export default function ConfigurationViewPage() {
         </Box>
 
         <Button
-          onClick={() => setIsEditMode(!isEditMode)}
-          startIcon={isEditMode ? <VisibilityIcon /> : <EditIcon />}
+          onClick={() => {
+            configurationViewerRef.current?.save();
+          }}
+          startIcon={<SaveIcon />}
           variant="contained"
-          color={isEditMode ? "secondary" : "primary"}
+          color="primary"
+          disabled={isSaving}
         >
-          {isEditMode ? "Modo Visualização" : "Editar Configuração"}
+          {isSaving ? "Salvando..." : "Salvar"}
         </Button>
       </Box>
 
       {/* Componente de visualização */}
       <ConfigurationViewer 
+        ref={configurationViewerRef}
         configuration={configuration} 
-        isEditMode={isEditMode}
-        onSave={(updatedData) => {
-          // TODO: Implementar chamada da API para salvar
-          console.log("Saving configuration:", updatedData);
-          setIsEditMode(false);
-        }}
-        onCancel={() => setIsEditMode(false)}
+        onSave={handleSave}
       />
     </Box>
   );

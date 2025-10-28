@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, forwardRef, useImperativeHandle } from "react";
 import {
   Box,
   Paper,
@@ -8,17 +8,16 @@ import {
   Tabs,
   Typography,
   Chip,
+  TextField,
+  Button,
   Grid,
   Card,
   CardContent,
-  Button,
 } from "@mui/material";
 import { MonacoJsonEditor } from '@/components/monaco/MonacoJsonEditor';
 import { MonacoEditorProvider } from '@/components/monaco/MonacoEditorProvider';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import InfoIcon from '@mui/icons-material/Info';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Cancel';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 import { Configuration } from "@/types/configuration";
@@ -26,9 +25,18 @@ import AssociatedConfigurationsModal from './AssociatedConfigurationsModal';
 
 interface ConfigurationViewerProps {
   configuration: Configuration;
-  isEditMode?: boolean;
-  onSave?: (updatedData: { data: any; metadata: any }) => void;
-  onCancel?: () => void;
+  onSave?: (updatedData: { 
+    data: any; 
+    metadata: any; 
+    title?: string;
+    description?: string;
+    slug?: string;
+    expression?: string;
+  }) => void;
+}
+
+export interface ConfigurationViewerRef {
+  save: () => void;
 }
 
 enum ViewerTabs {
@@ -39,37 +47,34 @@ enum ViewerTabs {
   PREVIEW = 4,
 }
 
-export default function ConfigurationViewer({ 
+const ConfigurationViewer = forwardRef<ConfigurationViewerRef, ConfigurationViewerProps>(({ 
   configuration, 
-  isEditMode = false, 
   onSave, 
-  onCancel 
-}: ConfigurationViewerProps) {
+}, ref) => {
   const [activeTab, setActiveTab] = useState(ViewerTabs.DATA);
   const [editedData, setEditedData] = useState(configuration.data);
   const [editedMetadata, setEditedMetadata] = useState(configuration.metadata);
   const [associationsModalOpen, setAssociationsModalOpen] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-
-  // Ensure editedData is properly initialized when isEditMode changes
-  useEffect(() => {
-    if (isEditMode) {
-      setEditedData(configuration.data || {});
-      setEditedMetadata(configuration.metadata || {});
-    }
-  }, [isEditMode, configuration.data, configuration.metadata]);
+  const [editedTitle, setEditedTitle] = useState(configuration.title);
+  const [editedDescription, setEditedDescription] = useState(configuration.description || "");
+  const [editedSlug, setEditedSlug] = useState(configuration.slug || "");
+  const [editedExpression, setEditedExpression] = useState(configuration.expression || "");
 
   const handleSave = () => {
-    onSave?.({ data: editedData, metadata: editedMetadata });
-    setHasUnsavedChanges(false);
+    onSave?.({ 
+      data: editedData, 
+      metadata: editedMetadata,
+      title: editedTitle,
+      description: editedDescription,
+      slug: editedSlug,
+      expression: editedExpression,
+    });
   };
 
-  const handleCancel = () => {
-    setEditedData(configuration.data);
-    setEditedMetadata(configuration.metadata);
-    setHasUnsavedChanges(false);
-    onCancel?.();
-  };
+
+  useImperativeHandle(ref, () => ({
+    save: handleSave,
+  }));
 
   const handleExportJson = () => {
     const dataToExport = {
@@ -111,25 +116,17 @@ export default function ConfigurationViewer({
       {/* Header da configuração */}
       <Paper sx={{ p: 3, mb: 3 }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-          <Box sx={{ flex: 1 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-              <Typography variant="h6" component="h2">
-                {configuration.title}
-              </Typography>
+        <Box sx={{ flex: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+            <TextField
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              variant="outlined"
+              size="small"
+              placeholder="Título da configuração"
+              sx={{ minWidth: 300 }}
+            />
               <Box sx={{ display: "flex", gap: 1 }}>
-                <Chip
-                  label={`v${configuration.version}`}
-                  size="small"
-                  color="primary"
-                  variant="outlined"
-                />
-                {configuration.slug && (
-                  <Chip
-                    label={configuration.slug}
-                    size="small"
-                    variant="outlined"
-                  />
-                )}
                 <Chip
                   label={configuration.isActive ? "Ativo" : "Inativo"}
                   size="small"
@@ -146,9 +143,41 @@ export default function ConfigurationViewer({
               </Box>
             </Box>
 
-            <Typography variant="body1" color="text.secondary" gutterBottom>
-              {configuration.description}
-            </Typography>
+            <TextField
+              value={editedDescription}
+              onChange={(e) => setEditedDescription(e.target.value)}
+              variant="outlined"
+              size="small"
+              placeholder="Descrição da configuração"
+              multiline
+              rows={2}
+              fullWidth
+              sx={{ mb: 2 }}
+            />
+
+            {/* Slug e Expression */}
+            <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+              <TextField
+                label="Slug"
+                value={editedSlug}
+                onChange={(e) => setEditedSlug(e.target.value)}
+                variant="outlined"
+                size="small"
+                placeholder="exemplo_slug"
+                sx={{ flex: 1 }}
+              />
+              <TextField
+                label="Expression"
+                value={editedExpression}
+                onChange={(e) => setEditedExpression(e.target.value)}
+                variant="outlined"
+                size="small"
+                multiline
+                rows={2}
+                placeholder="Ex: $segment.locale == 'en_us'"
+                sx={{ flex: 2 }}
+              />
+            </Box>
 
             <Typography variant="caption" color="text.secondary">
               Tipo: {configuration.configurationType.name} • 
@@ -189,7 +218,6 @@ export default function ConfigurationViewer({
           <Tab label="Dados (JSON)" />
           <Tab label="Metadados" />
           <Tab label="Schemas" />
-          <Tab label="Informações" />
           <Tab label="Preview" />
         </Tabs>
 
@@ -200,38 +228,12 @@ export default function ConfigurationViewer({
               <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                 <Box>
                   <Typography variant="h6" gutterBottom>
-                    Dados da Configuração {isEditMode && "(Modo Edição)"}
+                    Dados da Configuração
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {isEditMode 
-                      ? "Edite os dados da configuração. Você pode adicionar, remover e modificar valores."
-                      : "Conteúdo principal da configuração em formato JSON"
-                    }
+                    Edite os dados da configuração. Você pode adicionar, remover e modificar valores.
                   </Typography>
                 </Box>
-                
-                {isEditMode && (
-                  <Box sx={{ display: "flex", gap: 1 }}>
-                    <Button
-                      onClick={handleSave}
-                      startIcon={<SaveIcon />}
-                      variant="contained"
-                      color="primary"
-                      size="small"
-                    >
-                      Salvar
-                    </Button>
-                    <Button
-                      onClick={handleCancel}
-                      startIcon={<CancelIcon />}
-                      variant="outlined"
-                      color="secondary"
-                      size="small"
-                    >
-                      Cancelar
-                    </Button>
-                  </Box>
-                )}
               </Box>
               
               <MonacoEditorProvider
@@ -244,19 +246,18 @@ export default function ConfigurationViewer({
                     cacheTypes: true
                   },
                   theme: 'vs-dark',
-                  readOnly: !isEditMode,
+                  readOnly: false,
                   wordWrap: true,
                   minimap: false
                 }}
               >
                 <MonacoJsonEditor
-                  value={JSON.stringify(isEditMode ? (editedData || {}) : (configuration.data || {}), null, 2)}
+                  value={JSON.stringify(editedData || {}, null, 2)}
                   onChange={(value) => {
-                    if (isEditMode && value) {
+                    if (value) {
                       try {
                         const parsedData = JSON.parse(value);
                         setEditedData(parsedData);
-                        setHasUnsavedChanges(true);
                       } catch (error) {
                         // Handle JSON parsing errors gracefully
                         console.warn('Invalid JSON entered:', error);
@@ -276,38 +277,12 @@ export default function ConfigurationViewer({
               <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                 <Box>
                   <Typography variant="h6" gutterBottom>
-                    Metadados da Configuração {isEditMode && "(Modo Edição)"}
+                    Metadados da Configuração
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {isEditMode 
-                      ? "Edite os metadados da configuração. Adicione informações contextuais e organizacionais."
-                      : "Informações adicionais sobre a configuração"
-                    }
+                    Edite os metadados da configuração. Adicione informações contextuais e organizacionais.
                   </Typography>
                 </Box>
-
-                {isEditMode && (
-                  <Box sx={{ display: "flex", gap: 1 }}>
-                    <Button
-                      onClick={handleSave}
-                      startIcon={<SaveIcon />}
-                      variant="contained"
-                      color="primary"
-                      size="small"
-                    >
-                      Salvar
-                    </Button>
-                    <Button
-                      onClick={handleCancel}
-                      startIcon={<CancelIcon />}
-                      variant="outlined"
-                      color="secondary"
-                      size="small"
-                    >
-                      Cancelar
-                    </Button>
-                  </Box>
-                )}
               </Box>
               
               <MonacoEditorProvider
@@ -320,19 +295,18 @@ export default function ConfigurationViewer({
                     cacheTypes: true
                   },
                   theme: 'vs-dark',
-                  readOnly: !isEditMode,
+                  readOnly: false,
                   wordWrap: true,
                   minimap: false
                 }}
               >
                 <MonacoJsonEditor
-                  value={JSON.stringify(isEditMode ? (editedMetadata || {}) : (configuration.metadata || {}), null, 2)}
+                  value={JSON.stringify(editedMetadata || {}, null, 2)}
                   onChange={(value) => {
-                    if (isEditMode && value) {
+                    if (value) {
                       try {
                         const parsedData = JSON.parse(value);
                         setEditedMetadata(parsedData);
-                        setHasUnsavedChanges(true);
                       } catch (error) {
                         // Handle JSON parsing errors gracefully
                         console.warn('Invalid JSON entered:', error);
@@ -423,130 +397,6 @@ export default function ConfigurationViewer({
               </Grid>
             </Box>
           )}
-
-          {/* Tab 4: Informações Gerais */}
-          {activeTab === ViewerTabs.INFO && (
-            <Box>
-              <Typography variant="h6" gutterBottom>
-                Informações Gerais
-              </Typography>
-              
-              <Grid container spacing={3}>
-                {/* Informações da Configuração */}
-                <Grid item xs={12} md={6}>
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6" gutterBottom>
-                        Detalhes da Configuração
-                      </Typography>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" fontWeight="bold">ID:</Typography>
-                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                            {configuration.id}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" fontWeight="bold">Versão:</Typography>
-                          <Typography variant="body2">{configuration.version}</Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" fontWeight="bold">Slug:</Typography>
-                          <Typography variant="body2">{configuration.slug || 'N/A'}</Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" fontWeight="bold">Status:</Typography>
-                          <Typography variant="body2">
-                            {configuration.isActive ? 'Ativo' : 'Inativo'}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" fontWeight="bold">Tem Regras:</Typography>
-                          <Typography variant="body2">
-                            {configuration.hasRule ? 'Sim' : 'Não'}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" fontWeight="bold">Criado:</Typography>
-                          <Typography variant="body2">
-                            {new Date(configuration.createdAt).toLocaleString('pt-BR')}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" fontWeight="bold">Atualizado:</Typography>
-                          <Typography variant="body2">
-                            {new Date(configuration.updatedAt).toLocaleString('pt-BR')}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                {/* Informações do Módulo */}
-                <Grid item xs={12} md={6}>
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6" gutterBottom>
-                        Módulo
-                      </Typography>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" fontWeight="bold">Nome:</Typography>
-                          <Typography variant="body2">{configuration.module.name}</Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" fontWeight="bold">Descrição:</Typography>
-                          <Typography variant="body2">{configuration.module.description}</Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" fontWeight="bold">Nível:</Typography>
-                          <Typography variant="body2">{configuration.module.level}</Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" fontWeight="bold">Status:</Typography>
-                          <Typography variant="body2">
-                            {configuration.module.isActive ? 'Ativo' : 'Inativo'}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                {/* Informações do Tipo */}
-                <Grid item xs={12}>
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6" gutterBottom>
-                        Tipo de Configuração
-                      </Typography>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" fontWeight="bold">Nome:</Typography>
-                          <Typography variant="body2">{configuration.configurationType.name}</Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" fontWeight="bold">Slug:</Typography>
-                          <Typography variant="body2">{configuration.configurationType.slug}</Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" fontWeight="bold">Descrição:</Typography>
-                          <Typography variant="body2">{configuration.configurationType.description}</Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" fontWeight="bold">Status:</Typography>
-                          <Typography variant="body2">
-                            {configuration.configurationType.isActive ? 'Ativo' : 'Inativo'}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              </Grid>
-            </Box>
-          )}
         </Box>
       </Paper>
 
@@ -562,4 +412,6 @@ export default function ConfigurationViewer({
       />
     </Box>
   );
-}
+});
+
+export default ConfigurationViewer;

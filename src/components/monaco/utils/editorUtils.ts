@@ -65,18 +65,9 @@ export const configureEditorOptions = (
     formatOnType: true,
     suggestOnTriggerCharacters: true,
     
-    // Autocomplete configuration
-    wordBasedSuggestions: 'off', // Disable to avoid conflicts with custom providers
-    quickSuggestions: {
-      other: 'on', // ✅ FIXED: Enable for template expressions
-      comments: 'off', 
-      strings: 'on'
-    },
+    // Autocomplete configuration - word suggestions are disabled globally in MonacoProvider
+    // Only custom providers (like $locale) will show suggestions
     suggest: {
-      filterGraceful: true, // ✅ FIXED: More flexible filtering
-      showWords: false,
-      showSnippets: false,
-      showKeywords: false,
       insertMode: 'replace'
     },
     suggestSelection: 'first',

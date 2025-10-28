@@ -26,6 +26,7 @@ export type Configuration = {
   isActive: boolean;
   hasRule: boolean;
   rule: Rule | null;
+  expression?: string | null; // ← ADICIONAR
   createdAt: string;
   updatedAt: string;
   configurationType: ConfigurationType;
@@ -70,3 +71,12 @@ export type CreateConfiguration = Pick<Configuration, "title" | "description" | 
 };
 
 export type CreateConfigurationType = Pick<ConfigurationType, "name" | "slug" | "description" | "dataSchema" | "metadataSchema">;
+
+export type UpdateConfiguration = Pick<Configuration, "configurationTypeId" | "moduleId" | "title" | "description" | "isActive"> & {
+  slug?: string;
+  baseConfigurationId?: string | null;
+  version?: string;
+  metadata?: Record<string, any>;
+  data?: Record<string, any>;
+  expression?: string | null; // ← ADICIONAR
+};
