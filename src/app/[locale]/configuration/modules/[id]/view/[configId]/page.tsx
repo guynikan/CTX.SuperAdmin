@@ -43,7 +43,6 @@ export default function ConfigurationViewPage() {
           isActive: configuration.isActive,
         }
       });
-      toast.success("Configuração salva com sucesso!");
     } catch (error) {
       console.error("Error saving configuration:", error);
       toast.error("Erro ao salvar configuração");

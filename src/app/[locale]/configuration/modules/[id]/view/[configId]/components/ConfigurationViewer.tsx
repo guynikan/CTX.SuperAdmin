@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, forwardRef, useImperativeHandle } from "react";
+import { useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import {
   Box,
   Paper,
@@ -59,6 +59,16 @@ const ConfigurationViewer = forwardRef<ConfigurationViewerRef, ConfigurationView
   const [editedDescription, setEditedDescription] = useState(configuration.description || "");
   const [editedSlug, setEditedSlug] = useState(configuration.slug || "");
   const [editedExpression, setEditedExpression] = useState(configuration.expression || "");
+
+  // Sync state when configuration changes
+  useEffect(() => {
+    setEditedData(configuration.data);
+    setEditedMetadata(configuration.metadata);
+    setEditedTitle(configuration.title);
+    setEditedDescription(configuration.description || "");
+    setEditedSlug(configuration.slug || "");
+    setEditedExpression(configuration.expression || "");
+  }, [configuration]);
 
   const handleSave = () => {
     onSave?.({ 
