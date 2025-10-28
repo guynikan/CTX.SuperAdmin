@@ -46,7 +46,8 @@ export default function SegmentTypesPage() {
   };
 
   const columns: GridColDef[] = [
-    { field: "name", headerName: dictionary?.configuration?.table?.name, width: 320 },
+    { field: "name", headerName: dictionary?.configuration?.table?.name, width: 250 },
+    { field: "slug", headerName: dictionary?.configuration?.table?.slug, width: 200 },
     { field: "description", headerName: dictionary?.configuration?.table?.description, width: 350 },
     {
       field: "actions",

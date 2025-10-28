@@ -42,6 +42,7 @@ export default function ModulePageDetail() {
 
   const [configurationData, setConfigurationData] = useState({
     title: "",
+    slug: "",
     description: "",
     configurationTypeId: "",
   });
@@ -54,18 +55,20 @@ export default function ModulePageDetail() {
   const handleAddConfiguration = async (configurationData: CreateConfiguration) => {
     setLoading(true);
     try {
-      const { title, description, configurationTypeId } = configurationData;
+      const { title, slug, description, configurationTypeId } = configurationData;
       const configResponse = await createConfigurationMutation.mutateAsync({
         title,
+        slug,
         description,
         configurationTypeId,
         moduleId: id as string,
+        baseConfigurationId: null,
       });
 
       if (configResponse) {
         setConfigModalOpen(false);
-        setConfigurationData({ title: "", description: "", configurationTypeId: "" });
-        window.location.href = `/configuration/modules/${id}/new?&config_id=${configResponse?.id}`;
+        setConfigurationData({ title: "", slug: "", description: "", configurationTypeId: "" });
+        window.location.href = `/configuration/modules/${id}/view/${configResponse?.id}`;
       }
     } catch (error) {
       console.error("Erro ao adicionar Módulo:", error);

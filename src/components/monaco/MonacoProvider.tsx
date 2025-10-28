@@ -60,6 +60,51 @@ export const MonacoProvider: React.FC<MonacoProviderProps> = ({ children }) => {
           enableSchemaRequest: true
         })
 
+        // ===== GLOBAL MONACO EDITOR CONFIGURATION =====
+        
+        // Disable built-in JSON completion globally (we use custom providers)
+        monacoInstance.languages.json.jsonDefaults.setModeConfiguration({
+          documentFormattingEdits: true,
+          documentRangeFormattingEdits: true,
+          completionItems: false, // Disable built-in completion globally
+          hovers: true,
+          documentSymbols: true,
+          tokens: true,
+          colors: true,
+          foldingRanges: true,
+          diagnostics: true
+        })
+
+        // Helper function to apply word suggestion settings to editors
+        const applyWordSuggestionSettings = (editor: any) => {
+          editor.updateOptions({
+            quickSuggestions: {
+              other: 'off',      // Disable word-based suggestions
+              comments: 'off',   // Disable comment suggestions
+              strings: 'on'      // Keep string suggestions for JSON values
+            },
+            suggest: {
+              showWords: false,      // Disable word suggestions
+              showSnippets: false,   // Disable snippet suggestions
+              showKeywords: false,   // Disable keyword suggestions
+              filterGraceful: false  // Use strict filtering
+            }
+          })
+        }
+
+        // Apply settings to all existing editors
+        monacoInstance.editor.getEditors().forEach(applyWordSuggestionSettings)
+
+        // Hook into editor creation to apply settings to new editors
+        const originalCreate = monacoInstance.editor.create
+        monacoInstance.editor.create = (domElement: HTMLElement, options: any, override?: any) => {
+          const editor = originalCreate.call(monacoInstance.editor, domElement, options, override)
+          if (editor.getModel()?.getLanguageId() === 'json') {
+            applyWordSuggestionSettings(editor)
+          }
+          return editor
+        }
+
         // Register completion providers and other language features
         // (These will be registered later by specific components)
 

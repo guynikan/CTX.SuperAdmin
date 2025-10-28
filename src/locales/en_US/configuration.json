@@ -2,6 +2,7 @@
   "title": "All Configuration Types",
   "table": {
     "name": "Name",
+    "slug": "Slug",
     "description": "Description",
     "metadataSchema": "Metadata Schema",
     "dataSchema": "Data Schema",
@@ -12,6 +13,8 @@
     "titleEdit": "Edit Configuration Type",
     "validations":{
       "nameRequired": "Name is required",
+      "slugRequired": "Slug is required",
+      "slugInvalid": "Slug must contain only lowercase letters, numbers, and underscore",
       "metadataSchemaRequired": "MetaData is required",
       "dataSchemaRequired": "Data Schema is required"
     }

@@ -18,6 +18,13 @@ export const getConfigurationById = async (id: string): Promise<Configuration | 
   });
 };
 
+export const deleteConfiguration = async (id: string): Promise<void> => {
+  return await httpService<void>({
+    path: `/api/Configuration/${id}`,
+    options: { method: "DELETE" },
+  });
+};
+
 export const updateConfiguration = async (id: string, configuration: UpdateConfiguration): Promise<Configuration | undefined> => {
   return await httpService<Configuration>({
     path: `/api/Configuration/${id}`,

@@ -5,7 +5,9 @@ import { Editor, OnChange, OnMount } from '@monaco-editor/react'
 import { editor } from 'monaco-editor'
 import { Box, CircularProgress, Alert } from '@mui/material'
 import { useMonaco } from './MonacoProvider'
-import { registerTemplateExpressionProvider } from './providers/templateExpressionProvider'
+import { useMonacoEditor } from './MonacoEditorProvider'
+import { createTemplateExpressionProvider } from './providers/templateExpressionProviderFactory'
+import { configureEditorOptions } from './utils/editorUtils'
 import { useSchemaService } from '@/hooks/useSchemaService'
 
 interface TemplateError {
@@ -36,6 +38,7 @@ export const MonacoJsonEditor: React.FC<MonacoJsonEditorProps> = ({
   onValidationChange
 }) => {
   const { isMonacoReady, monaco } = useMonaco()
+  const context = useMonacoEditor()
   const schemaService = useSchemaService()
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
   const [validationErrors, setValidationErrors] = useState<editor.IMarker[]>([])
@@ -67,16 +70,26 @@ export const MonacoJsonEditor: React.FC<MonacoJsonEditorProps> = ({
     resolveSchema()
   }, [schema, schemaService])
 
-  // Register basic autocomplete provider when Monaco is ready
+  // Register template expression provider when context is ready
   useEffect(() => {
-    if (!monaco || !isMonacoReady) return
+    if (!context.state.isReady || !context.config.autocomplete?.enabled) {
+      return
+    }
 
-    const disposable = registerTemplateExpressionProvider(monaco, configId, setTemplateErrors)
+    console.log('🔌 [MonacoJsonEditor] Registering template expression provider')
+    const provider = createTemplateExpressionProvider(
+      context.state.autocompleteTypes,
+      context.actions.getAutocompleteSuggestions,
+      setTemplateErrors
+    )
+    
+    const disposable = context.actions.registerCustomProvider(provider)
     
     return () => {
+      console.log('🧹 [MonacoJsonEditor] Disposing template expression provider')
       disposable.dispose()
     }
-  }, [monaco, isMonacoReady, configId])
+  }, [context.state.isReady, context.state.autocompleteTypes, context.config.autocomplete?.enabled])
 
   // Configure JSON schema when available
   useEffect(() => {
@@ -97,18 +110,8 @@ export const MonacoJsonEditor: React.FC<MonacoJsonEditorProps> = ({
           }]
         })
         
-        // Enable all JSON language features including autocomplete
-        jsonDefaults.setModeConfiguration({
-          documentFormattingEdits: true,
-          documentRangeFormattingEdits: true,
-          completionItems: true,
-          hovers: true,
-          documentSymbols: true,
-          tokens: true,
-          colors: true,
-          foldingRanges: true,
-          diagnostics: true
-        })
+        // JSON language features are configured globally in MonacoProvider
+        // No need to override here since global settings handle word suggestions
       }
     }
   }, [monaco, resolvedSchema])
@@ -117,38 +120,12 @@ export const MonacoJsonEditor: React.FC<MonacoJsonEditorProps> = ({
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor
 
-    // Configure editor options for JSON editing
-    editor.updateOptions({
-      minimap: { enabled: false },
-      lineNumbers: 'on',
-      roundedSelection: false,
-      scrollBeyondLastLine: false,
-      automaticLayout: true,
-      tabSize: 2,
-      insertSpaces: true,
-      wordWrap: 'on',
-      formatOnPaste: true,
-      formatOnType: true,
-      suggestOnTriggerCharacters: true,
-      // Disable word-based suggestions to avoid conflicts with custom providers
-      wordBasedSuggestions: 'off',
-      quickSuggestions: {
-        other: 'off',
-        comments: 'off', 
-        strings: 'on'
-      },
-      suggest: {
-        filterGraceful: false,
-        showWords: false,
-        showSnippets: false,
-        showKeywords: false,
-        insertMode: 'replace'
-      },
-      suggestSelection: 'first',
-      parameterHints: {
-        enabled: true,
-        cycle: false
-      },
+    // Configure editor options using centralized configuration
+    configureEditorOptions(editor, {
+      readOnly,
+      wordWrap: true,
+      minimap: false,
+      autocomplete: context.config.autocomplete
     })
 
     // Listen for validation changes

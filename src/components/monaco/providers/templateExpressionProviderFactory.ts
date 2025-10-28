@@ -1,14 +1,19 @@
-import { editor, languages, Position, IRange, IDisposable } from 'monaco-editor'
-import { fetchAutocompleteTypes } from '@/services/autocompleteTypesService'
-import { fetchAutocompleteSuggestions } from '@/services/autocompleteSuggestionsService'
-import { AutocompleteTypeInfo, TemplateError, TemplateErrorCallback, ExpressionPrefixType } from '@/types/autocomplete'
+import { editor, languages, Position, IRange } from 'monaco-editor'
+import { AutocompleteTypeInfo, TemplateError, ExpressionPrefixType } from '@/types/autocomplete'
+import { AutocompleteSuggestion } from '@/services/autocompleteSuggestionsService'
 
+/**
+ * Check if cursor is inside a template expression {{ }}
+ */
 const isInsideTemplateExpression = (textBeforeCursor: string): boolean => {
   const openTemplates = (textBeforeCursor.match(/\{\{/g) || []).length
   const closeTemplates = (textBeforeCursor.match(/\}\}/g) || []).length
   return openTemplates > closeTemplates
 }
 
+/**
+ * Get the range to replace for autocomplete insertion
+ */
 const getInsertRange = (position: Position, partial: string = ''): IRange => ({
   startLineNumber: position.lineNumber,
   endLineNumber: position.lineNumber,
@@ -16,30 +21,36 @@ const getInsertRange = (position: Position, partial: string = ''): IRange => ({
   endColumn: position.column,
 })
 
-const parseTemplateContext = (textBeforeCursor: string): { context: string; path: string[]; endsWithDot: boolean; partial: string } => {
+/**
+ * Parse template context from text before cursor
+ */
+const parseTemplateContext = (textBeforeCursor: string): { 
+  context: string; 
+  path: string[]; 
+  endsWithDot: boolean; 
+  partial: string 
+} => {
   const dotMatch = textBeforeCursor.match(/\{\{\s*\$(\w+)((?:\.(\w+))*)(\.)\s*$/)
   if (dotMatch) {
     const [, context, pathString] = dotMatch
-    // Remove leading dot and split: ".menu.header" → ["menu", "header"] 
     const path = pathString ? pathString.replace(/^\./, '').split('.').filter(p => p.length > 0) : []
     return { context: `$${context}`, path, endsWithDot: true, partial: '' }
   }
   
   const contextPartialMatch = textBeforeCursor.match(/\{\{\s*(\$\w+)\s*$/)
   if (contextPartialMatch) {
-    const [, partialContext] = contextPartialMatch  // Inclui o $ agora
+    const [, partialContext] = contextPartialMatch
     return { context: '', path: [], endsWithDot: false, partial: partialContext }
   }
   
   const pathPartialMatch = textBeforeCursor.match(/\{\{\s*\$(\w+)((?:\.(\w+))*)\.([\w]*)\s*$/)
   if (pathPartialMatch) {
     const [, context, pathString, , partialWord] = pathPartialMatch
-    // Remove leading dot and split: ".menu.header" → ["menu", "header"]
     const path = pathString ? pathString.replace(/^\./, '').split('.').filter(p => p.length > 0) : []
     return { context: `$${context}`, path, endsWithDot: false, partial: partialWord }
   }
   
-  // Detectar $ sozinho ({{ $)
+  // Detect $ alone ({{ $)
   const dollarOnlyMatch = textBeforeCursor.match(/\{\{\s*\$\s*$/)
   if (dollarOnlyMatch) {
     return { context: '', path: [], endsWithDot: false, partial: '$' }
@@ -48,16 +59,31 @@ const parseTemplateContext = (textBeforeCursor: string): { context: string; path
   return { context: '', path: [], endsWithDot: false, partial: '' }
 }
 
-const getTemplateExpressionSuggestions = async (textBeforeCursor: string, range: IRange): Promise<languages.CompletionItem[]> => {
+/**
+ * Convert prefix to API type string - simply remove the $
+ */
+const getApiTypeString = (prefix: string): string => {
+  return prefix.replace('$', '') // "$locale" → "locale", "$segment" → "segment"
+}
+
+/**
+ * Create template expression suggestions using context data
+ */
+const createTemplateExpressionSuggestions = async (
+  textBeforeCursor: string, 
+  range: IRange,
+  availableTypes: AutocompleteTypeInfo[],
+  getSuggestions: (type: string, prefix?: string) => Promise<AutocompleteSuggestion[]>
+): Promise<languages.CompletionItem[]> => {
   const { context, path, endsWithDot, partial } = parseTemplateContext(textBeforeCursor)
   
-  // If no types available from API, no autocomplete
+  // If no types available from context, no autocomplete
   if (availableTypes.length === 0) {
     return []
   }
   
   if (!context && partial) {
-    // Se partial é '$' sozinho, mostrar todos os prefixes
+    // If partial is '$' alone, show all prefixes
     if (partial === '$') {
       return availableTypes.map(type => ({
         label: type.prefix,
@@ -69,7 +95,7 @@ const getTemplateExpressionSuggestions = async (textBeforeCursor: string, range:
       }))
     }
     
-    // Se partial já inclui $ (ex: '$segment'), filtrar diretamente
+    // If partial already includes $ (ex: '$segment'), filter directly
     if (partial.startsWith('$')) {
       const filteredTypes = availableTypes
         .filter(type => type.prefix.toLowerCase().startsWith(partial.toLowerCase()))
@@ -84,7 +110,7 @@ const getTemplateExpressionSuggestions = async (textBeforeCursor: string, range:
       }))
     }
     
-    // Legacy: partial sem $ (ex: 'segment') - adicionar $ para filtering
+    // Legacy: partial without $ (ex: 'segment') - add $ for filtering
     const filteredTypes = availableTypes
       .filter(type => type.prefix.toLowerCase().startsWith(`$${partial.toLowerCase()}`))
     
@@ -99,7 +125,7 @@ const getTemplateExpressionSuggestions = async (textBeforeCursor: string, range:
   }
   
   if (!context && !partial) {
-    // Show all available types from API
+    // Show all available types from context
     return availableTypes.map(type => ({
       label: type.prefix,
       kind: languages.CompletionItemKind.Variable,
@@ -110,7 +136,7 @@ const getTemplateExpressionSuggestions = async (textBeforeCursor: string, range:
     }))
   }
   
-  // Check if context is valid according to API types
+  // Check if context is valid according to available types
   const contextType = availableTypes.find(type => type.prefix === context)
   if (context && !contextType) {
     return []
@@ -120,20 +146,11 @@ const getTemplateExpressionSuggestions = async (textBeforeCursor: string, range:
   if (contextType && !endsWithDot && partial) {
     if (contextType.expressionPrefixType === ExpressionPrefixType.AssociatedConfig) {
       // Call API to get suggestions, then filter by partial
-      if (!currentConfigId) {
-        return [] // No configId available
-      }
-      
       const prefix = path.join('.')
       const apiTypeString = getApiTypeString(contextType.prefix)
       
       try {
-        const suggestions = await fetchAutocompleteSuggestions(
-          currentConfigId,
-          apiTypeString,
-          prefix,
-          100
-        )
+        const suggestions = await getSuggestions(apiTypeString, prefix)
         
         // Filter suggestions by partial
         const filteredSuggestions = suggestions.filter(suggestion => 
@@ -204,21 +221,11 @@ const getTemplateExpressionSuggestions = async (textBeforeCursor: string, range:
       }
     } else if (contextType.expressionPrefixType === ExpressionPrefixType.AssociatedConfig) {
       // AssociatedConfig types ($locale, $route, etc.) → use dynamic suggestions from API
-      if (!currentConfigId) {
-        return [] // No configId available
-      }
-      
-      // Build prefix from path: [] → "", ["menu"] → "menu", ["menu", "header"] → "menu.header"
       const prefix = path.join('.')
       const apiTypeString = getApiTypeString(contextType.prefix)
       
       try {
-        const suggestions = await fetchAutocompleteSuggestions(
-          currentConfigId,
-          apiTypeString, // Simple conversion: "$locale" → "locale"
-          prefix, // "" for first level, "menu" for second level, "menu.header" for third, etc.
-          100
-        )
+        const suggestions = await getSuggestions(apiTypeString, prefix)
         
         let filteredSuggestions = suggestions
         if (partial) {
@@ -250,50 +257,13 @@ const getTemplateExpressionSuggestions = async (textBeforeCursor: string, range:
   return []
 }
 
-// ⚠️ LEGACY PROVIDER - This file is being phased out
-// New implementation uses templateExpressionProviderFactory.ts
-// These global variables are kept for backward compatibility during migration
-
-let templateErrorCallback: TemplateErrorCallback | null = null
-let lastValidationText = ''
-let availableTypes: AutocompleteTypeInfo[] = [] // API data with complete type info
-let isLoadingTypes = false
-let currentConfigId: string | null = null // Store configId for API calls
-
 /**
- * Convert prefix to API type string - simply remove the $
+ * Validate template expressions in the model
  */
-const getApiTypeString = (prefix: string): string => {
-  return prefix.replace('$', '') // "$locale" → "locale", "$segment" → "segment"
-}
-
-/**
- * Load available autocomplete types from API
- */
-const loadAvailableTypes = async (configId: string): Promise<void> => {
-  if (isLoadingTypes) return
-  
-  isLoadingTypes = true
-  currentConfigId = configId // Store configId for later use
-  
-  try {
-    console.log('📡 Loading autocomplete types for configId:', configId)
-    const types = await fetchAutocompleteTypes(configId)
-    
-    // Use API data directly - if empty, no autocomplete available
-    availableTypes = types || []
-    console.log('✅ Available types loaded:', availableTypes.length, availableTypes.map(t => t.prefix))
-  } catch (error) {
-    console.error('❌ Failed to load autocomplete types from API - template autocomplete disabled:', error)
-    // No fallback - if API fails, no autocomplete
-    availableTypes = []
-  } finally {
-    isLoadingTypes = false
-  }
-}
-
-
-const validateTemplateExpressions = (model: editor.ITextModel): TemplateError[] => {
+const validateTemplateExpressions = (
+  model: editor.ITextModel,
+  availableTypes: AutocompleteTypeInfo[]
+): TemplateError[] => {
   const errors: TemplateError[] = []
   const lineCount = model.getLineCount()
   
@@ -307,7 +277,7 @@ const validateTemplateExpressions = (model: editor.ITextModel): TemplateError[] 
       const parts = fullExpression.split('.')
       const context = parts[0]
       
-      // Check against available types from API
+      // Check against available types from context
       const contextType = availableTypes.find(type => type.prefix === context)
       if (!contextType) {
         errors.push({
@@ -317,75 +287,63 @@ const validateTemplateExpressions = (model: editor.ITextModel): TemplateError[] 
         })
         continue
       }
-      
-      // For now, skip detailed path validation since we only have flat properties
-      // Future enhancement: could validate against contextType.properties
     }
   }
   
   return errors
 }
 
-const provideCompletionItems = async (
-  model: editor.ITextModel,
-  position: Position
-): Promise<languages.CompletionList | null> => {
-  
-  if (templateErrorCallback) {
-    const currentText = model.getValue()
-    if (currentText !== lastValidationText) {
-      lastValidationText = currentText
-      const templateErrors = validateTemplateExpressions(model)
-      templateErrorCallback(templateErrors)
-    }
-  }
-  
-  const currentLine = model.getLineContent(position.lineNumber)
-  const textBeforeCursor = currentLine.substring(0, position.column - 1)
-  
-  if (isInsideTemplateExpression(textBeforeCursor)) {
-    const { partial } = parseTemplateContext(textBeforeCursor)
-    const range = getInsertRange(position, partial)
-    const suggestions = await getTemplateExpressionSuggestions(textBeforeCursor, range)
-    
-    return {
-      suggestions,
-      incomplete: false
-    }
-  }
-  
-  return null
-}
-
 /**
- * @deprecated This provider is being replaced by createTemplateExpressionProvider from templateExpressionProviderFactory.ts
- * Use MonacoEditorProvider with context-based architecture instead.
+ * Factory function to create a template expression provider using context data
  */
-export const registerTemplateExpressionProvider = (
-  monaco: typeof import('monaco-editor'),
-  configId?: string,
-  errorCallback?: TemplateErrorCallback
-): IDisposable => {
+export const createTemplateExpressionProvider = (
+  availableTypes: AutocompleteTypeInfo[],
+  getSuggestions: (type: string, prefix?: string) => Promise<AutocompleteSuggestion[]>,
+  onTemplateErrors?: (errors: TemplateError[]) => void
+): languages.CompletionItemProvider => {
   
-  console.warn('⚠️ DEPRECATED: registerTemplateExpressionProvider is deprecated. Use MonacoEditorProvider with createTemplateExpressionProvider instead.')
-  console.log('🚀 Registering legacy template provider for configId:', configId)
+  let lastValidationText = ''
   
-  templateErrorCallback = errorCallback || null
-  
-  // Load available types if configId is provided
-  if (configId) {
-    loadAvailableTypes(configId).catch(error => {
-      console.error('❌ Failed to initialize autocomplete types:', error)
-    })
+  const provideCompletionItems = async (
+    model: editor.ITextModel,
+    position: Position
+  ): Promise<languages.CompletionList | null> => {
+    
+    // Validate template expressions if callback provided
+    if (onTemplateErrors) {
+      const currentText = model.getValue()
+      if (currentText !== lastValidationText) {
+        lastValidationText = currentText
+        const templateErrors = validateTemplateExpressions(model, availableTypes)
+        onTemplateErrors(templateErrors)
+      }
+    }
+    
+    const currentLine = model.getLineContent(position.lineNumber)
+    const textBeforeCursor = currentLine.substring(0, position.column - 1)
+    
+    if (isInsideTemplateExpression(textBeforeCursor)) {
+      const { partial } = parseTemplateContext(textBeforeCursor)
+      const range = getInsertRange(position, partial)
+      const suggestions = await createTemplateExpressionSuggestions(
+        textBeforeCursor, 
+        range, 
+        availableTypes,
+        getSuggestions
+      )
+      
+      return {
+        suggestions,
+        incomplete: false
+      }
+    }
+    
+    return null
   }
-  
-  const triggerCharacters = ['.', '"', '{', ':', ' ', '$']
-  
-  const provider: languages.CompletionItemProvider = {
-    triggerCharacters,
+
+  return {
+    triggerCharacters: ['.', '"', '{', ':', ' ', '$'],
     provideCompletionItems,
     resolveCompletionItem: (item) => item
   }
-  
-  return monaco.languages.registerCompletionItemProvider('json', provider)
 }
