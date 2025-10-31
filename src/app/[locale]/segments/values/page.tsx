@@ -52,6 +52,23 @@ export default function SegmentValuesPage() {
       },
     },
     {
+      field: "parentSegmentValueId",
+      headerName: "Parent Segment",
+      width: 200,
+      renderCell: (params) => {
+        const parentId = params.row.parentSegmentValueId;
+        const parent = params.row.parent;
+        if (!parentId) {
+          return <Typography variant="body2" color="text.secondary">—</Typography>;
+        }
+        return (
+          <Typography variant="body2" title={parentId}>
+            {parent?.displayName || parent?.value || parentId.substring(0, 8) + '...'}
+          </Typography>
+        );
+      },
+    },
+    {
       field: "actions",
       headerName:  "Ações",
       width: 120,

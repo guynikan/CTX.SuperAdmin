@@ -18,6 +18,9 @@ export type SegmentValue = {
   displayName: string;
   description?: string;
   isActive: boolean;
+  parentSegmentValueId?: string | null;
+  parent?: SegmentValue | null;
+  segmentType?: SegmentType | null;
 };
 
 export type CreateSegmentValue = Pick<SegmentValue, "segmentTypeId" | "value" | "displayName" | "description">;
