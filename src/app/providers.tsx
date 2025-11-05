@@ -3,6 +3,7 @@
 import { ReactNode, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider, CssBaseline } from "@mui/material";
+import { SessionProvider } from "next-auth/react";
 import { Locale } from "@/i18n/config";
 import { DictionaryProvider } from "@/i18n/DictionaryProvider";
 import { MonacoProvider } from "@/components/monaco/MonacoProvider";
@@ -44,17 +45,23 @@ const Providers = ({ children, lang }: ProvidersProps) => {
   });
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <ToastContainer position="top-right" autoClose={3000} />
-        <MonacoProvider>
-          <DictionaryProvider namespaces={["common"]} lang={lang}>
-            {children}
-          </DictionaryProvider>
-        </MonacoProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <SessionProvider
+      refetchInterval={250}
+      refetchOnWindowFocus={true}
+      refetchWhenOffline={false}
+    >
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <ToastContainer position="top-right" autoClose={3000} />
+          <MonacoProvider>
+            <DictionaryProvider namespaces={["common"]} lang={lang}>
+              {children}
+            </DictionaryProvider>
+          </MonacoProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </SessionProvider>
   );
 };
 

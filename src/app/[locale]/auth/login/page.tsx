@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   TextField,
   Button,
@@ -10,6 +11,7 @@ import {
   Link,
   IconButton,
   InputAdornment,
+  Alert,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Grid from "@mui/material/Grid2"; 
@@ -18,15 +20,18 @@ import { useDictionary } from "@/i18n/DictionaryProvider";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { signIn } from "next-auth/react";
 import { ROUTES } from "@/routes";
 
 
 export default function LoginPage() {
-
+  const router = useRouter();
   const {  dictionary: translations } = useDictionary();
   const dictionary = translations.auth;
   
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const schema = yup.object({
     username: yup
@@ -48,9 +53,30 @@ export default function LoginPage() {
     mode: "onTouched",
   });
 
-    const onSubmit = (data: FormValues) => {
-      console.log({data})
-    };
+  const onSubmit = async (data: FormValues) => {
+    setError(null);
+    setLoading(true);
+
+    try {
+      const result = await signIn('credentials', {
+        username: data.username,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError('Invalid credentials. Please try again.');
+        setLoading(false);
+      } else if (result?.ok) {
+        router.push(ROUTES.HOME);
+        router.refresh();
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('An error occurred. Please try again.');
+      setLoading(false);
+    }
+  };
 
   return (
 
@@ -71,6 +97,12 @@ export default function LoginPage() {
             <Typography variant="h5" fontWeight={600}>
               {(dictionary as any)?.signIn || 'Sign In'}
             </Typography>
+
+            {error && (
+              <Alert severity="error" onClose={() => setError(null)}>
+                {error}
+              </Alert>
+            )}
 
             <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
 
@@ -112,6 +144,7 @@ export default function LoginPage() {
                 type="submit"
                 fullWidth
                 variant="contained"
+                disabled={loading}
                 sx={{
                   mt: 2,
                   py: 1.5,
@@ -120,7 +153,7 @@ export default function LoginPage() {
                   "&:hover": { opacity: 0.9 },
                 }}
               >
-                {(dictionary as any)?.signIn} →
+                {loading ? 'Signing in...' : `${(dictionary as any)?.signIn || 'Sign In'} →`}
               </Button>
 
               {/* Esqueci a Senha */}

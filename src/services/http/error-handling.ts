@@ -7,3 +7,8 @@ export const defaultErrorHandling = (error: unknown): never => {
 
   throw new Error("Erro desconhecido. Tente novamente mais tarde.");
 };
+
+export function httpErrorHandling(error: unknown) {
+  console.error(error);
+  return error;
+}

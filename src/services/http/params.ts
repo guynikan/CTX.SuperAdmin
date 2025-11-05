@@ -5,5 +5,6 @@ export interface HttpParams<T = unknown> {
   config?: {
     throwError?: boolean;
     signOutOnUnauthorized?: boolean;
+    injectAccessToken?: boolean;
   };
 }
